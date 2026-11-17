@@ -12,3 +12,5 @@ Ish tugaganda yoki topshirilganda, tegishli rol faylidagi vazifa holati va dalil
 - Loyiha ishga tushirish yoki test buyruqlarini mavjud fayllardan aniqlang. Konfiguratsiya yoki test hali qo‘shilmagan bo‘lsa, buni aniq qayd eting. Natijani Jira vazifasi, o‘zgargan fayllar, bajarilgan tekshiruv va keyingi qadam bilan topshiring.
 
 Chat yoki qo‘lda ish boshlash uchun [AI boshlash matnlari](Подсказка/START.md)dan foydalaning.
+
+Yangi qaror yoki jamoadoshga ta’sir qiladigan o‘zgarishda [birgalikda ishlash tartibiga](Подсказка/COLLABORATION.md) amal qiling. AI variantlar va tavsiya beradi, kelishuv va qaror dalilga tayangan holda yoziladi.
