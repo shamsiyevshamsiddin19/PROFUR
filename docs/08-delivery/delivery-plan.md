@@ -1,27 +1,34 @@
-# Delivery Plan — AI-assisted Team
+# Ishlab chiqish va jamoaviy ish rejasi
 
-## Team structure
-PM: instructor. Team Lead: technical coordination. Three additional engineers: recommended backend/database, admin web, worker mobile; exact assignments TBD.
+## Jamoa
 
-## Current Jira state
-- Four epics: PCRM-1–4.
-- Requirement-backed Stories: PCRM-5–24, PCRM-27–30 (24).
-- PCRM-25 and PCRM-26 flagged duplicates, do not schedule.
-- Planning Tasks: PCRM-31–37.
-- Sprint not started.
+- **PM:** ustoz; muddatlar va buyurtmachi bilan qarorlar.
+- **Jamoa yetakchisi:** texnik reja, integratsiya, tekshiruv va muvofiqlashtirish.
+- **Qolgan uch a'zo:** dastlabki tavsiya — server/ma'lumotlar bazasi, admin veb-ilovasi, ishchilar mobil ilovasi. Yakuniy taqsimot kelishilmagan.
+- **Ish usuli:** AI yordamida kod yaratish; natijani inson ko‘rib chiqishi va testlardan o‘tkazishi shart.
 
-## Proposed stage gates
-1. PM review of open P0 questions.
-2. User stories and approved scope.
-3. Architecture/ERD/API contract review.
-4. GitHub branch protection and AI coding guidelines.
-5. Small vertical slice: receive warehouse material -> persist transaction -> update stock -> test.
-6. Iterative web/mobile integration with code reviews and CI.
-7. Customer UAT and release.
+## Jira bo‘yicha holat
 
-## AI coding review checklist
-- Trace implementation to approved user story.
-- Never paste secrets/customer data into agent prompts.
-- Require automated tests, human review and reproducible run instructions.
-- No direct push to main; use pull requests.
-- Merge only when behavior, security and data invariants pass checks.
+- 4 ta yirik modul (Epic): PCRM-1–4.
+- 24 ta asosiy foydalanuvchi vazifasi: PCRM-5–24, PCRM-27–30.
+- PCRM-25 va PCRM-26 — takroriy vazifalar; sprintga kiritilmaydi.
+- 7 ta tayyorgarlik vazifasi: PCRM-31–37.
+- Sprint hali boshlanmagan.
+
+## Taklif etilayotgan tartib
+
+1. Muhim ochiq savollarni PM va buyurtmachi bilan aniqlashtirish.
+2. Talablar hamda MVP chegarasini tasdiqlash.
+3. Arxitektura, ma'lumotlar modeli va API kelishuvini tekshirish.
+4. GitHub va AI yordamida kod yozish standartlarini belgilash.
+5. Birinchi kichik to‘liq funksiya: omborga kirim → ma'lumotlar bazasi → qoldiq yangilanishi → testlar.
+6. Veb va mobil qismlarni bosqichma-bosqich birlashtirish.
+7. Haqiqiy foydalanuvchilar bilan sinov va ishga tushirish.
+
+## AI yaratgan kodni qabul qilish
+
+- Kod tasdiqlangan Jira vazifasiga mos bo‘lishi kerak.
+- Maxfiy kalitlar va mijoz ma'lumotlari AIga yoki GitHubga joylanmaydi.
+- Avtomatik test, inson tekshiruvi va ishga tushirish yo‘riqnomasi kerak.
+- Asosiy `main` tarmog‘iga bevosita kod yozilmaydi; Pull Request orqali tekshiriladi.
+- Test, xavfsizlik va biznes qoidalaridan o‘tgan o‘zgarishgina birlashtiriladi.
