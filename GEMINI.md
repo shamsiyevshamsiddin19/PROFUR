@@ -1,0 +1,3 @@
+# PROFUR
+
+@./AGENTS.md

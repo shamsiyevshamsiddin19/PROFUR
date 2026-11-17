@@ -11,3 +11,5 @@ Ish statuslari: `Reja` → `Jarayonda` → `Ko‘rikda` → `Bajarildi`. Bog‘l
 Qayd shakli:
 
 `YYYY-MM-DD · PCRM-XX · holat · nima o‘zgardi · tekshiruv / PR · keyingi qadam yoki bloklovchi sabab`
+
+Jira yoki GitHub ulanishi bo‘lmasa, oxirgi lokal qayd qachon yozilganini ko‘rsating va masofaviy holatni tekshirilmagan deb belgilang. Status so‘rovi yoki faylni o‘qishning o‘zi loyiha holatini o‘zgartirmaydi. Qaydlar loyiha ustida ish olib borilgan va tekshiriladigan dalil mavjud bo‘lgan sessiyada yangilanadi.

@@ -11,6 +11,8 @@ PROFUR’ning joriy doirasi — TZning 1-qismi. Jamoa ombor va kirim-chiqim uchu
 
 Jadval vazifa taqsimoti rejasini ko‘rsatadi. Amaldagi ijrochi, vazifa va sprint holati Jira’da tekshiriladi. [PCRM taxtasi](https://shamsiyevshamsiddin19.atlassian.net/jira/software/projects/PCRM/boards/34/backlog)
 
+[AI bilan ish boshlash](START.md) — to‘rt a’zo uchun alohida tayyor matn.
+
 ## Parallel ishlash va birlashtirish
 
 1. **Umumiy asos.** [@jamoliddinusarov1-create](https://github.com/jamoliddinusarov1-create) PCRM-37 doirasida lokal ishga tushirish yo‘riqnomasi, muhit sozlamalari namunalari va CI’ni tayyorlaydi. Ikki backendchi umumiy model va migratsiyalardagi o‘zgarishlarni kelishadi.
