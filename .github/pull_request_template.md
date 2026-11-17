@@ -15,3 +15,5 @@ Qaysi buyruq yoki qabul ssenariysi sinab ko‘rildi? Natija qanday?
 ## Ish qaydi
 
 Подсказка ichidagi tegishli rol faylida holat va dalil yangilandimi?
+
+Bu PR boshqa a’zoning ishiga ta’sir qilsa, kim bilan kelishilganini va Jira yoki muhokama havolasini yozing.
