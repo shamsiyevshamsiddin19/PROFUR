@@ -1,23 +1,27 @@
-# System Architecture — Proposed, Not Approved
+# Tizim arxitekturasi — dastlabki taklif
 
-## Candidate system boundaries
+**Holat:** Hali PM va buyurtmachi tomonidan tasdiqlanmagan.
 
-- **Admin Web App** — warehouse, orders, production monitoring, finances, history.
-- **Worker Mobile App** — role-aware tasks, acceptance, stage progress, material usage.
-- **Backend API** — validation, business rules, authorization, transaction orchestration, calculations.
-- **Relational Database** — persistent catalog, inventory ledger, orders, models, worker activities and accounting data.
-- **Notifications** — task and discrepancy alerts.
+## Tizim tarkibi
 
-## Important invariants
-1. Inventory must never be reduced twice for one physical movement.
-2. Costs depend on the customer-approved stock valuation rule (OQ-001).
-3. Model totals must reconcile with order quantity.
-4. Stage mismatch and excess material require alerts and saved explanations.
-5. A project can close only after packaging and delivery stages.
-6. History must retain historical facts after closure.
-7. Worker data visibility must be enforced in backend authorization, not only UI.
+- **Adminning veb-ilovasi:** ombor, zakazlar, ishlab chiqarishni kuzatish, foyda/zarar va tarix.
+- **Ishchilarning mobil ilovasi:** o‘z vazifalari, vazifani qabul qilish, bajarilgan ish va real material sarfi.
+- **Server API:** ruxsatlar, biznes qoidalari, tekshiruvlar va hisob-kitoblar.
+- **Ma'lumotlar bazasi:** materiallar, kirim-chiqim, loyihalar, modellar, ishlab chiqarish amallari va moliya.
+- **Bildirishnomalar:** yangi vazifa, ortiqcha sarf va bosqichlar soni farqi.
 
-## Decisions not made
-Backend framework, web stack, mobile platform, database engine, hosting, notification provider, offline mode and authentication implementation. Select through documented ADR after P0 business clarification.
+## Buzilmasligi kerak bo‘lgan qoidalar
 
-See [decision log](../09-decisions/decision-log.md).
+1. Bitta material chiqimi qoldiqni ikki marta kamaytirmasligi kerak.
+2. Material tannarxi buyurtmachi tasdiqlagan usulda hisoblanadi.
+3. Model miqdorlari loyiha umumiy miqdoriga solishtiriladi.
+4. Sarf yoki bosqichlar farqi aniqlansa ogohlantirish hamda sabab saqlanadi.
+5. Upakovka va yetkazish tugamasdan loyiha yopilmaydi.
+6. Yopilgan loyiha ma'lumotlari tarixda qoladi.
+7. Har bir ishchining ma'lumotga kirish huquqi serverda ham tekshiriladi.
+
+## Hali tanlanmagan texnologiyalar
+
+Backend freymvorki, veb texnologiya, mobil platforma, ma'lumotlar bazasi, hosting, bildirishnoma xizmati va autentifikatsiya usuli.
+
+[Qarorlar jurnali](../09-decisions/decision-log.md)
