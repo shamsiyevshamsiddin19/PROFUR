@@ -40,6 +40,8 @@ ignore = [
 combine-as-imports = true
 
 [tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["backend"]
 testpaths = ["tests", "backend"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-v --strict-markers"

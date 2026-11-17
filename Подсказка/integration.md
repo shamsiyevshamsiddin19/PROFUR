@@ -22,11 +22,12 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 ## Jamoadoshlarga topshirish (Handoff)
 
-- **Tayyorlangan poydevor:** `feat/PCRM-37-setup-and-ci` tarmog‘ida `.gitignore`, `.env.example`, `pyproject.toml` (Ruff sozlamalari), `docker-compose.yml` (PostgreSQL 16) va GitHub Actions CI tayyorlandi.
-- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [@thealiiheere](https://github.com/thealiiheere)):** PostgreSQL bazani `docker compose up -d` orqali ko‘tarishingiz, Python kodini esa `ruff check .` va `ruff format .` standartlari asosida tekshirishingiz mumkin.
-- **Frontend va Team Leadga (Shamsiddin):** Umumiy CI va lokal ishga tushirish yo‘riqnomasi ko‘rikka taqdim etildi.
+- **Tayyorlangan poydevor:** `backend/` ichida Django + DRF loyihasi, modulli `apps/` arxitekturasi, `requirements.txt`, `tests/test_health.py` (pytest), `pyproject.toml` (Ruff sozlamalari), `docker-compose.yml` (PostgreSQL 16) va GitHub Actions CI to‘liq tayyorlandi.
+- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [@thealiiheere](https://github.com/thealiiheere)):** Django muhiti tayyor. O‘z ilovalaringizni `backend/apps/` papkasiga qo‘shishingiz, PostgreSQL bazani `docker compose up -d` orqali ko‘tarishingiz va testlarni `pytest` bilan ishlatishingiz mumkin.
+- **Frontend va Team Leadga (Shamsiddin):** Django backend asosiy sozlamalari, CORS, `/api/health/` API tekshiruvi va CI ko‘rikka taqdim etildi.
 
 ## Oxirgi qayd
 
-2026-11-17 · PCRM-37 · Ko‘rikda · Mahalliy ishga tushirish yo‘riqnomasi, .env.example, Ruff (pyproject.toml), docker-compose va GitHub Actions CI qo‘shildi · [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) · PR ko‘rikdan o‘tgach birlashtirish va PCRM-32 (Login/ruxsatlar)ga o‘tish
+2026-11-17 · PCRM-37 · Ko‘rikda · Django backend loyihasi, DRF, CORS, requirements.txt, health API va pytest sinovlari to‘liq sozlandi · [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) · PR ko‘rikdan o‘tgach birlashtirish va PCRM-32 (Login/ruxsatlar)ga o‘tish
+
 

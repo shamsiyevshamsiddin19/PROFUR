@@ -21,6 +21,9 @@ cd PROFUR
 # Python virtual muhitini yaratish va faollashtirish (Python 3.11+)
 python3 -m venv .venv
 source .venv/bin/activate
+
+# Bog'liqliklarni o'rnatish
+pip install -r requirements.txt
 ```
 
 ### 2. Muhit sozlamalarini tayyorlash
@@ -30,7 +33,15 @@ cp .env.example .env
 ```
 Zarur bo‘lsa, `.env` ichidagi ma’lumotlar bazasi yoki kalit qiymatlarini tahrirlang.
 
-### 3. Ma’lumotlar bazasini ishga tushirish (PostgreSQL)
+### 3. Serverni ishga tushirish (Backend)
+```bash
+python backend/manage.py migrate
+python backend/manage.py runserver
+```
+Tekshirish uchun brauzerda oching: `http://127.0.0.1:8000/api/health/`
+
+
+### 4. Ma’lumotlar bazasini ishga tushirish (PostgreSQL)
 Docker o‘rnatilgan bo‘lsa, PostgreSQL bazasini bitta buyruq bilan ko‘taring:
 ```bash
 docker compose up -d
@@ -40,12 +51,9 @@ Bazani to‘xtatish uchun:
 docker compose down
 ```
 
-### 4. Kod sifati va formatlash tekshiruvi (Ruff)
+### 5. Kod sifati va formatlash tekshiruvi (Ruff)
 Jamoamizda Python kodi uchun [Ruff](https://docs.astral.sh/ruff/) standart qilib belgilangan:
 ```bash
-# Ruff o'rnatish
-pip install ruff
-
 # Kodni tekshirish (linter)
 ruff check .
 
@@ -56,7 +64,13 @@ ruff check --fix .
 ruff format .
 ```
 
-### 5. Avtomatlashtirilgan tekshiruv (CI)
+### 6. Testlarni ishga tushirish (pytest)
+```bash
+pytest
+```
+
+### 7. Avtomatlashtirilgan tekshiruv (CI)
+
 Har bir ochilgan Pull Request (PR) GitHub Actions orqali avtomatik tarzda quyidagilar bo‘yicha tekshiriladi:
 - Ruff lint va formatlash tekshiruvi
 - Ma’lumotlar bazasi migratsiyalari to‘liqligi (`makemigrations --check`)

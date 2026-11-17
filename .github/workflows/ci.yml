@@ -73,7 +73,7 @@ jobs:
             MANAGE_CMD="python manage.py"
             [ -f "backend/manage.py" ] && MANAGE_CMD="python backend/manage.py"
             $MANAGE_CMD makemigrations --check --dry-run
-            $MANAGE_CMD test
+            pytest
           else
             echo "Kod bazasi hali qo'shilmagan. Dastlabki CI tekshiruvi muvaffaqiyatli."
           fi
