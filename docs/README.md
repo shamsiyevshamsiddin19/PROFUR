@@ -1,31 +1,30 @@
-# PROFUR CRM MVP — Project Documentation
+# PROFUR CRM MVP — Loyiha hujjatlari
 
-**Status:** Draft; architecture and customer decisions not yet approved.  
-**Source:** `Profur_CRM_MVP_TZ.pdf` (9 pages). **Work management:** Jira `PCRM`.  
-**Owner:** Team Lead (4-person AI-assisted engineering team; instructor is PM).
+**Holat:** Dastlabki nusxa. PM va buyurtmachi tasdig‘i kutilmoqda.  
+**Asosiy manba:** `Profur_CRM_MVP_TZ.pdf` (9 sahifa). **Jira:** `PCRM`.
 
-## Directory structure
+## Papkalar
 
-| Folder | Purpose |
+| Papka | Vazifasi |
 |---|---|
-| [00-governance](00-governance/document-control.md) | Document lifecycle, responsibilities, approvals |
-| [01-requirements](01-requirements/open-questions.md) | TZ traceability, clarification questions |
-| [02-business-analysis](02-business-analysis/business-processes.md) | Actors and business workflows |
-| [03-architecture](03-architecture/system-overview.md) | Proposed boundaries and components |
-| [04-diagrams](04-diagrams/diagram-index.md) | Use Case, Activity, Sequence, C4 drafts |
-| [05-data-model](05-data-model/data-model.md) | Initial entities and invariants |
-| [06-api-contract](06-api-contract/api-outline.md) | Proposed API interface boundaries |
-| [07-ux-ui](07-ux-ui/screen-inventory.md) | Web/mobile screen planning |
-| [08-delivery](08-delivery/delivery-plan.md) | Jira and AI-assisted workflow |
-| [09-decisions](09-decisions/decision-log.md) | PM/customer and architecture decisions |
+| [00-governance](00-governance/document-control.md) | Hujjatlarni boshqarish va javobgarlik |
+| [01-requirements](01-requirements/open-questions.md) | Talablar va aniqlashtiriladigan savollar |
+| [02-business-analysis](02-business-analysis/business-processes.md) | Biznes jarayonlari va ishtirokchilar |
+| [03-architecture](03-architecture/system-overview.md) | Tizim arxitekturasi |
+| [04-diagrams](04-diagrams/diagram-index.md) | Foydalanish holatlari va jarayon diagrammalari |
+| [05-data-model](05-data-model/data-model.md) | Ma'lumotlar modeli |
+| [06-api-contract](06-api-contract/api-outline.md) | API kelishuvi |
+| [07-ux-ui](07-ux-ui/screen-inventory.md) | Ekranlar va dizayn rejasi |
+| [08-delivery](08-delivery/delivery-plan.md) | Jamoaviy ish va ishlab chiqish rejasi |
+| [09-decisions](09-decisions/decision-log.md) | Muhim qarorlar jurnali |
 
-**Start here:** [Open Questions Register](01-requirements/open-questions.md) — 48 unanswered questions organized by priority.
+**Boshlang‘ich hujjat:** [48 ta ochiq savol](01-requirements/open-questions.md).
 
-## Status terminology
-- `TZ-CONFIRMED` — explicitly in the original TZ.
-- `USER-PROPOSED` — stated by Team Lead, pending PM/customer confirmation.
-- `TECH-PROPOSED` — engineering suggestion, not a requirement.
-- `OPEN` — unresolved question.
-- `APPROVED` — decision recorded with owner/date.
+## Belgilar
 
-No confidential customer records, passwords or API keys should be committed to this public repository.
+- **TZDA BOR:** Asl texnik topshiriqda ko‘rsatilgan talab.
+- **TAKLIF:** Jamoa taklifi; hali tasdiqlanmagan.
+- **OCHIQ:** Hali qaror qilinmagan.
+- **TASDIQLANGAN:** Mas'ul va tasdiq sanasi qayd etilgan.
+
+Repozitoriy ochiq: maxfiy ma'lumotlar, parollar va kalitlarni joylamang.
