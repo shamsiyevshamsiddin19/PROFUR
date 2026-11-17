@@ -2,6 +2,8 @@
 
 **Holat:** Hali PM va buyurtmachi tomonidan tasdiqlanmagan.
 
+TZning 1-qismi uchun responsive veb-sayt chegarasi, ombor hisobining yaxlitligi va qabul mezonlari [ombor muhandislik rejasida](warehouse-engineering-plan.md) berilgan. Reja taklif holatida. Quyida butun CRM bo‘yicha avvalgi konsepsiya saqlangan.
+
 ## Tizim tarkibi
 
 - **Adminning veb-ilovasi:** ombor, zakazlar, ishlab chiqarishni kuzatish, foyda/zarar va tarix.
