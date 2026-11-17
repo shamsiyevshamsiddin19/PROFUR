@@ -15,11 +15,18 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
 | [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Reja | — |
-| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Jarayonda | feat/PCRM-37-setup-and-ci |
+| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Ko‘rikda | [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) |
 | [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Reja | — |
 
 **Qabul mezoni** — To‘rt jamoadosh loyihani mahalliy ishga tushira oladi. Ruxsatsiz amal rad etiladi. birinchi brauzer sinovida kirim bir marta saqlanib, qoldiq yangilanadi.
 
+## Jamoadoshlarga topshirish (Handoff)
+
+- **Tayyorlangan poydevor:** `feat/PCRM-37-setup-and-ci` tarmog‘ida `.gitignore`, `.env.example`, `pyproject.toml` (Ruff sozlamalari), `docker-compose.yml` (PostgreSQL 16) va GitHub Actions CI tayyorlandi.
+- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [@thealiiheere](https://github.com/thealiiheere)):** PostgreSQL bazani `docker compose up -d` orqali ko‘tarishingiz, Python kodini esa `ruff check .` va `ruff format .` standartlari asosida tekshirishingiz mumkin.
+- **Frontend va Team Leadga (Shamsiddin):** Umumiy CI va lokal ishga tushirish yo‘riqnomasi ko‘rikka taqdim etildi.
+
 ## Oxirgi qayd
 
-2026-11-17 · PCRM-37 · Jarayonda · Mahalliy ishga tushirish yo‘riqnomasi, .env.example, Ruff (pyproject.toml), docker-compose va GitHub Actions CI qo‘shildi · feat/PCRM-37-setup-and-ci · Lokal Ruff tekshiruvini sinash va PR ochish
+2026-11-17 · PCRM-37 · Ko‘rikda · Mahalliy ishga tushirish yo‘riqnomasi, .env.example, Ruff (pyproject.toml), docker-compose va GitHub Actions CI qo‘shildi · [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) · PR ko‘rikdan o‘tgach birlashtirish va PCRM-32 (Login/ruxsatlar)ga o‘tish
+
