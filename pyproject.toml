@@ -1,0 +1,45 @@
+[project]
+name = "profur"
+version = "0.1.0"
+description = "PROFUR ombor va kirim-chiqim boshqaruvi tizimi"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.ruff]
+# Qator uzunligi PEP 8 va zamonaviy standartlar bo'yicha 88 belgi
+line-length = 88
+target-version = "py311"
+
+# Tekshirilmaydigan papkalar
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "node_modules",
+    "*/migrations/*",
+]
+
+[tool.ruff.lint]
+# E / W - PEP 8 xatolari va ogohlantirishlari
+# F - Pyflakes (ishlatilmagan importlar, o'zgaruvchilar)
+# I - isort (importlar tartibi)
+# N - PEP 8 nomlash qoidalari (pep8-naming)
+# UP - Python versiyasiga mos yangilanishlar (pyupgrade)
+# B - Ehtimoliy xatolar (flake8-bugbear)
+# C4 - Qulay ro'yxat/lug'at generatsiyasi (flake8-comprehensions)
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+ignore = [
+    "E501", # Qator uzunligini formatlovchi o'zi hal qiladi
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "backend"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --strict-markers"

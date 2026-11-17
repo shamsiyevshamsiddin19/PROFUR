@@ -15,11 +15,11 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
 | [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Reja | — |
-| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Reja | — |
+| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Jarayonda | feat/PCRM-37-setup-and-ci |
 | [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Reja | — |
 
 **Qabul mezoni** — To‘rt jamoadosh loyihani mahalliy ishga tushira oladi. Ruxsatsiz amal rad etiladi. birinchi brauzer sinovida kirim bir marta saqlanib, qoldiq yangilanadi.
 
 ## Oxirgi qayd
 
-Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha kiriting.
+2026-11-17 · PCRM-37 · Jarayonda · Mahalliy ishga tushirish yo‘riqnomasi, .env.example, Ruff (pyproject.toml), docker-compose va GitHub Actions CI qo‘shildi · feat/PCRM-37-setup-and-ci · Lokal Ruff tekshiruvini sinash va PR ochish
