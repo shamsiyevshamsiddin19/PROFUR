@@ -12,6 +12,13 @@ Backend uchun taklif — Django + DRF + PostgreSQL, bitta ilova ichidagi alohida
 
 Material bitta katalog yozuvi bo‘lib, turli narxda kelgan kirimlar alohida partiya bo‘ladi. Ombor harakati tarix manbasi. Ishlash tezligi uchun qoldiq alohida saqlansa, u harakat bilan ayni tranzaksiyada yangilanadi. Hisobda o‘nlik sonlar ishlatiladi, kirimning asl narxi va valyutasi saqlanadi. Xato operatsiya tasdiqlangan yozuvni o‘zgartirib yuborish o‘rniga sabab va asl yozuvga havolasi bor tuzatish harakati orqali aks etishi taklif qilinadi.
 
+## Kod yozish va tekshirish standarti
+
+- **SOLID.** API so‘rov shaklini tekshiradi va javob beradi. Ombor amali qoldiq, partiya va tasdiqlash qoidalarini bajaradi. Ma’lumotlar bazasi tranzaksiya va cheklovlarni ta’minlaydi. Yangi partiya tanlash usuli kerak bo‘lsa, o‘zgarish shu qoida doirasida qoladi. O‘zaro almashtiriladigan usullar bir xil shartlarga, jumladan manfiy qoldiq va asl narx qoidalariga rioya qiladi. Modullar faqat kerakli amallarni ochadi. Tashqi xizmatlar uchun kichik interfeys ishlatiladi, masalan, kurs manbasi keyin tasdiqlansa. Abstraksiya amaldagi ehtiyojga qarab kiritiladi.
+- **[PEP 8](https://peps.python.org/pep-0008/) va [PEP 257](https://peps.python.org/pep-0257/).** Python kodida to‘rt bo‘shliq bilan chekinish, ma’noli nomlar va tartibli importlar qo‘llanadi. Ochiq funksiyalar va modul chegaralarida tur annotatsiyalari yoziladi. Docstring amaldagi shartlar, qaytariladigan natija va muhim xatolarni tushuntiradi. [Ruff](https://docs.astral.sh/ruff/) qoidalari bitta loyiha konfiguratsiyasida yuritiladi. Format va lint CI’da tekshiriladi.
+- **DRY, KISS va YAGNI.** Qoldiqni tekshirish kabi biznes qoidasi bitta joyda yuritiladi. Kirim va chiqimning umumiy qismi faqat xatti-harakatlari bir xil bo‘lsa ajratiladi. Modul va bog‘liqliklar joriy talabga qarab qo‘shiladi. React/TypeScript tanlansa, qat’iy turlash, lint va build ham CI tekshiruvida bo‘ladi.
+- **PR qabul mezonlari.** Jamoa a’zosi kodni ko‘rib chiqadi. CI format, lint, avtomatik test va PostgreSQL migratsiyalarini tekshiradi. Qoldiq yoki ruxsatga ta’sir qiladigan o‘zgarishga tegishli qabul sinovi qo‘shiladi yoki yangilanadi. Maxfiy qiymatlar repozitoriy va jurnallarga yozilmaydi, foydalanuvchi tushunadigan xato javobi serverdan qaytadi.
+
 ## Qabul mezonlari
 
 | Ssenariy | Tekshiruv natijasi | Mavjud vazifa |
