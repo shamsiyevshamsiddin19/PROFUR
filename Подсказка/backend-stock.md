@@ -1,12 +1,12 @@
 # Backend · Katalog, kirim va qoldiq
 
-**Egasi** — 1-a’zo (ism yoki GitHub logini kiritiladi).
+**Egasi** — [@ozodbek101](https://github.com/ozodbek101).
 
 **Mas’uliyat** — Katalog va qoldiq modellari, migratsiyalar va kirim API’si.
 
 ## Ish tartibi
 
-Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material va partiyani ajrating. Kirim va qoldiqni bitta tranzaksiyada yozing. Qoldiqni o‘zgartiradigan umumiy amalni 2-a’zo bilan kelishing va birgalikda tekshiring.
+Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material va partiyani ajrating. Kirim va qoldiqni bitta tranzaksiyada yozing. Qoldiqni o‘zgartiradigan umumiy amalni @thealiiheere bilan kelishing va birgalikda tekshiring.
 
 ## Vazifalar va holat
 
