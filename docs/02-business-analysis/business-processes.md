@@ -1,22 +1,26 @@
-# Business Processes — Draft
+# Biznes jarayonlari — dastlabki tahlil
 
-## Primary workflow
+## Asosiy ish oqimi
 
-1. Admin creates order/project (client, sum, quantity, deadline).
-2. Add models/variants and material norms.
-3. Calculate planned material needs and availability.
-4. Assign workers by model and production stage.
-5. Worker accepts mobile task and records work/material usage.
-6. Progress: Arra -> Freza -> Shkurka -> Kraska -> Zbor.
-7. Compare actual versus planned usage and stage-to-stage counts; record discrepancies and reasons.
-8. Package finished products, record delivery cost.
-9. Close project and retain historic costs, worker output, payment state and financial statistics.
+1. Admin loyiha yaratadi: mijoz, summa, tumba soni, muddat.
+2. Modellar, razmerlar va material normalari qo‘shiladi.
+3. Rejalashtirilgan material sarfi va narxi hisoblanadi, ombordagi mavjudlik tekshiriladi.
+4. Ishchilarga loyiha va model bo‘yicha vazifa beriladi.
+5. Ishchi mobil ilovada vazifani qabul qiladi va ishlatilgan material hamda bajarilgan ishni qayd etadi.
+6. Ishlab chiqarish: Arra → Freza → Shkurka → Kraska → Zbor.
+7. Normadan ortiq sarf va detallar soni farqi aniqlansa, ogohlantirish berilib, sabab saqlanadi.
+8. Upakovka qilinadi, yetkazib berish narxi kiritiladi.
+9. Loyiha yopiladi, tarix va yakuniy foyda/zarar hisoboti saqlanadi.
 
-## Actors
-- **Admin** — sees active projects, production progress, warehouse and reports (exact permissions to confirm).
-- **Worker** — sees role-relevant tasks, accepts them and records work.
-- **Worker group** — special shared-account case for cutting (per TZ; attribution open).
-- **PM / Customer** — project approval stakeholders, not necessarily software accounts.
+## Ishtirokchilar
 
-## Cross-cutting rules
-All operations should retain time/history as required by TZ. Detail-level access policies are not fully specified. See [open questions](../01-requirements/open-questions.md).
+- **Admin:** ombor, buyurtmalar, ishlab chiqarish va hisobotlar; aniq ruxsatlar kelishiladi.
+- **Ishchi:** o‘ziga tegishli vazifalarni ko‘radi, qabul qiladi, natijani kiritadi.
+- **Ishchilar guruhi:** arrachilar uchun umumiy akkaunt TZda ko‘rsatilgan ehtimoliy yechim.
+- **PM va buyurtmachi:** biznes va loyiha qarorlarini tasdiqlaydi; ular albatta tizim foydalanuvchisi bo‘lishi shart emas.
+
+## Asosiy qoida
+
+Rejalashtirilgan sarf, ombordagi haqiqiy qoldiq va real ishlab chiqarish sarfi o‘zaro bog‘liq bo‘ladi. Har bir amal tarixda saqlanadi.
+
+[Ochiq savollar](../01-requirements/open-questions.md)
