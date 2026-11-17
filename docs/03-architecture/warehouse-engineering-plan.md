@@ -1,4 +1,4 @@
-# PROFUR CRM · Ombor uchun muhandislik rejasi
+# PROFUR · Ombor uchun muhandislik rejasi
 
 **17-noyabr 2026 · Taklif.** Doira — TZning 1-qismi, bitta ombor va telefon, planshet hamda kompyuterga mos veb-sayt. Interfeys noldan quriladi, UZ/RU/EN tanlovi saqlanadi. Manbalar — [OQ reyestri](../01-requirements/open-questions.md), [Jira Sprint 1](https://shamsiyevshamsiddin19.atlassian.net/jira/software/projects/PCRM/boards/34/backlog).
 

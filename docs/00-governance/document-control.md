@@ -2,7 +2,7 @@
 
 | Maydon | Qiymat |
 |---|---|
-| Loyiha | PROFUR CRM MVP |
+| Loyiha | PROFUR MVP |
 | Manba | Profur_CRM_MVP_TZ.pdf — 9 sahifa |
 | Loyiha boshqaruvchisi (PM) | Ustoz |
 | Jamoa yetakchisi | Talabalar jamoasining yetakchisi |

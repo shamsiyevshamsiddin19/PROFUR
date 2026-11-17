@@ -1,4 +1,4 @@
-# PROFUR CRM — OQ-001–OQ-048: Team Lead javoblari
+# PROFUR — OQ-001–OQ-048: Team Lead javoblari
 
 **Sana:** 2026-11-17  
 **Holat:** **TAKLIF / PROPOSED** — PM va buyurtmachi hali tasdiqlamagan  

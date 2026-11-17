@@ -1,4 +1,4 @@
-# PROFUR CRM MVP — Loyiha hujjatlari
+# PROFUR MVP — Loyiha hujjatlari
 
 **Holat:** Dastlabki nusxa. PM va buyurtmachi tasdig‘i kutilmoqda.  
 **Asosiy manba:** `Profur_CRM_MVP_TZ.pdf` (9 sahifa). **Jira:** `PCRM`.
