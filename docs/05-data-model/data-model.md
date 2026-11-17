@@ -1,19 +1,27 @@
-# Data Model — Initial Concepts
+# Ma'lumotlar modeli — dastlabki tushunchalar
 
-Suggested entities (not yet final tables):
+Bu ro‘yxat hali yakuniy ma'lumotlar bazasi jadvallari emas.
 
-- User, Role, Permission, RolePermission (dynamic RBAC still pending PM approval).
-- MaterialCategory, Material, MaterialReceipt, InventoryMovement.
-- Project, ProjectPayment, Model, ModelVariant, MaterialNorm.
-- Worker, WorkTask, WorkLog, ProductionStage, StageDiscrepancy.
-- Expense, PackagingRecord, Delivery, ProjectClosure.
+## Taklif etilgan obyektlar
 
-## Relationships
-- One Project has many Models, Payments, Tasks and Expenses.
-- One Model can have multiple variants and per-detail material norms.
-- InventoryMovement references Material and, where applicable, Project/Worker.
-- WorkLog references Worker/Group, Task, Stage, parts and actual quantities.
-- Closure produces retained project-level financial and production summaries.
+| Yo‘nalish | Obyektlar |
+|---|---|
+| Foydalanuvchilar | Foydalanuvchi, Rol, Ruxsat, RolRuxsati |
+| Ombor | MaterialKategoriyasi, Material, MaterialKirimi, OmborHarakati |
+| Zakaz | Loyiha, To‘lov, Model, ModelRazmeri, MaterialNormasi |
+| Ishlab chiqarish | Ishchi, IshVazifasi, IshQaydi, IshlabChiqarishBosqichi, Nomuvofiqlik |
+| Yakunlash | Xarajat, UpakovkaQaydi, Yetkazish, LoyihaYopilishi |
 
-## Validation risks
-Valuation method, reservation timing, group-account identity, piecework rate, loss and rework behavior are unresolved; avoid finalizing ERD migrations until P0 decisions.
+**Izoh:** Adminning dinamik rol va ruxsatlar yaratishi hali tasdiqlanmagan.
+
+## Asosiy aloqalar
+
+- Bitta loyihaga bir nechta model, to‘lov, vazifa va xarajat tegishli bo‘lishi mumkin.
+- Bitta modelda turli razmer va material normalari bo‘lishi mumkin.
+- Ombor harakati materialga, zarur bo‘lsa loyiha va ishchiga bog‘lanadi.
+- Ish qaydi ishchi yoki guruh, vazifa, bosqich va detal miqdoriga bog‘lanadi.
+- Loyiha yopilgach barcha tarixiy yozuvlar saqlanadi.
+
+## Hali aniqlashtirilmagan masalalar
+
+Tannarx usuli, zaxiraga olish va qoldiqni kamaytirish vaqti, umumiy akkaunt orqali ishni shaxsga bog‘lash, ishbay stavkalar, brak va qayta ishlash qoidalari. Ular aniqlashmaguncha jadvallar yakuniy tasdiqlanmaydi.
