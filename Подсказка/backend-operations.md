@@ -1,12 +1,12 @@
 # Backend · Chiqim va xarajatlar
 
-**Egasi** — 2-a’zo (ism yoki GitHub logini kiritiladi).
+**Egasi** — [@thealiiheere](https://github.com/thealiiheere).
 
 **Mas’uliyat** — Ombor amallari va xarajatlar API’si.
 
 ## Ish tartibi
 
-Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bilan aniqlang. Chiqimda partiya tanlash qarorini PCRM-31 orqali tekshiring. 1-a’zo bilan qoldiq tranzaksiyasi va migratsiyalarni, 3-a’zo bilan tasdiqlovchi ruxsatlarni kelishing.
+Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bilan aniqlang. Chiqimda partiya tanlash qarorini PCRM-31 orqali tekshiring. @ozodbek101 bilan qoldiq tranzaksiyasi va migratsiyalarni, @jamoliddinusarov1-create bilan tasdiqlovchi ruxsatlarni kelishing.
 
 ## Vazifalar va holat
 

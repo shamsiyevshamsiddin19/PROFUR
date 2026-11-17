@@ -1,6 +1,6 @@
 # Login, ruxsatlar, test va CI
 
-**Egasi** — 3-a’zo (ism yoki GitHub logini kiritiladi).
+**Egasi** — [@jamoliddinusarov1-create](https://github.com/jamoliddinusarov1-create).
 
 **Mas’uliyat** — Ishga tushirish yo‘riqnomasi, kirish va ruxsat moduli, CI hamda tizim sinovlari.
 
