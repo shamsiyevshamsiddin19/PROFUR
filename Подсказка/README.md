@@ -15,7 +15,7 @@ Jadval vazifa taqsimoti rejasini ko‘rsatadi. Amaldagi ijrochi, vazifa va sprin
 
 ## Parallel ishlash va birlashtirish
 
-1. **Umumiy asos.** [@jamoliddinusarov1-create](https://github.com/jamoliddinusarov1-create) PCRM-37 doirasida lokal ishga tushirish yo‘riqnomasi, muhit sozlamalari namunalari va CI’ni tayyorlaydi. Ikki backendchi umumiy model va migratsiyalardagi o‘zgarishlarni kelishadi.
+1. **Umumiy asos.** [@jamoliddinusarov1-create](https://github.com/jamoliddinusarov1-create) PCRM-37 doirasida lokal ishga tushirish yo‘riqnomasi, muhit sozlamalari namunalari, docker-compose va CI’ni tayyorladi ([feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci), Ko‘rikda). Jamoadoshlar ushbu poydevor asosida o‘z ishlarini boshlashi mumkin. Ikki backendchi umumiy model va migratsiyalardagi o‘zgarishlarni kelishadi.
 2. **Birinchi oqim.** Siz va [@ozodbek101](https://github.com/ozodbek101) material → kirim → qoldiq uchun API manzillari, maydonlar, javob va xato namunalarini kelishasiz. Shundan so‘ng formani namunaviy javoblar bilan, API’ni esa PostgreSQL bilan parallel qurasiz. [@thealiiheere](https://github.com/thealiiheere) xarajatlar ustida parallel ishlaydi.
 3. **PR tartibi.** Bitta vazifaga bitta qisqa branch, masalan `feat/PCRM-40-receipt-api`. Ketma-ketlik — umumiy asos → katalog va kirim API’si → forma integratsiyasi. Mustaqil xarajatlar PR’i o‘z tekshiruvlaridan o‘tgach shu orada birlashishi mumkin. Bog‘liq PR tavsifida oldin qaysi PR birlashishi ko‘rsatiladi.
 4. **Qabul.** Kamida bir jamoadosh PR’ni ko‘rib chiqadi. Tegishli testlar va migratsiya tekshiruvi o‘tgach birlashtiriladi. Birinchi qabul sinovida telefon orqali kirim yuboriladi, bitta partiya yaratiladi va ekranda qoldiq ko‘rinadi.
