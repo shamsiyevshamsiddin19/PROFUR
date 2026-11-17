@@ -5,7 +5,7 @@
 **Manba:** `Profur_CRM_MVP_TZ.pdf` (9 sahifa), jamoa yetakchisining rollar va ruxsatlarga oid qo‘shimcha talabi  
 **Jira:** [PCRM-31](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-31)
 
-Bu hujjatda savollar keltirilgan, javoblar **hali tasdiqlanmagan**. TZda ko‘rsatilmagan funksiyalar avtomatik ravishda MVPga kiritilmaydi.
+Bu hujjatda 48 savol keltirilgan. Team Leadning 48 ta **dastlabki javobi** [alohida hujjatda](oq-001-048-team-lead-answers.md) saqlangan. Jadvaldagi **OCHIQ** holati PM/buyurtmachi tomonidan **rasmiy tasdiq yo‘qligini** bildiradi, javob umuman berilmaganligini emas. TZda ko‘rsatilmagan funksiyalar avtomatik ravishda MVPga kiritilmaydi.
 
 **Ustuvorlik:** P0 — arxitektura yoki hisob-kitobga bevosita ta’sir qiladi; P1 — asosiy biznes jarayoniga ta’sir qiladi; P2 — UX, infratuzilma yoki operatsion qaror.
 
