@@ -1,15 +1,23 @@
-# API Contract — Draft Boundaries
+# API kelishuvi — dastlabki reja
 
-Proposed resource groups, not final endpoint commitments:
+Bu yerda API guruhlari taklif qilinmoqda. Yakuniy manzillar va javob shakllari hali tasdiqlanmagan.
 
-- Authentication / session and role access
-- Material categories, materials, receipts, inventory movements, stock snapshots
-- Projects, models, variants, material norms, payment terms
-- Production tasks, acceptance, work logs, stage counts, discrepancies
-- Notifications
-- Packaging, delivery, closure, historical reports
+## Asosiy API yo‘nalishlari
 
-## Contract rules
-An API endpoint requires request/response schemas, permission rule, validation, error conditions, transactional semantics and acceptance tests. Worker-owned data must be scoped server-side.
+- Tizimga kirish va foydalanuvchi ruxsatlarini tekshirish.
+- Material kategoriyalari, materiallar, ombor kirimi, chiqimi va qoldig‘i.
+- Loyihalar, modellar, razmerlar, material normalari va to‘lovlar.
+- Ishlab chiqarish vazifalari, qabul qilish, ish qaydlari va bosqichlar farqi.
+- Bildirishnomalar va ogohlantirishlar.
+- Upakovka, yetkazib berish, loyiha yopilishi, tarix va hisobotlar.
 
-Do not implement arbitrary role management or a cost formula until the PM approves the relevant questions.
+## Har bir API uchun aniqlanadigan talablar
+
+- Qanday ma'lumot yuboriladi va qanday javob qaytadi?
+- Qaysi rol uni ishlata oladi?
+- Ma'lumot qanday tekshiriladi?
+- Xato yuz bersa qanday javob beriladi?
+- Bir nechta yozuvni birgalikda o‘zgartirish xavfsizmi?
+- Qanday avtomatik testlar talab qilinadi?
+
+Ishchi faqat o‘ziga ruxsat etilgan ma'lumotlarga kira olishi server tomonida tekshiriladi. Dinamik rollar va tannarx formulasi PM tasdiqlashini kutadi.
