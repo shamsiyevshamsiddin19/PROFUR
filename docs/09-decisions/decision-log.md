@@ -1,24 +1,26 @@
-# Decision Log
+# Qarorlar jurnali
 
-**No architecture or customer scope decisions are yet approved.**
+**Hozircha buyurtmachi talablariga yoki arxitekturaga doir yakuniy qarorlar tasdiqlanmagan.**
 
-| ID | Subject | Status | Owner | Date |
+| ID | Qaror mavzusi | Holat | Mas'ul | Sana |
 |---|---|---|---|---|
-| DEC-001 | Material valuation method | OPEN | PM/customer | — |
-| DEC-002 | Inventory reservation vs actual deduction | OPEN | PM/customer | — |
-| DEC-003 | Dynamic role/permission management | OPEN | PM/customer | — |
-| DEC-004 | Worker group attribution and piecework rates | OPEN | PM/customer | — |
-| DEC-005 | Mobile platform / offline use | OPEN | PM/customer | — |
-| DEC-006 | Technology stack | TECH-PROPOSED | Team Lead + PM | — |
+| Q-001 | Material tannarxini hisoblash usuli | OCHIQ | PM / buyurtmachi | — |
+| Q-002 | Materialni zaxiraga olish va qoldiqdan ayirish vaqti | OCHIQ | PM / buyurtmachi | — |
+| Q-003 | Admin yangi rol va ruxsat yarata olishi | OCHIQ | PM / buyurtmachi | — |
+| Q-004 | Guruh akkauntida shaxsiy hisob va ishbay stavkalar | OCHIQ | PM / buyurtmachi | — |
+| Q-005 | Mobil platforma va internetsiz ishlash | OCHIQ | PM / buyurtmachi | — |
+| Q-006 | Dasturlash texnologiyalarini tanlash | TAKLIF | Jamoa yetakchisi / PM | — |
 
-## Decision template
-- ID:
-- Question reference:
-- Decision and alternatives:
-- Reason:
-- Approved by:
-- Date:
-- Affected documentation/Jira:
-- Status: APPROVED / REJECTED / DEFERRED
+## Qaror qaydi namunasi
 
-See [all open questions](../01-requirements/open-questions.md).
+- Qaror ID:
+- Tegishli savol ID:
+- Qabul qilingan qaror:
+- Ko‘rib chiqilgan boshqa variantlar:
+- Qaror sababi:
+- Kim tasdiqladi:
+- Sana:
+- Ta'sir qiladigan Jira vazifalari va hujjatlar:
+- Holat: TASDIQLANGAN / RAD ETILGAN / KEYINGA QOLDIRILGAN
+
+[Barcha ochiq savollar](../01-requirements/open-questions.md)
