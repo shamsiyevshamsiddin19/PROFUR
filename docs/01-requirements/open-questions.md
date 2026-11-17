@@ -1,4 +1,4 @@
-# PROFUR CRM MVP — Savollar va dastlabki javoblar reyestri
+# PROFUR MVP — Savollar va dastlabki javoblar reyestri
 
 **Holat:** Dastlabki nusxa — PM va buyurtmachi tasdig‘i kutilmoqda  
 **Sana:** 2026-11-17  
