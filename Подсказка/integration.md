@@ -15,7 +15,7 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
 | [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Reja | — |
-| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Ko‘rikda | [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) |
+| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Ko‘rikda | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8) |
 | [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Reja | — |
 
 **Qabul mezoni** — To‘rt jamoadosh loyihani mahalliy ishga tushira oladi. Ruxsatsiz amal rad etiladi. birinchi brauzer sinovida kirim bir marta saqlanib, qoldiq yangilanadi.
@@ -28,6 +28,7 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 ## Oxirgi qayd
 
-2026-11-17 · PCRM-37 · Ko‘rikda · Django backend loyihasi, DRF, CORS, requirements.txt, health API va pytest sinovlari to‘liq sozlandi · [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) · PR ko‘rikdan o‘tgach birlashtirish va PCRM-32 (Login/ruxsatlar)ga o‘tish
+2026-11-17 · PCRM-37 · Ko‘rikda · Django backend loyihasi, DRF, CORS, requirements.txt, health API va pytest sinovlari to‘liq sozlandi · PR [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8) (CI: success) · PR ko‘rikdan o‘tgach birlashtirish va PCRM-32 (Login/ruxsatlar)ga o‘tish
+
 
 
