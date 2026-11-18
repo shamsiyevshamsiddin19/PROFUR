@@ -1,14 +1,8 @@
 import { useState, type FormEvent } from "react";
-import {
-  ApiError,
-  can,
-  write,
-  type Expense,
-  type ExpenseType,
-  type User,
-} from "../api";
+import { can, type Expense, type ExpenseType, type User } from "../api";
 import { translate, type Language } from "../i18n";
 import { localDate, money } from "../format";
+import { useIdempotentWrite } from "../hooks/useIdempotentWrite";
 import { useRecords } from "../hooks/useRecords";
 import { Field, Feedback, Modal, RecordsState } from "../components/WorkflowUI";
 export function Expenses({ lang, user }: { lang: Language; user: User }) {
@@ -29,39 +23,19 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
     revision,
   );
   const types = useRecords<ExpenseType>("/api/v1/expense-types/", lang);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const operation = useIdempotentWrite<Expense>("expenses", user.id, lang);
+  const { busy, error, pending } = operation;
   const [success, setSuccess] = useState(false);
   const [reverse, setReverse] = useState<Expense | null>(null);
-  const storage = `profur.expense.uncertain.${user.id}`;
-  const [uncertain, setUncertain] = useState(() => {
-    try {
-      return sessionStorage.getItem(storage) === "true";
-    } catch {
-      return false;
-    }
-  });
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    setBusy(true);
-    setError(null);
     setSuccess(false);
-    const data = new FormData(form);
-    try {
-      sessionStorage.setItem(storage, "true");
-      await write("/api/v1/expenses/", lang, expenseBody(data));
-      sessionStorage.removeItem(storage);
-      setUncertain(false);
+    const result = await operation.submit(expenseBody(new FormData(form)));
+    if (result) {
       form.reset();
       setSuccess(true);
       setRevision((n) => n + 1);
-    } catch (err) {
-      setError(err);
-      if (!(err instanceof ApiError) || err.status >= 500) setUncertain(true);
-      else sessionStorage.removeItem(storage);
-    } finally {
-      setBusy(false);
     }
   }
   return (
@@ -72,43 +46,42 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
           {t("savedChanges")}
         </div>
       )}
-      {uncertain && (
+      {pending && !busy && (
         <div className="notice" role="alert">
-          <span>{t("expenseUnknown")}</span>
-          <button
-            type="button"
-            onClick={() => {
-              records.reload();
-            }}
-          >
-            {t("refresh")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              sessionStorage.removeItem(storage);
-              setUncertain(false);
-            }}
-          >
-            {t("checkedResult")}
-          </button>
+          {t("locked")}
         </div>
       )}
       {can(user, "expenses.add_expense") && (
         <section className="workflow-panel">
           <h2>{t("expenses")}</h2>
           <form onSubmit={submit}>
-            <fieldset disabled={busy || uncertain}>
+            <fieldset disabled={busy || Boolean(pending)}>
               <ExpenseFields types={types.data} lang={lang} />
             </fieldset>
             <div className="dialog-actions">
               <span>USD</span>
-              <button
-                disabled={busy || uncertain || !types.data.length}
-                className="primary"
-              >
-                {t(busy ? "saving" : "saveChanges")}
-              </button>
+              {pending ? (
+                <button
+                  type="button"
+                  disabled={busy}
+                  className="primary"
+                  onClick={async () => {
+                    if (await operation.submit(null)) {
+                      setSuccess(true);
+                      setRevision((n) => n + 1);
+                    }
+                  }}
+                >
+                  {t(busy ? "saving" : "again")}
+                </button>
+              ) : (
+                <button
+                  disabled={busy || !types.data.length}
+                  className="primary"
+                >
+                  {t(busy ? "saving" : "saveChanges")}
+                </button>
+              )}
             </div>
           </form>
         </section>
@@ -220,6 +193,7 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
       {reverse && (
         <ReverseExpense
           row={reverse}
+          userId={user.id}
           lang={lang}
           types={types.data}
           close={() => setReverse(null)}
@@ -306,12 +280,14 @@ function ExpenseFields({
 }
 function ReverseExpense({
   row,
+  userId,
   lang,
   types,
   close,
   saved,
 }: {
   row: Expense;
+  userId: number;
   lang: Language;
   types: ExpenseType[];
   close: () => void;
@@ -319,24 +295,22 @@ function ReverseExpense({
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   const [correction, setCorrection] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const operation = useIdempotentWrite<{ reversal: Expense }>(
+    `expenses/${row.id}/reverse`,
+    userId,
+    lang,
+  );
+  const { busy, error, pending } = operation;
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    setBusy(true);
-    setError(null);
-    try {
-      await write(`/api/v1/expenses/${row.id}/reverse/`, lang, {
+    if (
+      await operation.submit({
         reason: data.get("reason"),
         ...(correction ? { replacement: expenseBody(data) } : {}),
-      });
+      })
+    )
       saved();
-    } catch (err) {
-      setError(err);
-    } finally {
-      setBusy(false);
-    }
   }
   return (
     <Modal title={t("reverse")} lang={lang} close={close} busy={busy}>
@@ -349,7 +323,12 @@ function ReverseExpense({
       </div>
       <form onSubmit={submit}>
         <Feedback error={error} lang={lang} />
-        <fieldset disabled={busy}>
+        {pending && !busy && (
+          <div className="notice" role="alert">
+            {t("locked")}
+          </div>
+        )}
+        <fieldset disabled={busy || Boolean(pending)}>
           <Field label={t("reason")}>
             <input name="reason" required maxLength={1000} />
           </Field>
@@ -372,9 +351,22 @@ function ReverseExpense({
           >
             {t("cancel")}
           </button>
-          <button disabled={busy} className="primary">
-            {t(busy ? "saving" : "reverse")}
-          </button>
+          {pending ? (
+            <button
+              type="button"
+              disabled={busy}
+              className="primary"
+              onClick={async () => {
+                if (await operation.submit(null)) saved();
+              }}
+            >
+              {t(busy ? "saving" : "again")}
+            </button>
+          ) : (
+            <button disabled={busy} className="primary">
+              {t(busy ? "saving" : "reverse")}
+            </button>
+          )}
         </div>
       </form>
     </Modal>

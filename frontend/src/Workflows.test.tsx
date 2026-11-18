@@ -6,8 +6,10 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { Operations } from "./pages/Operations";
+import { Expenses } from "./pages/Expenses";
 import { App } from "./App";
 import { csvCell } from "./pages/History";
 import type { User } from "./api";
@@ -123,4 +125,71 @@ test("CSV values cannot execute spreadsheet formulas and quotes remain escaped",
   );
   expect(csvCell("ordinary, value")).toBe('"ordinary, value"');
   expect(csvCell("  +SUM(1,2)")).toBe('"\'  +SUM(1,2)"');
+});
+
+test("expense form labels select their controls and an uncertain write reuses its key", async () => {
+  const posts: RequestInit[] = [];
+  const expenseUser: User = {
+    ...user,
+    roles: [
+      {
+        code: "ACCOUNTANT",
+        name: "Accountant",
+        permissions: ["expenses.view_expense", "expenses.add_expense"],
+      },
+    ],
+  };
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (path: string, init: RequestInit = {}) => {
+      if (path === "/api/auth/csrf/") return json({ csrfToken: "fresh" });
+      if (path === "/api/v1/expense-types/")
+        return json({
+          results: [{ id: 1, code: "tax", name: "Tax", is_active: true }],
+          next: null,
+        });
+      if (path.startsWith("/api/v1/expenses/") && init.method === "POST") {
+        posts.push(init);
+        if (posts.length === 1) throw new TypeError("lost");
+        return json({ id: 31 }, 200);
+      }
+      return json({ results: [], next: null });
+    }),
+  );
+  const view = render(<Expenses lang="en" user={expenseUser} />);
+  await waitFor(() =>
+    expect(screen.getAllByRole("option", { name: "Tax" })).toHaveLength(2),
+  );
+  const form = screen.getByRole("button", { name: "Save" }).closest("form")!;
+  fireEvent.change(
+    within(form).getByLabelText("Expense type", { exact: true }),
+    { target: { value: "tax" } },
+  );
+  fireEvent.change(
+    within(form).getByLabelText("Amount · USD", { exact: true }),
+    { target: { value: "12.50" } },
+  );
+  fireEvent.change(
+    within(form).getByLabelText("Project number", { exact: true }),
+    { target: { value: "7" } },
+  );
+  fireEvent.submit(form);
+  await screen.findByRole("button", { name: "Retry the same request" });
+  view.unmount();
+  render(<Expenses lang="en" user={expenseUser} />);
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Retry the same request" }),
+  );
+  await waitFor(() => expect(posts).toHaveLength(2));
+  expect(posts[1].body).toBe(posts[0].body);
+  expect(new Headers(posts[1].headers).get("Idempotency-Key")).toBe(
+    new Headers(posts[0].headers).get("Idempotency-Key"),
+  );
+  expect(JSON.parse(String(posts[1].body))).toMatchObject({
+    amount: "12.50",
+    currency: "USD",
+    project_id: 7,
+    expense_type: "tax",
+  });
+  await screen.findByText("Saved.", { exact: true });
 });
