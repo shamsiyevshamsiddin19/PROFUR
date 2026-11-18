@@ -27,6 +27,7 @@ from decimal import Decimal
 import pytest
 from accounts.models import Role
 from apps.catalog.models import Category, Material, Unit
+from apps.inventory import services
 from apps.inventory.models import (
     Batch,
     MovementType,
@@ -51,8 +52,16 @@ ME_URL = "/api/auth/me/"
 
 
 def create_role(code: str, name: str, permissions: list[str]) -> Role:
-    """Sinov uchun maxsus rol yaratish."""
-    return Role.objects.create(code=code, name=name, permissions=permissions)
+    """Sinov uchun maxsus rol yaratish yoki mavjud bo'lsa yangilash."""
+    role, created = Role.objects.get_or_create(
+        code=code,
+        defaults={"name": name, "permissions": permissions},
+    )
+    if not created:
+        role.permissions = list(permissions)
+        role.name = name
+        role.save()
+    return role
 
 
 def create_storekeeper(username: str = "storekeeper_pcrm50") -> tuple:
@@ -65,8 +74,8 @@ def create_storekeeper(username: str = "storekeeper_pcrm50") -> tuple:
         last_name="Mas'uli",
     )
     role = create_role(
-        code="STOREKEEPER_ROLE",
-        name="Ombor Mas'uli",
+        code=f"STOREKEEPER_ROLE_{username.upper()}",
+        name=f"Ombor Mas'uli {username}",
         permissions=[
             "catalog.view_material",
             "inventory.view_stock",
@@ -444,9 +453,24 @@ def test_pcrm50_worker_without_receipt_permission_is_forbidden(sample_material):
 
 def test_pcrm50_user_without_price_permission_sees_hidden_prices(sample_material):
     """inventory.view_purchase_price ruxsati bo'lmagan foydalanuvchiga narx ko'rinmaydi."""
-    user, password = create_storekeeper(username="limited_storekeeper")
-    # Narx ko'rish ruxsatini olib tashlaymiz
-    role = user.roles.first()
+    # 1. Avval omborda narx va summaga ega haqiqiy kirim yaratamiz
+    admin_user = get_user_model().objects.create_user(
+        username="admin_stock_creator", password="CreatorPassword123!"
+    )
+    batch, _ = services.receive(
+        material=sample_material,
+        received_on=timezone.localdate(),
+        quantity=Decimal("10.00"),
+        total_amount=Decimal("300.00"),
+        user=admin_user,
+        currency="USD",
+        supplier="Test Supplier",
+        document_number="DOC-PRICE-101",
+    )
+
+    # 2. Narx ko'rish ruxsati bo'lmagan foydalanuvchi yaratamiz
+    limited_user, password = create_storekeeper(username="limited_storekeeper")
+    role = limited_user.roles.first()
     role.permissions = ["catalog.view_material", "inventory.view_stock"]
     role.save()
 
@@ -454,18 +478,49 @@ def test_pcrm50_user_without_price_permission_sees_hidden_prices(sample_material
     csrf_token = client.get(CSRF_URL).data["csrfToken"]
     client.post(
         LOGIN_URL,
-        {"username": user.username, "password": password},
+        {"username": limited_user.username, "password": password},
         format="json",
         HTTP_X_CSRFTOKEN=csrf_token,
     )
 
-    # Kirimlar ro'yxatini ko'rish
+    # 3. Kirimlar ro'yxatini ko'rish: ro'yxat bo'sh emas, aynan yaratilgan kirimda narxlar yashiringan
     res = client.get(RECEIPTS_URL)
     assert res.status_code == 200
-    for receipt in res.data["results"]:
-        assert receipt["unit_price"] is None
-        assert receipt["total_amount"] is None
-        assert receipt["currency"] is None
+    assert len(res.data["results"]) >= 1
+    limited_receipt = next(
+        item for item in res.data["results"] if item["id"] == batch.pk
+    )
+    # Narx maydonlari ruxsatsiz foydalanuvchiga umuman ko'rsatilmaydi (dict'dan o'chiriladi)
+    assert "unit_price" not in limited_receipt
+    assert "total_amount" not in limited_receipt
+    assert "currency" not in limited_receipt
+    assert limited_receipt["quantity"] == "10.00"
+
+    # Alohida bitta kirim detail endpointida ham narxlar yashiringanini tekshirish
+    detail_res = client.get(f"{RECEIPTS_URL}{batch.pk}/")
+    assert detail_res.status_code == 200
+    assert "unit_price" not in detail_res.data
+    assert "total_amount" not in detail_res.data
+    assert "currency" not in detail_res.data
+
+    # 4. Solishtirish: narx ko'rish ruxsati BOR foydalanuvchi aynan shu yozuvda narxni ko'radi
+    full_user, full_pwd = create_storekeeper(username="full_price_storekeeper")
+    full_client = APIClient(enforce_csrf_checks=True)
+    full_csrf = full_client.get(CSRF_URL).data["csrfToken"]
+    full_client.post(
+        LOGIN_URL,
+        {"username": full_user.username, "password": full_pwd},
+        format="json",
+        HTTP_X_CSRFTOKEN=full_csrf,
+    )
+    full_res = full_client.get(RECEIPTS_URL)
+    assert full_res.status_code == 200
+    full_receipt = next(
+        item for item in full_res.data["results"] if item["id"] == batch.pk
+    )
+    assert full_receipt["unit_price"] == "30.000000"
+    assert full_receipt["total_amount"] == "300.00"
+    assert full_receipt["currency"] == "USD"
 
 
 # --- 6. Biznes qoidalari salbiy holatlari --------------------------------------
