@@ -14,7 +14,7 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Ko‘rikda | [feat/PCRM-32-auth-and-permissions](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-32-auth-and-permissions) |
+| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Ko‘rikda | [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) |
 | [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Bajarildi | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8) |
 | [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Reja | — |
 
@@ -29,7 +29,8 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 ## Oxirgi qayd
 
-2026-11-18 · PCRM-32 · Ko‘rikda · User modeli, login/logout/me/csrf API va ruxsatlar tayyorlandi, 8 ta avtomatik testdan o‘tdi · feat/PCRM-32-auth-and-permissions · PR ochish va ko‘rikka taqdim etish
+2026-11-18 · PCRM-32 · Ko‘rikda · User modeli, login/logout/me/csrf API va ruxsatlar tayyorlandi, 8 ta avtomatik testdan o‘tdi · PR [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) (CI: success) · PR ko‘rikdan o‘tgach birlashtirish
+
 
 
 
