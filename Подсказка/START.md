@@ -9,7 +9,7 @@
 |---|---|
 | Shamsiddin | [frontend.md](frontend.md) · PCRM-48 va PCRM-41 |
 | @ozodbek101 | [backend-stock.md](backend-stock.md) · PCRM-38 va PCRM-40 |
-| @thealiiheere | [backend-operations.md](backend-operations.md) · PCRM-46 va PCRM-44 |
+| Akbar (@thealiiheere) | [backend-operations.md](backend-operations.md) · PCRM-46 va PCRM-44 |
 | @jamoliddinusarov1-create | [integration.md](integration.md) · PCRM-37 va PCRM-32 |
 
 **Shamsiddin**
@@ -20,9 +20,9 @@
 
 > PROFUR repozitoriysida men @ozodbek101. AGENTS.md, Подсказка/AI.md va Подсказка/backend-stock.md ni o‘qi. Jira va ochiq PR’larni tekshir. Material, kirim hamda qoldiq bo‘yicha keyingi ishni va frontendga beriladigan API shartnomasini aniqlab ber.
 
-**@thealiiheere**
+**Akbar (@thealiiheere)**
 
-> PROFUR repozitoriysida men @thealiiheere. AGENTS.md, Подсказка/AI.md va Подсказка/backend-operations.md ni o‘qi. Xarajatlar va chiqim uchun mavjud Jira vazifalari, PR’lar, qoldiq API’siga bog‘liqlik va PM qarorlarini tekshir. Hozir boshlash mumkin bo‘lgan keyingi ishni ayt.
+> PROFUR repozitoriysida men Akbar (@thealiiheere). AGENTS.md, Подсказка/AI.md va Подсказка/backend-operations.md ni o‘qi. Xarajatlar va chiqim uchun mavjud Jira vazifalari, PR’lar, qoldiq API’siga bog‘liqlik va PM qarorlarini tekshir. Hozir boshlash mumkin bo‘lgan keyingi ishni ayt.
 
 **@jamoliddinusarov1-create**
 
