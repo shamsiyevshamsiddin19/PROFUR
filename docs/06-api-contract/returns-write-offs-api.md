@@ -129,3 +129,8 @@ Bir amal bir nechta partiyaga tegsa, harakatlar ham bir nechta, lekin `reference
 ## Sinovlar
 
 `tests/test_inventory_requests.py`: tasdiqgacha qoldiq o‘zgarmasligi, partiyaga qaytish, ikki marta tasdiq — bitta harakat, limit (kutilayotganlar bilan va qulf ostida), rad etish, idempotentlik, ruxsatlar (`403`/`405`), narxni yashirish, harakatlar tarixida har amal bir marta, jarayon o‘rtasidagi xatoda to‘liq ortga qaytish. PostgreSQL’da: ikki ulanishdan bir vaqtda qaytarish va hisobdan chiqarishni tasdiqlash — bitta harakat.
+
+
+## Takroriy javobdagi narx ruxsati (OQ-041)
+
+`Idempotency-Key` bilan qayta yuborishda ham narx ko‘rishning joriy ruxsati tekshiriladi. `inventory.view_purchase_price` olib tashlangan bo‘lsa, oldingi javobda mavjud `total_cost`, `currency` va `allocations[].unit_price` yashiriladi. Saqlangan javob o‘zgarmaydi; qaytarish yoki hisobdan chiqarish amali qayta bajarilmaydi. Shu qoida kirim va chiqimdagi takroriy javoblarga ham tatbiq etiladi. Regressiya: `tests/test_inventory_replay_permissions.py`.

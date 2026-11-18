@@ -50,3 +50,8 @@ Lokal: 76 backend testi o‘tdi, 2 PostgreSQL cheklovi sinovi SQLite’da o‘tk
 ## PCRM-44 · 1-qism · 2026-11-18
 
 `2026-11-18 · PCRM-44 · Jarayonda · chiqim: StockIssue va StockIssueAllocation modellari, services.decrease() va issue_stock() (avval qoldiq, keyin partiyalar id tartibida qulflanadi), POST/GET /api/v1/issues/ (Idempotency-Key majburiy, 409 insufficient_stock va batch_insufficient, narx OQ-041 bo‘yicha yashiriladi, PUT/PATCH/DELETE 405), tannarx partiya narxida USD, ru/en tarjimalar · partiyani mijoz tanlaydi, chunki OQ-001 PM’da · PR #27 (PCRM-42) ustiga qurilgan, avval u birlashishi kerak · lokal (SQLite): pytest 144 o‘tdi, 3 tasi o‘tkazildi; ruff va makemigrations --check toza; PostgreSQL’dagi «10 dan 7 + 7» parallel sinovi CI’da · keyingi qadam: qaytarish so‘rovi va tasdiqlash (OQ-003), keyin hisobdan chiqarish (OQ-007); `inventory.add_issue` kodini rollarga berish — Jamoliddin`
+
+
+## PR #35 · ko‘rik tuzatishi · 2026-11-18
+
+`2026-11-18 · PCRM-44 / PCRM-46 · Ko‘rikda · PR #35: qaytarish so‘rovi, tasdiq/rad, hisobdan chiqarish, xarajatni teskari yozuv bilan bekor qilish. Ko‘rikda topilgan OQ-041 xatosi (#36) tuzatildi: kirim/chiqim/qaytarish/hisobdan chiqarishda idempotent javob ham joriy narx ruxsatiga mos filtrlanadi, saqlangan javob va biznes amal o‘zgarmaydi · 4 yangi endpoint regressiya testi tuzatishdan oldin yiqildi, keyin o‘tdi; Ruff check/format, makemigrations --check va diff tekshiruvi toza · keyingi qadam: yangilangan PR CI (PostgreSQL va real brauzer) o‘tgach main’ga birlashtirish. OQ-001 algoritm qarori va to‘liq frontend qabul mezonlari alohida qoladi.`

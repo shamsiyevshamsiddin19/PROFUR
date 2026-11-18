@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from . import services
 from .issue_serializers import IssueCreateSerializer, IssueSerializer
 from .models import IdempotencyKey, StockIssue
+from .serializers import replay_body_for_user
 from .views import (
     IDEMPOTENCY_TTL,
     IdempotencyConflictError,
@@ -151,7 +152,10 @@ class IdempotentCreateMixin:
             return None
         if record.request_hash != fingerprint:
             raise IdempotencyConflictError()
-        return Response(record.response_body, status=status.HTTP_200_OK)
+        return Response(
+            replay_body_for_user(record.response_body, request.user),
+            status=status.HTTP_200_OK,
+        )
 
 
 class StockIssueViewSet(
