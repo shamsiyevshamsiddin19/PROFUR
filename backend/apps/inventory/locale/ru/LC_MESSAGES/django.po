@@ -1,0 +1,49 @@
+# PROFUR · ombor chiqimi (PCRM-44) tarjimalari.
+# Manba tili — o'zbekcha (lotin).
+msgid ""
+msgstr ""
+"Project-Id-Version: profur-inventory\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "chiqim"
+msgstr "расход"
+
+msgid "chiqimlar"
+msgstr "расходы"
+
+msgid "chiqim sanasi"
+msgstr "дата расхода"
+
+msgid "kim oldi"
+msgstr "получатель"
+
+msgid "loyiha raqami"
+msgstr "номер проекта"
+
+msgid "chiqim partiyasi"
+msgstr "партия расхода"
+
+msgid "chiqim partiyalari"
+msgstr "партии расхода"
+
+msgid "Chiqim sanasi kelajakda bo'lishi mumkin emas."
+msgstr "Дата расхода не может быть в будущем."
+
+msgid "Bitta partiya ikki marta ko'rsatilgan."
+msgstr "Одна и та же партия указана дважды."
+
+msgid "Partiya bu materialga tegishli emas: {ids}."
+msgstr "Партия не относится к этому материалу: {ids}."
+
+msgid "Partiyada yetarli miqdor qolmagan."
+msgstr "В партии недостаточно остатка."
+
+msgid "Omborda yetarli material yo'q."
+msgstr "На складе недостаточно материала."
+
+msgid "Butun son bo'lishi kerak."
+msgstr "Должно быть целым числом."
