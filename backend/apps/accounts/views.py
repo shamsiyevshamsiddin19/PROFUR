@@ -1,9 +1,15 @@
-"""Foydalanuvchi autentifikatsiyasi, rollar va profiliga oid API ko'rinishlari (views)."""
-
-from accounts.models import Role
+from accounts.models import Role, User
 from accounts.permissions import IsAdminRole
-from accounts.serializers import LoginSerializer, RoleSerializer, UserSerializer
+from accounts.serializers import (
+    LoginSerializer,
+    PasswordResetSerializer,
+    RoleSerializer,
+    UserAdminCreateSerializer,
+    UserAdminUpdateSerializer,
+    UserSerializer,
+)
 from django.contrib.auth import login, logout
+from django.db.models import Q
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -99,3 +105,107 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     permission_classes = [IsAdminRole]
+
+
+class UserListCreateView(generics.ListCreateAPIView):
+    """
+    Admin tomonidan foydalanuvchilar ro'yxatini ko'rish va yangi yaratish (OQ-040).
+    Faqat administrator uchun ochiq.
+    """
+
+    permission_classes = [IsAdminRole]
+    queryset = User.objects.all().prefetch_related("roles")
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return UserAdminCreateSerializer
+        return UserSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        params = self.request.query_params
+        if search := params.get("search", "").strip():
+            queryset = queryset.filter(
+                Q(username__icontains=search)
+                | Q(first_name__icontains=search)
+                | Q(last_name__icontains=search)
+                | Q(email__icontains=search)
+                | Q(phone__icontains=search)
+            )
+        if is_active_param := params.get("is_active"):
+            if is_active_param.lower() in ("true", "1"):
+                queryset = queryset.filter(is_active=True)
+            elif is_active_param.lower() in ("false", "0"):
+                queryset = queryset.filter(is_active=False)
+        return queryset
+
+
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    """
+    Foydalanuvchi ma'lumotlarini ko'rish va yangilash (OQ-040).
+    OQ-040 bo'yicha akkaunt bazadan o'chirilmaydi (DELETE 405 Method Not Allowed).
+    """
+
+    permission_classes = [IsAdminRole]
+    queryset = User.objects.all().prefetch_related("roles")
+    serializer_class = UserAdminUpdateSerializer
+    http_method_names = ["get", "patch", "put", "head", "options"]
+
+
+class UserDeactivateView(APIView):
+    """
+    Foydalanuvchi hisobini faolsizlantirish API'si (OQ-040).
+    Akkaunt o'chirilmaydi, faolsizlantiriladi va ish tarixi saqlanadi.
+    """
+
+    permission_classes = [IsAdminRole]
+
+    def post(self, request, pk: int):
+        try:
+            target_user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": _("Foydalanuvchi topilmadi.")},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        target_user.is_active = False
+        target_user.save(update_fields=["is_active"])
+        return Response(
+            {
+                "message": _("Foydalanuvchi muvaffaqiyatli faolsizlantirildi."),
+                "user": UserSerializer(target_user).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class UserResetPasswordView(APIView):
+    """
+    Foydalanuvchi parolini tiklash API'si (OQ-040).
+    Faqat administrator amalga oshira oladi.
+    """
+
+    permission_classes = [IsAdminRole]
+
+    def post(self, request, pk: int):
+        try:
+            target_user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": _("Foydalanuvchi topilmadi.")},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = PasswordResetSerializer(
+            data=request.data, context={"user": target_user}
+        )
+        if serializer.is_valid():
+            new_password = serializer.validated_data["new_password"]
+            target_user.set_password(new_password)
+            target_user.save(update_fields=["password"])
+            return Response(
+                {"message": _("Parol muvaffaqiyatli yangilandi.")},
+                status=status.HTTP_200_OK,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

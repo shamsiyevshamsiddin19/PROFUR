@@ -93,3 +93,19 @@ msgstr "Успешный вход в систему."
 #: apps/accounts/views.py:65
 msgid "Tizimdan muvaffaqiyatli chiqildi."
 msgstr "Успешный выход из системы."
+
+#: apps/accounts/views.py
+msgid "Foydalanuvchi topilmadi."
+msgstr "Пользователь не найден."
+
+#: apps/accounts/views.py
+msgid "Foydalanuvchi muvaffaqiyatli faolsizlantirildi."
+msgstr "Пользователь успешно отключен."
+
+#: apps/accounts/views.py
+msgid "Parol muvaffaqiyatli yangilandi."
+msgstr "Пароль успешно обновлен."
+
+#: apps/accounts/serializers.py
+msgid "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak."
+msgstr "Новый пароль должен содержать не менее 6 символов."

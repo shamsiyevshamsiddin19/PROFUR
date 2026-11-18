@@ -14,27 +14,22 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Bajarildi | [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) |
-| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Bajarildi | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8) |
-| [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Ko‘rikda | [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26) |
+| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session, ombor ruxsatlari va admin foydalanuvchi boshqaruvi (OQ-040) | Ko‘rikda | [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12), [commit `f0078b2`] |
+| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, PostgreSQL, backup/restore, frontend build va CI | Ko‘rikda | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8), [backup-restore.md](../docs/08-delivery/backup-restore.md) |
+| [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Qabul sinovlari, PostgreSQL parallel konkurentlik va 3 ekranli Chromium E2E | Ko‘rikda | [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26), [tests/test_concurrency_postgres.py](../tests/test_concurrency_postgres.py), [frontend/e2e/receipt.spec.ts](../frontend/e2e/receipt.spec.ts) |
 
-**Qabul mezoni** — To‘rt jamoadosh loyihani mahalliy ishga tushira oladi. Ruxsatsiz amal rad etiladi. birinchi brauzer sinovida kirim bir marta saqlanib, qoldiq yangilanadi.
+**Qabul mezoni** — To‘rt jamoadosh loyihani toza muhitda ishga tushira oladi. Ruxsatsiz amal rad etiladi. Haqiqiy PostgreSQL'da parallel amallar qoldiqni buzmaydi. Brauzerda mobil, planshet va kompyuter ekranlarida to'liq oqim va uch tilda barqaror ishlaydi.
 
-## Jamoadoshlarga topshirish (Handoff)
+## Jamoadoshlarga topshirish (joriy)
 
-- **PCRM-37 (Umumiy asos):** PR #8 orqali main’ga birlashtirildi. Django + DRF, Ruff, docker-compose va CI to‘liq ishlamoqda.
-- **PCRM-32 (Accounts va Ruxsatlar):** `accounts` ilovasi, kengaytirilgan `User` modeli (`Role` ko‘pdan-ko‘p bog‘lanishi bilan, OQ-037), login/logout/me/csrf hamda rollar API nuqtalari (`/api/auth/roles/`) va DRF ruxsatlari (`IsAdminRole`, `IsWarehouseManager`, `IsProductionSupervisor`, `IsProjectManager`) tayyorlandi va PR #12 orqali main'ga birlashtirildi.
-- **PCRM-50 (Qabul va Tizim Sinovlari):** Kirimdan qoldiqqacha bo‘lgan to‘liq zanjir (Login, CSRF, Material tanlash, Idempotency-Key bilan kirim, partiya va qoldiq yangilanishi), tarmoq uzilishida takrorlanmaslik, faqat USD qabul qilinishi, uz/ru/en tillarida xabarlar qabul sinovlari ([`tests/test_pcrm50_acceptance.py`](../tests/test_pcrm50_acceptance.py)) va mobil ekran formasi sinovlari ([`frontend/src/App.test.tsx`](../frontend/src/App.test.tsx)) bilan to‘liq qoplandi. PR [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26).
-- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [Akbar (@thealiiheere)](https://github.com/thealiiheere)):** Katalog, ombor va xarajatlar modullarida foydalanuvchi tekshiruvi uchun `request.user` va `accounts.permissions` ruxsatnomalaridan foydalanishingiz mumkin.
-- **Frontend va Team Leadga (Shamsiddin):** Kirish, chiqish, joriy foydalanuvchi ma'lumoti, CSRF token hamda rol boshqaruvi (OQ-037) API shartnomasi [docs/06-api-contract/auth-api.md](../docs/06-api-contract/auth-api.md) hujjatiga kiritildi.
+- **PCRM-32 / OQ-040:** admin uchun foydalanuvchi yaratish, qidirish, tahrirlash, rol biriktirish, faolsizlantirish va parolni tiklash API’si PR #44 da. Parol yaratish/tiklash loyiha validatorlari bilan tekshiriladi. Joriy main’dagi ADMIN/superuser va aniq permission kodlari kontrakti saqlandi; prefiks maskalari yoki tasdiqlanmagan yangi admin vakolati modeli qo‘shilmadi.
+- **PCRM-37:** backup/restore yo‘riqnomasi mavjud. Muallif lokal drill bajarganini yozgan; ushbu integratsiya ko‘rigida production backup rejasi yoki tiklash amali bajarilgani da’vo qilinmaydi.
+- **PCRM-50:** PostgreSQL mustaqil ulanishlar testi, uch ekranli Chromium, uz/ru/en va uzun nom sinovlari bor. Main’dagi to‘liq kirim → chiqim → qaytarish/tasdiq → hisobdan chiqarish/tasdiq → xarajat/teskari yozuv → qoldiq/minimum → tarix/CSV ssenariysi saqlandi. Har ekran o‘z materiali/loyihasi bilan ajratildi, kutishlar aniq natijani tekshiradi.
+- **Ochiq:** PM/buyurtmachi va haqiqiy xodimlar bilan yakuniy qabul, P1/P3/P5 qarorlari. OQ-014 xabarnoma hajmini o‘zidan 2-bosqichga ko‘chirmang; tasdiqlangan doira bilan kelishing. StockMovement auditi avtomatik xabarnoma o‘rnini bosmaydi.
 
 ## Oxirgi qayd
 
-2026-11-18 · PCRM-50 · Ko‘rikda · Review asosida narx yashirish testi haqiqiy kirim bilan to'g'rilandi va mobil ekran formasi testi qo'shildi · 16 ta backend testi, 4 ta frontend testi (CI: pass), PR [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26) · Ko‘rikdan so'ng main'ga birlashtirish
-
-
-
-
+2026-11-18 · PCRM-32/37/50 · Ko‘rikda · PR #44: joriy main bilan to‘qnashuvlar yechildi, kuchsiz parolni qabul qilish xatosiga regressiya qo‘shildi, auth kontrakti va barcha yangi ombor oqimlari saqlandi. Python yo‘li CI’ga moslandi; uch ekranli E2E ma’lumotlari ajratildi. Lokal tekshiruv va CI dalili PR’da. PR merge va PM/buyurtmachi qabulisiz PCRM-50 Done qilinmaydi.
 
 ## Navbatdagi ish
 

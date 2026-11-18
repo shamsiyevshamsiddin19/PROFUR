@@ -7,6 +7,10 @@ from accounts.views import (
     MeView,
     RoleDetailView,
     RoleListCreateView,
+    UserDeactivateView,
+    UserDetailView,
+    UserListCreateView,
+    UserResetPasswordView,
 )
 from django.urls import path
 
@@ -19,4 +23,16 @@ urlpatterns = [
     path("csrf/", CsrfTokenView.as_view(), name="csrf"),
     path("roles/", RoleListCreateView.as_view(), name="role-list-create"),
     path("roles/<int:pk>/", RoleDetailView.as_view(), name="role-detail"),
+    path("users/", UserListCreateView.as_view(), name="user-list-create"),
+    path("users/<int:pk>/", UserDetailView.as_view(), name="user-detail"),
+    path(
+        "users/<int:pk>/deactivate/",
+        UserDeactivateView.as_view(),
+        name="user-deactivate",
+    ),
+    path(
+        "users/<int:pk>/reset-password/",
+        UserResetPasswordView.as_view(),
+        name="user-reset-password",
+    ),
 ]

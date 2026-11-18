@@ -151,6 +151,97 @@ Tavsiya etilgan rollar (avtomatik yaratilmaydi; admin ruxsatlarni beradi):
   "permissions": ["view_quality", "approve_batch"],
   "is_system": false
 }
+### 3.6. Foydalanuvchilarni boshqarish (OQ-040)
+Faqat Administrator (`IsAdminRole`) uchun ochiq. OQ-040 qaroriga ko‘ra:
+* Faqat admin akkaunt yaratadi, parolni tiklaydi, rollarni o‘zgartiradi.
+* Akkaunt bazadan o‘chirilmaydi (`DELETE` so‘rovi `405 Method Not Allowed`), faolsizlantiriladi (`is_active: false`); barcha harakatlar tarixi saqlanadi.
+
+#### 3.6.1. Foydalanuvchilar ro‘yxati
+* **Manzil:** `GET /api/auth/users/`
+* **Filtrlar:** `?search=ism_yoki_login`, `?is_active=true|false`
+* **Muvaffaqiyatli javob (`200 OK`):**
+```json
+{
+  "count": 4,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 2,
+      "username": "omborchi_vali",
+      "email": "vali@profur.uz",
+      "first_name": "Vali",
+      "last_name": "Aliyev",
+      "roles": [
+        {
+          "id": 2,
+          "code": "WAREHOUSE_MANAGER",
+          "name": "Ombor mas'uli",
+          "permissions": ["catalog.view_material", "inventory.*"],
+          "is_system": true
+        }
+      ],
+      "role_codes": ["WAREHOUSE_MANAGER"],
+      "primary_role": "WAREHOUSE_MANAGER",
+      "phone": "+998901234567",
+      "is_active": true,
+      "date_joined": "2026-11-18T10:00:00Z"
+    }
+  ]
+}
+```
+
+#### 3.6.2. Yangi foydalanuvchi yaratish
+* **Manzil:** `POST /api/auth/users/`
+* **So‘rov tanasi:**
+```json
+{
+  "username": "omborchi_sardor",
+  "password": "TemporaryPassword123!",
+  "first_name": "Sardor",
+  "last_name": "Rahimov",
+  "email": "sardor@profur.uz",
+  "phone": "+998901112233",
+  "role_ids": [2],
+  "is_active": true
+}
+```
+* **Muvaffaqiyatli javob (`201 Created`):** yangi yaratilgan foydalanuvchi ma'lumoti (`password`siz).
+
+#### 3.6.3. Foydalanuvchi ma'lumotlarini yangilash va rollarini almashtirish
+* **Manzil:** `PATCH /api/auth/users/<id>/` (yoki `PUT`)
+* **So‘rov tanasi:**
+```json
+{
+  "first_name": "Sardorbek",
+  "role_ids": [2, 3]
+}
+```
+* **Muvaffaqiyatli javob (`200 OK`)**
+
+#### 3.6.4. Akkauntni faolsizlantirish (O‘chirish o‘rniga)
+* **Manzil:** `POST /api/auth/users/<id>/deactivate/`
+* **Muvaffaqiyatli javob (`200 OK`):**
+```json
+{
+  "message": "Foydalanuvchi muvaffaqiyatli faolsizlantirildi.",
+  "user": { "id": 2, "is_active": false }
+}
+```
+
+#### 3.6.5. Parolni tiklash
+* **Manzil:** `POST /api/auth/users/<id>/reset-password/`
+* **So‘rov tanasi:**
+```json
+{
+  "new_password": "NewSecretPassword123!"
+}
+```
+* **Muvaffaqiyatli javob (`200 OK`):**
+```json
+{
+  "message": "Parol muvaffaqiyatli yangilandi."
+}
 ```
 
 ---
@@ -176,3 +267,8 @@ Rolga kod berish va undan kodni olib tashlash keyingi so‘rovga ta’sir qiladi
 ## API ruxsat kodlari · 2026-11-18
 
 Katalog API’si `catalog.*`, xarajatlar API’si `expenses.*` kodlarini tekshiradi. Eski `view_catalog` / `manage_catalog` kodlari bu endpointlarga ruxsat bermaydi. Mavjud rollarga kerakli aniq kodlarni admin beradi; rol nomining o‘zi ruxsat emas. Xarajat kodlari [expenses-api.md](expenses-api.md)da.
+
+
+### Integratsiya ko‘rigi · PR #44
+
+Akkaunt yaratish va parolni tiklash `AUTH_PASSWORD_VALIDATORS` dagi barcha tekshiruvlardan o‘tadi; xato `password` yoki `new_password` maydonida 400 bilan qaytadi. Ishlayotgan `ADMIN`/superuser va aniq permission kodlari shartnomasi saqlandi: yangi `accounts.manage_users` yoki prefiks maskasi o‘zidan rol boshqarish huquqini bermaydi. Oldingi ruxsatlar algoritmini yoki mavjud akkauntlarni migratsiyasiz o‘zgartirish kiritilmadi.

@@ -5,7 +5,7 @@ test.describe.configure({ retries: 0 });
 
 test("mobile warehouse workflow persists receipts, issues, approvals and expenses through the real API", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/");
   await page.getByRole("combobox", { name: "Language" }).selectOption("en");
   await page.getByLabel("Username").fill("browser_storekeeper");
@@ -15,12 +15,32 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     page.getByRole("heading", { name: "Material receipts" }),
   ).toBeVisible();
 
+  const materialName = `Warehouse ${testInfo.project.name}`;
+  const csrf = await (await page.request.get("/api/auth/csrf/")).json();
+  const categories = await (
+    await page.request.get("/api/v1/categories/?search=LMDF")
+  ).json();
+  const created = await page.request.post("/api/v1/materials/", {
+    data: {
+      name: materialName,
+      category_id: categories.results[0].id,
+      unit: "sheet",
+    },
+    headers: { "X-CSRFToken": csrf.csrfToken },
+  });
+  expect(created.status()).toBe(201);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Material receipts", exact: true }),
+  ).toBeVisible();
   const material = page.getByRole("combobox", {
     name: "Material",
     exact: true,
   });
-  await expect(material.locator("option")).toHaveCount(2);
-  await material.selectOption({ label: "Browser MDF · sheet" });
+  await expect(
+    material.locator("option").filter({ hasText: materialName }),
+  ).toHaveCount(1);
+  await material.selectOption({ label: `${materialName} · sheet` });
   await page
     .getByRole("spinbutton", { name: "Quantity", exact: true })
     .fill("15");
@@ -58,7 +78,9 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await expect(
     page.getByRole("heading", { name: "Material receipts" }),
   ).toBeVisible();
-  const receipts = await page.request.get("/api/v1/receipts/");
+  const receipts = await page.request.get(
+    `/api/v1/receipts/?material=${batch.material.id}`,
+  );
   const result = await receipts.json();
   expect(result.count).toBe(1);
   expect(result.results[0].id).toBe(batch.id);
@@ -76,7 +98,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await page.goto("/#operations");
   await page
     .getByRole("combobox", { name: "Material", exact: true })
-    .selectOption({ label: "Browser MDF · 15.00" });
+    .selectOption({ label: `${materialName} · 15.00` });
   await page.getByLabel("Recipient", { exact: true }).fill("Sardor");
   const batchQuantity = page.getByRole("spinbutton", {
     name: `Batch #${batch.id}`,
@@ -85,7 +107,9 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await batchQuantity.fill("7");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByText("Issue saved.", { exact: true })).toBeVisible();
-  const issues = await (await page.request.get("/api/v1/issues/")).json();
+  const issues = await (
+    await page.request.get(`/api/v1/issues/?material=${batch.material.id}`)
+  ).json();
   expect(issues.count).toBe(1);
   expect(issues.results[0].quantity).toBe("7.00");
   await page.getByRole("tab", { name: "Return", exact: true }).click();
@@ -104,12 +128,15 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await expect(
-    page.getByRole("cell").getByText("Approved", { exact: true }),
+    page
+      .getByRole("row")
+      .filter({ hasText: materialName })
+      .getByText("Approved", { exact: true }),
   ).toBeVisible();
   await page.getByRole("tab", { name: "Write-off", exact: true }).click();
   await page
     .getByRole("combobox", { name: "Material", exact: true })
-    .selectOption({ label: "Browser MDF · 10.00" });
+    .selectOption({ label: `${materialName} · 10.00` });
   await page.getByLabel("Reason", { exact: true }).fill("Damaged sheet");
   await batchQuantity.fill("1");
   await page.getByRole("button", { name: "Save", exact: true }).click();
@@ -127,6 +154,11 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   ).json();
   expect(stock.quantity_on_hand).toBe("9.00");
 
+  const projectId =
+    100 +
+    ["mobile-chromium", "tablet-chromium", "desktop-chromium"].indexOf(
+      testInfo.project.name,
+    );
   await page.goto("/#expenses");
   await page
     .locator("form")
@@ -136,7 +168,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await page
     .locator("form")
     .getByLabel("Project number", { exact: true })
-    .fill("7");
+    .fill(String(projectId));
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByText("Saved.", { exact: true })).toBeVisible();
   await page
@@ -152,7 +184,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
   const expenseRows = await (
-    await page.request.get("/api/v1/expenses/")
+    await page.request.get(`/api/v1/expenses/?project_id=${projectId}`)
   ).json();
   expect(expenseRows.count).toBe(2);
   expect(
@@ -163,7 +195,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await page
     .getByRole("combobox", { name: "Category", exact: true })
     .selectOption({ label: "LMDF" });
-  await page.getByRole("button", { name: "Browser MDF", exact: true }).click();
+  await page.getByRole("button", { name: materialName, exact: true }).click();
   await page
     .getByRole("dialog")
     .getByLabel("Min. limit", { exact: true })
@@ -173,7 +205,12 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .getByRole("button", { name: "Apply", exact: true })
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
-  await expect(page.getByText("Low stock", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: materialName })
+      .getByText("Low stock", { exact: true }),
+  ).toBeVisible();
   const minimum = await (
     await page.request.get(`/api/v1/stock/${batch.material.id}/`)
   ).json();
@@ -189,7 +226,10 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     page.getByRole("heading", { name: "Movement history" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("row").filter({ hasText: "Write-off #" }),
+    page
+      .getByRole("row")
+      .filter({ hasText: "Write-off #" })
+      .filter({ hasText: materialName }),
   ).toBeVisible();
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download CSV", exact: true }).click();

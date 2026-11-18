@@ -2,6 +2,9 @@
 
 from accounts.models import Role, User
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -69,6 +72,13 @@ class LoginSerializer(serializers.Serializer):
 
         user = authenticate(username=username, password=password)
         if not user:
+            existing_user = User.objects.filter(username=username).first()
+            if (
+                existing_user
+                and existing_user.check_password(password)
+                and not existing_user.is_active
+            ):
+                raise serializers.ValidationError(_("Ushbu hisob faolsizlantirilgan."))
             raise serializers.ValidationError(
                 _("Login yoki parol noto'g'ri kiritildi.")
             )
@@ -77,3 +87,135 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+class UserAdminCreateSerializer(serializers.ModelSerializer):
+    """Admin tomonidan yangi foydalanuvchi yaratish (OQ-040)."""
+
+    password = serializers.CharField(write_only=True, required=True, min_length=6)
+    role_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        many=True,
+        required=False,
+        write_only=True,
+        source="roles",
+    )
+    roles = RoleSerializer(many=True, read_only=True)
+    role_codes = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+    )
+    primary_role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+            "role_ids",
+            "roles",
+            "role_codes",
+            "primary_role",
+            "is_active",
+            "date_joined",
+        ]
+        read_only_fields = ["id", "date_joined", "role_codes", "primary_role", "roles"]
+
+    def validate(self, attrs):
+        """Yangi akkaunt parolini loyiha sozlamalaridagi validatorlar bilan tekshiradi."""
+        candidate = User(
+            **{
+                key: attrs.get(key, "")
+                for key in ("username", "email", "first_name", "last_name")
+            }
+        )
+        try:
+            validate_password(attrs["password"], candidate)
+        except DjangoValidationError as error:
+            raise serializers.ValidationError({"password": error.messages}) from error
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        roles = validated_data.pop("roles", [])
+        password = validated_data.pop("password")
+        user = User.objects.create_user(password=password, **validated_data)
+        if roles:
+            user.roles.set(roles)
+        return user
+
+
+class UserAdminUpdateSerializer(serializers.ModelSerializer):
+    """Admin tomonidan foydalanuvchini tahrirlash va rollarni almashtirish (OQ-040)."""
+
+    role_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        many=True,
+        required=False,
+        write_only=True,
+        source="roles",
+    )
+    roles = RoleSerializer(many=True, read_only=True)
+    role_codes = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+    )
+    primary_role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+            "role_ids",
+            "roles",
+            "role_codes",
+            "primary_role",
+            "is_active",
+            "date_joined",
+        ]
+        read_only_fields = [
+            "id",
+            "username",
+            "date_joined",
+            "role_codes",
+            "primary_role",
+            "roles",
+        ]
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        roles = validated_data.pop("roles", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if validated_data:
+            instance.save(update_fields=list(validated_data))
+        if roles is not None:
+            instance.roles.set(roles)
+        return instance
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    """Admin tomonidan foydalanuvchi parolini tiklash (OQ-040)."""
+
+    new_password = serializers.CharField(write_only=True, required=True, min_length=6)
+
+    def validate_new_password(self, value):
+        if not value or len(value.strip()) < 6:
+            raise serializers.ValidationError(
+                _("Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.")
+            )
+        try:
+            validate_password(value, self.context.get("user"))
+        except DjangoValidationError as error:
+            raise serializers.ValidationError(error.messages) from error
+        return value
