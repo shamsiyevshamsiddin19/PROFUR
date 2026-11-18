@@ -7,9 +7,9 @@ taqiqi, filtrlar va uz/ru/en tillaridagi xato xabarlari.
 from decimal import Decimal
 
 import pytest
+from accounts.models import Role
 from apps.expenses.models import Expense, ExpenseType
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
 from django.db import IntegrityError
 from rest_framework.test import APIClient
 
@@ -18,16 +18,18 @@ TYPES_URL = "/api/v1/expense-types/"
 
 
 def make_user(username: str, *permission_codes: str):
-    """Berilgan ruxsatlarga ega sinov foydalanuvchisini yaratadi.
+    """Berilgan ruxsat kodlari bor rolga ega sinov foydalanuvchisini yaratadi.
 
-    Ruxsat kodi ``expenses`` ilovasidagi qisqa nom: ``add_expense`` va h.k.
+    Ruxsatlar real tizimdagidek rol orqali beriladi (``Role.permissions``).
+    Kod qisqa yoziladi va ``expenses.`` prefiksi qo'shiladi: ``add_expense``.
     """
     user = get_user_model().objects.create_user(username=username, password="x")
-    user.user_permissions.set(
-        Permission.objects.filter(
-            content_type__app_label="expenses", codename__in=permission_codes
-        )
+    role = Role.objects.create(
+        code=f"TEST_{username.upper()}",
+        name=username,
+        permissions=[f"expenses.{code}" for code in permission_codes],
     )
+    user.roles.add(role)
     return user
 
 
@@ -150,20 +152,8 @@ def test_inactive_expense_type_is_rejected(warehouse_user, tax_type):
         ("en", "Only USD currency is accepted."),
     ],
 )
-def test_error_message_follows_request_language(
-    warehouse_user, language, message, settings
-):
-    """Xato xabari ``Accept-Language`` tilida qaytadi (uz/ru/en).
-
-    Til middleware'i PCRM-32 da qo'shiladi; bu sinov uni shu yerda yoqadi.
-    """
-    settings.LANGUAGES = [("uz", "O'zbekcha"), ("ru", "Русский"), ("en", "English")]
-    settings.MIDDLEWARE = [
-        *settings.MIDDLEWARE[:2],
-        "django.middleware.locale.LocaleMiddleware",
-        *settings.MIDDLEWARE[2:],
-    ]
-
+def test_error_message_follows_request_language(warehouse_user, language, message):
+    """Xato xabari ``Accept-Language`` tilida qaytadi (uz/ru/en)."""
     response = client_for(warehouse_user).post(
         EXPENSES_URL,
         valid_payload(currency="EUR"),

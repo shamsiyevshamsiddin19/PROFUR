@@ -20,7 +20,7 @@ Manbalar: TZ 6.6 va 6.8, [OQ-010](../01-requirements/open-questions.md), [valyut
 | Turlarni ko‘rish | `expenses.view_expensetype` |
 | Tur qo‘shish / tahrirlash | `expenses.add_expensetype` / `expenses.change_expensetype` |
 
-**[Kelishish: Jamoliddin]** Rol ↔ ruxsat bog‘lanishi PCRM-32 da hal bo‘ladi. Ishchi roli bu ruxsatlarni olmaydi (TZ 3: ishchi pulni ko‘rmaydi).
+Tekshiruv `accounts.permissions.HasPermissionCode` orqali ([auth-api.md](auth-api.md)): kod foydalanuvchi rolidagi `Role.permissions` ro‘yxatida aynan shu ko‘rinishda bo‘lishi kerak. Administrator kodlarni ombor mas’uli kabi rollarga beradi. Ishchi roli bu kodlarni olmaydi (TZ 3: ishchi pulni ko‘rmaydi). Ruxsat yo‘q yoki tizimga kirilmagan — `403`.
 
 ## Xarajatlar
 
@@ -75,5 +75,4 @@ Boshlang‘ich turlar migratsiya bilan qo‘shiladi: `tax` (Soliq), `products` (
 | 1 | OQ-010: xarajat har doim loyihaga bog‘lanadimi? TZ 6.6 da loyiha ixtiyoriy («umumiy xarajat»). | `project_id` ixtiyoriy. Majburiy bo‘lsa, bitta tekshiruv qo‘shiladi. |
 | 2 | «Produkta» nimani bildiradi: mahsulot yoki ishchilar ovqati? (TZ 19-bo‘lim, 3-savol) | Kod `products`, nomini admin o‘zgartira oladi. |
 | 3 | Xato kiritilgan xarajat qanday bekor qilinadi? (TZ 6.8: teskari yozuv va sabab) | Hozir faqat yaratish. Bekor qilish keyingi bosqichda. |
-| 4 | Ruxsat tekshiruvi: Django ruxsatlari (PCRM-49) yoki rol ichidagi kodlar (PCRM-32)? | Django ruxsatlari. Tekshiruv bitta faylda (`expenses/permissions.py`). |
-| 5 | Umumiy xato shakli (`{"error": {...}}`, PCRM-49). | Hozircha DRF standart shakli: `{"maydon": ["xabar"]}`. |
+| 4 | Umumiy xato shakli (`{"error": {...}}`, PCRM-49). | Hozircha DRF standart shakli: `{"maydon": ["xabar"]}`. |

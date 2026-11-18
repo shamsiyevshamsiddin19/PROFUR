@@ -3,13 +3,17 @@
 Xarajat yozuvlari o'chirilmaydi va tahrirlanmaydi (TZ 6.8), shuning uchun
 ``ExpenseViewSet`` faqat ko'rish va yaratishga ruxsat beradi. ``PUT``,
 ``PATCH`` va ``DELETE`` so'rovlariga 405 qaytadi.
+
+Ruxsatlar jamoa qoidasi bo'yicha ``accounts.permissions.HasPermissionCode``
+orqali tekshiriladi: kod foydalanuvchi rolidagi ``Role.permissions``
+ro'yxatida bo'lishi kerak (docs/06-api-contract/auth-api.md).
 """
 
+from accounts.permissions import HasPermissionCode
 from django.db.models import QuerySet
 from rest_framework import mixins, viewsets
 
 from .models import Expense, ExpenseType
-from .permissions import HasActionPermission
 from .serializers import (
     ExpenseFilterSerializer,
     ExpenseSerializer,
@@ -17,7 +21,27 @@ from .serializers import (
 )
 
 
+class ActionPermissionMixin:
+    """Har bir DRF amali uchun alohida ruxsat kodini tanlaydi.
+
+    ``HasPermissionCode`` view'dan bitta ``required_permission`` kutadi. Bu
+    mixin uni joriy amalga qarab ``action_permissions`` lug'atidan oladi.
+    Manzilda yo'q metod (``DELETE`` kabi) uchun ko'rish ruxsati so'raladi:
+    ko'ra oladigan foydalanuvchi 405, qolganlar 403 oladi.
+    """
+
+    permission_classes = [HasPermissionCode]
+    action_permissions: dict[str, str] = {}
+    view_permission = ""
+
+    @property
+    def required_permission(self) -> str:
+        """Joriy amal uchun kerakli ruxsat kodini qaytaradi."""
+        return self.action_permissions.get(self.action, self.view_permission)
+
+
 class ExpenseTypeViewSet(
+    ActionPermissionMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -30,13 +54,11 @@ class ExpenseTypeViewSet(
     """
 
     serializer_class = ExpenseTypeSerializer
-    permission_classes = [HasActionPermission]
     http_method_names = ["get", "post", "patch", "head", "options"]
-    required_permissions = {
-        "list": ["expenses.view_expensetype"],
-        "retrieve": ["expenses.view_expensetype"],
-        "create": ["expenses.add_expensetype"],
-        "partial_update": ["expenses.change_expensetype"],
+    view_permission = "expenses.view_expensetype"
+    action_permissions = {
+        "create": "expenses.add_expensetype",
+        "partial_update": "expenses.change_expensetype",
     }
 
     def get_queryset(self) -> QuerySet[ExpenseType]:
@@ -48,6 +70,7 @@ class ExpenseTypeViewSet(
 
 
 class ExpenseViewSet(
+    ActionPermissionMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -56,12 +79,8 @@ class ExpenseViewSet(
     """Qo'shimcha xarajatlar: ro'yxat (filtr bilan), bitta yozuv va yangi yozuv."""
 
     serializer_class = ExpenseSerializer
-    permission_classes = [HasActionPermission]
-    required_permissions = {
-        "list": ["expenses.view_expense"],
-        "retrieve": ["expenses.view_expense"],
-        "create": ["expenses.add_expense"],
-    }
+    view_permission = "expenses.view_expense"
+    action_permissions = {"create": "expenses.add_expense"}
 
     def get_queryset(self) -> QuerySet[Expense]:
         """Xarajatlarni qaytaradi; ro'yxatda so'rovdagi filtrlarni qo'llaydi.
