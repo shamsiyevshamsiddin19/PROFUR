@@ -1,6 +1,6 @@
 # Backend · Chiqim va xarajatlar
 
-**Egasi** — [@thealiiheere](https://github.com/thealiiheere).
+**Egasi** — [Akbar (@thealiiheere)](https://github.com/thealiiheere).
 
 **Mas’uliyat** — Ombor amallari va xarajatlar API’si.
 
