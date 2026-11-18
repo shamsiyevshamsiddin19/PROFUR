@@ -53,3 +53,9 @@ PCRM-39 va PCRM-40 API’larini haqiqiy ma’lumotlar bilan ulab sinash.
 PR #16 (katalog), #17 (frontend) va #18 (xarajatlar) bir integratsiya tarmog‘ida tekshirildi. `config/urls.py` to‘qnashuvi ikkala API yo‘lini saqlab yechildi. Admin panelida xarajat turining kodi o‘zgarmas qilindi; xarajat yaratish muallifni server belgilaydigan API orqali amalga oshadi. Sessiya/CSRF va dinamik ruxsatlarni ikkala xizmatda tekshiruvchi integratsiya sinovi qo‘shildi.
 
 Lokal: 76 backend testi o‘tdi, 2 PostgreSQL cheklovi sinovi SQLite’da o‘tkazildi; qo‘shimcha 2 integratsiya sinovi ham o‘tdi. Frontend build va 3 testi o‘tdi. PostgreSQL cheklovlari birlashtirish PR’ining CI’sida tekshiriladi. Katalog API va frontend ro‘yxati mavjud; kirim/partiya/qoldiq backend hali PCRM-40/42 vazifasi. PCRM-39 to‘liq UI mezonlari, PCRM-48 barcha sahifalar va PCRM-46 teskari yozuv jarayoni avtomatik Done qilinmaydi.
+
+## PCRM-48 · Referensga mos ko‘rinish · 2026-11-18
+
+Foydalanuvchi yangi Warehouse Inventory System rasmining uslubini ma’qulladi va amalga oshirishni buyurdi. Mavjud frontendning ko‘rinishi yangilandi: to‘q ko‘kimtir menyu, och ish maydoni, oltin aksent, ixcham oq shakllar va jadvallar. [Vizual uslub](../docs/07-ux-ui/visual-style.md) keyingi komponentlar uchun asos. API va biznes oqimlari o‘zgarmadi.
+
+Tekshiruv: frontend build va mavjud 3 test o‘tdi; brauzerda login/logout, UZ/RU/EN, materiallar jadvali va mobil menyu tekshirildi. 320/390/768 px hamda desktopda sahifa gorizontal chiqmaydi. Kirim backendiga bog‘liqlik saqlanadi.
