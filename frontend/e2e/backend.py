@@ -46,4 +46,9 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
     user.roles.add(role)
     category = Category.objects.get(name="LMDF")
     Material.objects.create(name="Browser MDF", category=category, unit=Unit.SHEET)
+    Material.objects.create(
+        name="Akril panel yuqori zichlikdagi namlikka chidamli maxsus qoplama 2800x1220x18mm",
+        category=category,
+        unit=Unit.SHEET,
+    )
     call_command("runserver", "127.0.0.1:18110", use_reloader=False)
