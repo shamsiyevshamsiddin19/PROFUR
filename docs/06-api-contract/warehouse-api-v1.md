@@ -63,6 +63,7 @@ OQ-037 ga ko‘ra rollar admin tomonidan erkin yaratiladi. Shuning uchun API rol
 | `inventory.view_stock` | Qoldiq miqdori va harakatlar tarixi | ✓ | ✓ | ✓ |
 | `inventory.add_receipt` | Kirim yozish | ✓ | ✓ | — |
 | `inventory.view_purchase_price` | Narx, summa va valyuta maydonlarini ko‘rish | ✓ | ✓ | — |
+| `inventory.change_min_quantity` | Minimal qoldiq chegarasini belgilash (OQ-014) | ✓ | — | — |
 
 Rollar jadvali OQ-038 va OQ-041 asosida tuzilgan boshlang‘ich taklif. Admin uni keyin o‘zgartira oladi.
 Agar foydalanuvchida `inventory.view_purchase_price` bo‘lmasa, server narx maydonlarini (`total_amount`, `unit_price`, `currency`, `value_by_currency`) javobdan **olib tashlaydi**. Ular `null` bilan to‘ldirilmaydi. Bu ruxsat frontendda emas, serverda tekshiriladi.
@@ -206,14 +207,17 @@ Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o�
   "material": {"id": 41, "display_name": "LDSP Egger · oq · 280×207×1.6", "unit": "sheet", "category": {"id": 3, "name": "LDSP"}},
   "quantity_on_hand": "35.00",
   "open_batches": 2,
-  "min_quantity": null,
-  "is_below_min": null,
-  "value_by_currency": [{"currency": "USD", "amount": "945.00"}]
+  "min_quantity": "50.00",
+  "is_below_min": true,
+  "value_by_currency": [{"currency": "USD", "amount": "990.00"}]
 }
 ```
 
-- `min_quantity` va `is_below_min` PCRM-42 tayyor bo‘lguncha `null` qaytadi. Minimal chegarani admin belgilaydi (OQ-014).
-- `value_by_currency` faqat USD elementini qaytaradi. Qiymat USD partiya narxlari bo‘yicha hisoblanadi.
+- Ro‘yxatda hamma materiallar bor; kirimi bo‘lmagan material `quantity_on_hand: "0.00"`, `open_batches: 0`, `value_by_currency: []` bilan keladi. `GET /api/v1/stock/{material_id}/` — bitta qator.
+- `min_quantity` — chegara qo‘yilmagan bo‘lsa `null`. `is_below_min` — chegara bor va qoldiq undan kam bo‘lsa `true`, aks holda `false`. `below_min=true` faqat shunday materiallarni qaytaradi.
+- `value_by_currency` — qoldig‘i bor partiyalar bo‘yicha `quantity_remaining × unit_price` yig‘indisi, faqat USD. Narx ko‘rish ruxsati bo‘lmasa maydon javobda bo‘lmaydi.
+
+`PATCH /api/v1/stock/{material_id}/` `{"min_quantity": "50.00"}` yoki `{"min_quantity": null}` — minimal chegarani admin belgilaydi (OQ-014). Ruxsat: `inventory.change_min_quantity`. `>= 0`, aks holda `400 min_value`. Javob — yangilangan qoldiq qatori. `PUT`, `POST`, `DELETE` yo‘q (`405`). Chegaradan pastga tushganda xabarnoma yuborish keyingi vazifada.
 
 `GET /api/v1/stock/{material_id}/batches/` — qoldig‘i bor partiyalar: `id`, `received_on`, `quantity`, `quantity_remaining`, `unit_price`, `currency`. Eng eskisi birinchi keladi. Chiqim formasida partiya tanlash kerak bo‘lsa, shu ro‘yxat ishlatiladi. **[PM: P1]**
 
@@ -264,7 +268,7 @@ def increase(
 ```
 
 - Uchala funksiya `StockBalance` qatorini `select_for_update()` bilan qulflaydi. Shu sabab bir vaqtdagi ikki chiqim qoldiqni manfiyga tushira olmaydi (muhandislik rejasidagi «10 tadan 7 + 7» sinovi).
-- Qoldiq yetmasa, `decrease` `InsufficientStock(available=...)` xatosini ko‘taradi. API uni `409`, `code = "insufficient_stock"` va `"available": "3.00"` bilan qaytaradi.
+- Qoldiq yetmasa, `decrease` umumiy `services.ensure_available(balance, quantity)` orqali `InsufficientStockError(available, requested)` ko‘taradi (PCRM-42 da tayyor). API uni `409`, `code = "insufficient_stock"` va `"available": "3.00"` bilan qaytaradi.
 - `allocations` — qaysi partiyadan qancha olinishi. Tanlash qoidasi PM qaroriga bog‘liq. **[PM: P1]** Qaror chiqquncha xizmat partiyalarni ichida tanlamaydi: chaqiruvchi taqsimotni aniq beradi yoki bitta partiyani ko‘rsatadi.
 
 ## 7. Avtomatik sinovlar (PCRM-40 va PCRM-42 da yoziladi)
