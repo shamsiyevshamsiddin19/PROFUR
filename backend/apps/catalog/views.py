@@ -45,6 +45,12 @@ class MaterialHasHistoryError(APIException):
     )
     default_code = "material_has_history"
 
+    def __init__(self):
+        code = self.default_code
+        super().__init__(
+            {"detail": ErrorDetail(str(self.default_detail), code), "code": code}
+        )
+
 
 # Eski partiyalar shu qiymatlar bilan kirgan, ularni o'zgartirish tarixni buzadi.
 HISTORY_LOCKED_FIELDS = ("unit", "length_cm", "width_cm", "thickness_cm")

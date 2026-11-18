@@ -166,6 +166,7 @@ def test_same_key_with_other_body_is_conflict(storekeeper, egger):
 
     assert response.status_code == 409
     assert response.data["detail"].code == "idempotency_conflict"
+    assert response.data["code"] == "idempotency_conflict"
     assert Batch.objects.count() == 1
 
 
@@ -365,6 +366,7 @@ def test_material_with_receipts_keeps_unit_and_dimensions(storekeeper, egger):
         response = editor.patch(url, change, format="json")
         assert response.status_code == 409
         assert response.data["detail"].code == "material_has_history"
+        assert response.data["code"] == "material_has_history"
 
     assert editor.patch(url, {"name": "LDSP Egger W980"}).status_code == 200
     assert editor.patch(url, {"unit": "sheet"}).status_code == 200  # o'zgarmagan
