@@ -17,7 +17,7 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 | [PCRM-48](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-48) | Responsive ekran tuzilmasi, navigatsiya va UZ/RU/EN | Ko‘rikda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17) |
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Material katalogi UI | Reja | — |
 | [PCRM-41](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-41) | Kirim formasi va API integratsiyasi | Jarayonda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17), kirim backendiga bog‘liq |
-| [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Reja | — |
+| [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Jarayonda | Ozodbekning `/api/v1/stock/` API'si frontendga ulandi |
 | [PCRM-45](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-45) | Chiqim, qaytarish va tasdiqlash ekranlari | Reja | — |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Tarix va hisobot UI | Reja | — |
 
@@ -75,3 +75,12 @@ Foydalanuvchi so‘roviga ko‘ra kirish sahifasidagi oltin qutilar tasviri butu
 Foydalanuvchi oq fon saqlanishini va tizim ranglari/dizayn kamchiliklari tuzatilishini so‘radi. Safir ko‘k asosiy amallar, grafit matn va neytral status tizimi tanlandi. Mayda yozuvlar, maydon chegarasi kontrasti, takroriy bezaklar, mobil yorliq tekisligi va sana maydoni tuzatildi. Mobil menyu logout/login holati ham yopildi; yangi regressiya sinovi qo‘shildi. Rang va boshqaruv o‘lchamlari uchun Atlassian/W3C manbalari o‘rganilib, vizual uslubga kiritildi. Biznes/API o‘zgarmadi.
 
 Dalil: build va 4 frontend testi; matn/fon hamda boshqaruv/fon kontrast hisoblari; brauzerda 320/768 px va desktop, uz/ru/en, mobil menyu va maydon joylashuvi. Keyingi UI ishlarida yangi vizual uslubga tayaning.
+
+## PCRM-43 · Ozodbekning Qoldiq (Stock) API'siga frontendni ulash · 2026-11-18
+
+Frontend qoldiq ekrani (`#stock`) Ozodbek yaratgan `/api/v1/stock/` API'siga to‘liq ulandi.
+- Jadvalda har bir material qoldig‘i, ochiq partiyalar soni (`open_batches`), minimal chegara (`min_quantity`) va umumiy qiymati (`value_by_currency`) ko‘rsatiladi.
+- Agar qoldiq minimal chegaradan past bo‘lsa (`is_below_min: true`), «Kam qoldiq» (Low stock) ogohlantiruvchi badge chiqadi.
+- Qidiruv va «Faqat kam qolganlar» (`below_min=true`) filtri qo‘shildi.
+- Narx ko‘rish ruxsati bo‘lmaganda qiymat xatosiz yashiriladi (OQ-041).
+- Avtomatik sinovlar (`App.test.tsx` 6 ta test) va TypeScript build to‘liq o‘tdi.
