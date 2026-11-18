@@ -112,7 +112,10 @@ export function App() {
         lang={lang}
         languagePicker={languagePicker}
         initialError={authError}
-        onLogin={setUser}
+        onLogin={(user) => {
+          setDrawer(false);
+          setUser(user);
+        }}
       />
     );
 
@@ -120,6 +123,7 @@ export function App() {
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
   async function logout() {
+    setDrawer(false);
     try {
       await write("/api/auth/logout/", lang, {});
       setUser(null);
@@ -216,7 +220,6 @@ export function App() {
         <main>
           <div className="page-heading">
             <div>
-              <span className="eyebrow">PROFUR / {t("warehouse")}</span>
               <h1>{t(screen)}</h1>
               <p>{screen === "receiving" ? t("intro") : t("search")}</p>
             </div>

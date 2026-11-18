@@ -69,3 +69,9 @@ Tekshiruv: build va 3 mavjud test o‘tdi; brauzerda haqiqiy kirish/chiqish va x
 ## PCRM-48 · Kirish bezagi olib tashlandi · 2026-11-18
 
 Foydalanuvchi so‘roviga ko‘ra kirish sahifasidagi oltin qutilar tasviri butunlay olib tashlandi. Login formasi markazga joylandi. Tasvirning JSX, CSS va foydalanilmaydigan ranglari o‘chirildi. Yangi dekorativ tasvir qo‘shmang.
+
+## PCRM-48 · Oq fon va professional UI ko‘rigi · 2026-11-18
+
+Foydalanuvchi oq fon saqlanishini va tizim ranglari/dizayn kamchiliklari tuzatilishini so‘radi. Safir ko‘k asosiy amallar, grafit matn va neytral status tizimi tanlandi. Mayda yozuvlar, maydon chegarasi kontrasti, takroriy bezaklar, mobil yorliq tekisligi va sana maydoni tuzatildi. Mobil menyu logout/login holati ham yopildi; yangi regressiya sinovi qo‘shildi. Rang va boshqaruv o‘lchamlari uchun Atlassian/W3C manbalari o‘rganilib, vizual uslubga kiritildi. Biznes/API o‘zgarmadi.
+
+Dalil: build va 4 frontend testi; matn/fon hamda boshqaruv/fon kontrast hisoblari; brauzerda 320/768 px va desktop, uz/ru/en, mobil menyu va maydon joylashuvi. Keyingi UI ishlarida yangi vizual uslubga tayaning.

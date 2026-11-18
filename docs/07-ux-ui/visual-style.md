@@ -1,39 +1,56 @@
 # PROFUR interfeys uslubi
 
-2026-11-18 kuni Team Lead yuborgan «Warehouse Inventory System» tasvirining vizual uslubi tanlandi va «boshla unda» topshirig‘i bilan amalga oshirish boshlandi. Eski Figma maketi ishlatilmaydi. Mavjud React komponentlari PROFUR ombor talablariga mos qoladi.
+## Joriy yo‘nalish · 2026-11-18
 
-## Ranglar
+Foydalanuvchi fonni oq saqlab, tizim ranglari va dizayndagi kamchiliklarni tuzatishni so‘radi. Joriy yechim — oq ish maydoni, grafit matn, safir ko‘k asosiy amallar va to‘q neytral navigatsiya. Bu avvalgi oltin rangli palitrani almashtiradi. Kirish sahifasidagi rad etilgan qutilar tasvirini qaytarmang.
 
-| Vazifa | Rang |
+## Ko‘rikda topilgan va tuzatilgan kamchiliklar
+
+- 8–11 px yordamchi matnlar telefonda juda mayda edi. Yordamchi matnlar odatda 12 px, maydonlar 14 px, bo‘lim sarlavhalari 16 px bo‘ldi. Navigatsiya guruhi kabi qisqa metama’lumotlar bundan mustasno.
+- Oltin rang amal, bezak va ma’lumotda birday ishlatilgan. Ko‘k asosiy amal va faol navigatsiya uchun; yashil/qizil/ambar natija holatlari uchun ajratildi. USD belgisi neytral.
+- Maydon chegarasi va oq yuza kontrasti past edi. Yangi chegarada 3.11:1, ko‘k fokusda 6.16:1 kontrast tekshirildi.
+- Kirim hisob-kitobidagi dekorativ shakl va takrorlangan sarlavha/valyuta yozuvlari kamaytirildi. Asosiy e’tibor material, miqdor va summada.
+- Kichik ekranda uzun yorliqlar yonma-yon maydonlarni notekis ko‘rsatgan. Ixtiyoriy maydon yorliqlari tekislandi, 320 px da sana maydonining ichki bo‘shlig‘i tuzatildi.
+- Mobil menyu kirish-chiqishdan keyin ochiq qolishi mumkin edi. Holat tozalanadi; desktopda ortiqcha qoraytiruvchi qatlam ko‘rsatilmaydi. Avtomatik regressiya sinovi bor.
+
+## Palitra
+
+| Vazifa | Qiymat |
 |---|---|
-| Chap navigatsiya | `#101f32` — chuqur ko‘kimtir |
-| Ish maydoni | `#f4f6f9` — och sovuq kulrang |
-| Asosiy yuza | `#ffffff` |
-| Maydonlar | `#fbfcfe` |
-| Hisob-kitob paneli | `#fffcf5` — iliq oq |
-| Asosiy matn | `#1c2b3e` |
-| Ikkilamchi matn | `#647187` |
-| Asosiy tugma | `#e1ac45` — oltin |
-| Oltin matn | `#77500b` |
-| Ajratgich | `#e1e6ee` |
-| Xato | `#a7302a`, och yuza `#fff1ef` |
-| Muvaffaqiyat | `#216342`, och yuza `#edf8f0` |
-| Ogohlantirish | `#79520d`, och yuza `#fff8e7` |
+| Fon va asosiy yuza | `#ffffff` |
+| Asosiy matn | `#182230` |
+| Ikkilamchi matn | `#5d6b7d` |
+| Asosiy amal | `#2956d7`, ustidagi matn `#ffffff` |
+| Hover | `#2147b5` |
+| Och ko‘k yuza | `#edf2ff` |
+| Hisob-kitob yuza | `#f8faff` |
+| Navigatsiya | `#131e30` |
+| Faol navigatsiya | `#243c67` |
+| Maydon chegarasi | `#8793a5` |
+| Strukturaviy ajratgich | `#e4e8ef` |
+| Xato / muvaffaqiyat / ogohlantirish | `#a7302a` / `#216342` / `#79520d` |
 
-Barcha ranglar `frontend/src/tokens.css`da saqlanadi. Komponent uslublarida tayyor CSS o‘zgaruvchilarini ishlating; alohida hex yoki nomlangan rang yozmang. `styles.css` joylashuv va shaklni, `tokens.css` esa ranglarni boshqaradi. Brauzer paneli uchun `index.html`dagi `theme-color` navigatsiya rangiga mos bo‘lishi kerak.
+Manba — `frontend/src/tokens.css`. Komponentda yangi tarqoq hex rang yozmang. Brauzer `theme-color`i oq. Yordamchi yuza yoki ikonka rangini asosiy amal rangidan balandroq urg‘uda ishlatmang.
 
-Faol, hover, fokus, disabled, autofill, matn tanlash, surish paneli va soyalar ham yagona palitradan foydalanadi. Disabled holatni faqat shaffoflik bilan belgilanmaydi: alohida neytral yuza va matn qo‘llanadi. Gold aksent dekor va asosiy amal uchun, holat xabarlari esa o‘z semantik ranglari uchun ishlatiladi.
+## Komponent qoidalari
 
-Asosiy tekshirilgan matn/yuza juftliklari kamida 4.5:1 kontrastga ega: asosiy/ikkilamchi matn, placeholder, tugma, menyu, xato/muvaffaqiyat/ogohlantirish. Bu butun ilovaning accessibility auditi o‘rnini bosmaydi. Butun ilovani yana to‘liq dark uslubga almashtirmang.
+- Bir sahifada asosiy sarlavha, qisqa izoh va mazmunning aniq tartibi bo‘lsin. Takroriy brand/sarlavha va vazifasiz dekor qo‘shmang.
+- Yorliq va maydon orasida 8 px; guruhlar orasida 20–24 px masofa saqlang. Ixtiyoriylik yorliq bilan yonma-yon ko‘rsatiladi.
+- Maydon va asosiy tugma kamida 44 px balandlikda; ikonka tugmalar 40×40 px. Telefon va uzun tarjimalarda tekshiring.
+- Fokus ko‘rinadigan bo‘lsin. Xato faqat rang bilan emas, matn va maydonning aria atributlari bilan ham ko‘rsatilsin. Disabled holat alohida neytral rangda.
+- Tashqi panellar nozik strukturaviy chiziqda; foydalanuvchi yozadigan maydon chegarasi kuchliroq. Har bir elementga qalin border bermang.
+- Jadvallar oq yuza, neytral sarlavha va sokin hoverda. Gorizontal surish jadval konteynerida, butun sahifada emas.
+- Login markazdagi forma bo‘lib qoladi. Yangi dekorativ tasvir qo‘shmang.
+- UZ/RU/EN va USD saqlanadi. Faqat haqiqiy API ma’lumotlari ko‘rsatiladi.
 
-## Komponentlar
+## O‘rganilgan manbalar va tekshiruv
 
-- Chap menyu: ixcham SVG ikonka, faol bo‘limda oltin belgi, pastda foydalanuvchi va chiqish.
-- Ish maydoni: och fon, kenglikdan foydalanadigan mazmun, oq yuqori panel va til tanlash.
-- Shakllar: oq yuza, nozik ajratgich, yumshoq 7–10 px burchak, aniq fokus, mavjud kutish/xato holatlari.
-- Jadvallar: och sarlavha, ixcham qatorlar, yengil hover, uzun jadval uchun o‘z konteynerida gorizontal surish.
-- Kirim: material tanlash, USD summa, miqdor, sana va mustaqil hisob-kitob paneli.
-- Telefon: menyu ochiladigan panelga aylanadi; kirim formasi va hisob-kitob ketma-ket joylashadi. Matn va tugmalar bir-birini bosmasin.
-- Tillar uz/ru/en; barcha summalar USD. Refensdagi Google Sheets brendi, noutbuk maketi, demo statistika va mahsulotlar kiritilmaydi.
+[Atlassian rang tamoyillari](https://atlassian.design/foundations/color/) — neytral, asosiy amal va status ranglarini vazifasiga qarab ajratish.
 
-Joriy o‘zgarish faqat mavjud ekranlarning ko‘rinishiga tegishli. Kirim backendiga ulanish va hali yo‘q chiqim/tarix ekranlari alohida vazifalardir.
+[W3C matn kontrasti](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) — oddiy matn uchun 4.5:1 chegara. Tekshirilgan juftliklar: asosiy matn 16.03:1; ikkilamchi matn 5.43:1; oq matnli ko‘k tugma 6.16:1.
+
+[W3C boshqaruv kontrasti](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) — muhim boshqaruv belgilari uchun 3:1. Har bir dekorativ chiziq bu talabga kirmaydi.
+
+[W3C bosish maydoni](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) — kamida 24×24 px yoki tegishli masofa; PROFUR asosiy boshqaruvlari buning ustida tanlandi.
+
+Bu to‘liq WCAG muvofiqligi auditi emas. Brauzerda 320/768 px va desktop, uch til, mobil menyu va maydon joylashuvi tekshirildi. Build hamda 4 frontend sinovi bajariladi.
