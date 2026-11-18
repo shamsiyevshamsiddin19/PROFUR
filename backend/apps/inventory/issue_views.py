@@ -153,9 +153,16 @@ class IdempotentCreateMixin:
         if record.request_hash != fingerprint:
             raise IdempotencyConflictError()
         return Response(
-            replay_body_for_user(record.response_body, request.user),
+            self.replay_body(record.response_body, request.user),
             status=status.HTTP_200_OK,
         )
+
+    def replay_body(self, body: dict, user) -> dict:
+        """Saqlangan javobni joriy foydalanuvchiga moslaydi (ombor: narxni yashirish).
+
+        Narx maydonlari bo'lmagan view (masalan, xarajatlar) buni o'zgartiradi.
+        """
+        return replay_body_for_user(body, user)
 
 
 class StockIssueViewSet(

@@ -4,6 +4,7 @@ Asl yozuv o'chirilmaydi va o'zgarmaydi; teskari yozuv manfiy summa va sabab
 bilan qo'shiladi, shuning uchun summalar yig'indisi to'g'ri qoladi.
 """
 
+import uuid
 from decimal import Decimal
 
 import pytest
@@ -172,3 +173,71 @@ def test_reversal_message_follows_language(accountant, expense):
     )
 
     assert str(response.data["detail"]) == "This expense has already been cancelled."
+
+
+def post_with_key(client: APIClient, url: str, body: dict, key: str):
+    """``Idempotency-Key`` bilan ``POST`` yuboradi."""
+    return client.post(url, body, format="json", HTTP_IDEMPOTENCY_KEY=key)
+
+
+def test_resent_expense_is_saved_once(accountant):
+    """Bir xil kalit va tana: bitta xarajat, ikkinchi javob 200 (valyuta saqlanadi)."""
+    key = str(uuid.uuid4())
+    body = {
+        "expense_type": "tax",
+        "amount": "40.00",
+        "spent_on": "2026-11-18",
+        "project_id": 7,
+    }
+
+    first = post_with_key(accountant, EXPENSES, body, key)
+    second = post_with_key(accountant, EXPENSES, body, key)
+    other = post_with_key(accountant, EXPENSES, {**body, "amount": "41.00"}, key)
+
+    assert (first.status_code, second.status_code, other.status_code) == (201, 200, 409)
+    assert second.data == first.data
+    assert second.data["currency"] == "USD"
+    assert other.data["detail"].code == "idempotency_conflict"
+    assert Expense.objects.count() == 1
+
+
+def test_expense_without_key_still_works(accountant):
+    """Kalitsiz so'rov avvalgidek 201 (eski mijozlar buzilmaydi)."""
+    body = {
+        "expense_type": "tax",
+        "amount": "5.00",
+        "spent_on": "2026-11-18",
+        "project_id": 1,
+    }
+
+    assert accountant.post(EXPENSES, body, format="json").status_code == 201
+
+
+def test_invalid_key_is_rejected(accountant):
+    """Kalit UUID bo'lmasa 400 va hech narsa saqlanmaydi."""
+    body = {
+        "expense_type": "tax",
+        "amount": "5.00",
+        "spent_on": "2026-11-18",
+        "project_id": 1,
+    }
+
+    response = post_with_key(accountant, EXPENSES, body, "not-a-uuid")
+
+    assert response.status_code == 400
+    assert not Expense.objects.exists()
+
+
+def test_resent_reversal_returns_first_answer(accountant, expense):
+    """Bekor qilish shu kalit bilan qayta yuborilsa — birinchi javob, yangi yozuv yo'q."""
+    key = str(uuid.uuid4())
+    url = f"{EXPENSES}{expense.pk}/reverse/"
+
+    first = post_with_key(accountant, url, {"reason": "Xato"}, key)
+    second = post_with_key(accountant, url, {"reason": "Xato"}, key)
+    without_key = accountant.post(url, {"reason": "Xato"}, format="json")
+
+    assert (first.status_code, second.status_code) == (201, 200)
+    assert second.data == first.data
+    assert without_key.status_code == 409
+    assert Expense.objects.count() == 2
