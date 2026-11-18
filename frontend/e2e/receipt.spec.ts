@@ -129,11 +129,14 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
 
   await page.goto("/#expenses");
   await page
+    .locator("form")
     .getByLabel("Expense type", { exact: true })
-    .first()
     .selectOption("tax");
   await page.getByLabel("Amount · USD", { exact: true }).fill("12.50");
-  await page.getByLabel("Project number", { exact: true }).first().fill("7");
+  await page
+    .locator("form")
+    .getByLabel("Project number", { exact: true })
+    .fill("7");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByText("Saved.", { exact: true })).toBeVisible();
   await page
