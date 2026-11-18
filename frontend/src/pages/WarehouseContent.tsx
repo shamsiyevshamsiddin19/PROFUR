@@ -290,8 +290,12 @@ export function WarehouseContent({
   ) {
     return (
       <label className={field === "note" ? "wide" : ""}>
-        {t(key)}
-        {optional && <small>{t("optional")}</small>}
+        <span
+          className={optional ? "field-label optional-label" : "field-label"}
+        >
+          {t(key)}
+          {optional && <small>{t("optional")}</small>}
+        </span>
         <input
           type={type}
           value={draft[field]}
@@ -343,13 +347,16 @@ export function WarehouseContent({
               <h2>{t("details")}</h2>
               <p>{t("detailsHint")}</p>
             </div>
-            <span className="subtle-label">USD</span>
           </div>
           <div className="form-grid">
             <label className="wide">
               {t("material")}
               <select
                 required
+                aria-invalid={Boolean(fields.material_id)}
+                aria-describedby={
+                  fields.material_id ? "error-material" : undefined
+                }
                 value={draft.material_id}
                 disabled={locked || loading || materials.length === 0}
                 onChange={(e) => change("material_id", e.target.value)}
@@ -362,7 +369,9 @@ export function WarehouseContent({
                 ))}
               </select>
               {fields.material_id && (
-                <span className="field-error">{fields.material_id}</span>
+                <span className="field-error" id="error-material">
+                  {fields.material_id}
+                </span>
               )}
             </label>
             {next && (
@@ -425,10 +434,6 @@ export function WarehouseContent({
         <aside className="summary panel">
           <span className="eyebrow">{t("newReceipt")}</span>
           <h2>{t("summary")}</h2>
-          <div className="summary-graphic" aria-hidden="true">
-            <Package size={48} strokeWidth={1} />
-            <span className="orb" />
-          </div>
           <p className="selected-material">
             {selected?.display_name || selected?.name || t("select")}
           </p>
