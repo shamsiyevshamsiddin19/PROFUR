@@ -1,11 +1,13 @@
 # PROFUR — OQ-001–OQ-048: Team Lead javoblari
 
-**Sana:** 2026-11-17  
-**Holat:** **TAKLIF / PROPOSED** — PM va buyurtmachi hali tasdiqlamagan  
-**Asos:** Team Lead bilan ChatGPT suhbatida berilgan javoblar; [savollar reyestri](open-questions.md); `Profur_CRM_MVP_TZ.pdf`.  
+**Sana:** 2026-11-17
+**Holat:** **PM TASDIQLAGAN — 48 / 48**
+
+PM OQ-001–OQ-048 javoblarini tasdiqlagani Team Lead tomonidan 2026-11-18 kuni xabar qilindi. Bu sana tasdiq haqidagi xabar qayd etilgan sanadir.
+**Asos:** Team Lead bilan ChatGPT suhbatida berilgan javoblar; [savollar reyestri](open-questions.md); `Profur_CRM_MVP_TZ.pdf`.
 **Joriy ishlab chiqish chegarasi:** faqat TZdagi **1-qism — ombor/kirim-chiqim**, **responsive veb-sayt**. Qolgan qismlar kelgusida.
 
-> Bu hujjat suhbatdagi tanlovlarni qayd etadi, **PM/buyurtmachi tasdiqlagan talablar** yoki yakuniy TZ o‘rnini bosmaydi. Ayrim savollarning javobi qisman noma’lum; ular pastda ochiq belgilangan. Avvalgi qarorlarga zid so‘nggi qarorlar (ayniqsa OQ-042/OQ-048) aniq qayd etilgan.
+> PM tasdig‘i hujjatdagi javoblarga tegishli. Noma’lum deb yozilgan qiymatlar, hisoblash tafsilotlari va keyingi bosqichlar taqvimi alohida aniqlashtiriladi.
 
 ## A. Ombor, kirim-chiqim va tannarx
 
@@ -77,15 +79,15 @@
 
 | ID | Team Lead javobi — dastlabki qaror | Izoh / hal qilinmagan jihat |
 |---|---|---|
-| OQ-042 | Dastlab Android va iOS uchun ichki tarqatiladigan ishchi ilovasi hamda responsiv admin veb-paneli tanlangan; KEYINGI OQ-048 qaroriga ko‘ra alohida mobil ilova o‘rniga barcha qurilmalarga mos responsiv veb-sayt tanlandi. | Oxirgi tanlov avvalgi mobil ilova qarorini almashtiradi; TZda mobil ilova yozilgani uchun PM tasdig‘i talab qilinadi. |
+| OQ-042 | Dastlab Android va iOS uchun ichki tarqatiladigan ishchi ilovasi hamda responsiv admin veb-paneli tanlangan; KEYINGI OQ-048 qaroriga ko‘ra alohida mobil ilova o‘rniga barcha qurilmalarga mos responsiv veb-sayt tanlandi. | Oxirgi tanlov avvalgi mobil ilova qarorini almashtiradi; platforma qarori PM tomonidan tasdiqlangan. |
 | OQ-043 | Jami foydalanuvchilar, parallel foydalanuvchilar va faol loyihalar soni hozircha noma’lum. Arxitektura kelajakda kengaytirishga tayyor bo‘lishi kerak. | Aniq yuklama mezonlari keyin belgilanadi. |
 | OQ-044 | Tizim to‘liq onlayn ishlaydi. Internet bo‘lmasa yangi ish qaydlari kiritilmaydi; oflayn ish qaydlarini saqlash/sinxronlash talab qilinmaydi. | OQ-028 serverda xabar navbati saqlanishi haqidagi qaror bilan zid emas. |
 | OQ-045 | Interfeys: o‘zbek (lotin), rus va ingliz; har foydalanuvchi tilini mustaqil tanlaydi; barcha responsive veb-sahifalarda qo‘llanadi. | Standart dastlabki til alohida belgilanadi. |
 | OQ-046 | Hosting: bulutli VPS/cloud; domen hozircha noma’lum; har kuni avtomatik backup; nosozlikdan tiklash maqsadi RTO = 4 soat. | RPO, backupni saqlash muddati va amaliy tiklash imkoniyati keyin aniqlanadi. |
 | OQ-047 | Korxonaning haqiqiy xodimlari loyiha jamoasi bilan birgalikda alohida test muhitida sinov ma’lumotlari yordamida tekshiradi; qabul qiluvchi PM va buyurtmachi birgalikda; asosiy jarayonlar ishlashi va jiddiy xatolar qolmasligi kerak. | Jiddiy xato mezonlari va aniq test ssenariylari PM bilan rasmiylashtiriladi. |
-| OQ-048 | HOZIRGI SCOPE: TZdagi MVP 1 ning faqat 1-qismi — kirim-chiqim va ombor nazorati ishlab chiqiladi. Barcha ekranlarga mos bitta responsive veb-sayt; alohida Android/iOS mobil ilovasi hozir qilinmaydi. TZdagi 2–4-qismlar keyingi bosqichlar. | TZdagi '4 qism' va '4 versiya'ni adashtirmaslik; joriy sprint faqat omborga qaratilgan; PM tasdig‘i kutiladi. |
+| OQ-048 | HOZIRGI SCOPE: TZdagi MVP 1 ning faqat 1-qismi — kirim-chiqim va ombor nazorati ishlab chiqiladi. Barcha ekranlarga mos bitta responsive veb-sayt; alohida Android/iOS mobil ilovasi hozir qilinmaydi. TZdagi 2–4-qismlar keyingi bosqichlar. | TZdagi '4 qism' va '4 versiya'ni adashtirmaslik; joriy bosqich faqat omborga qaratilgan; doira PM tomonidan tasdiqlangan. |
 
-## PM bilan tasdiqlanishi yoki aniqlashtirilishi kerak bo‘lgan masalalar
+## Tasdiqlangan javoblar ichidagi qo‘shimcha aniqlashtirishlar
 
 1. **OQ-001:** narxi turlicha bo‘lgan kirim partiyalarini chiqimga bog‘lash/tannarx tanlash algoritmi.
 2. **OQ-013:** ikki kasr xona aniqligi va “yaxlitlanmasin” talabini muvofiqlashtirish.
@@ -94,17 +96,17 @@
 5. **OQ-031:** upakovkaning uchta ichki turi nomi.
 6. **OQ-034:** valyuta kursi manbasi.
 7. **OQ-037/039:** dinamik ruxsatlar auditi va umumiy akkaunt identifikatsiyasi xavfsizligi.
-8. **OQ-042/048:** TZda mobil ilova nazarda tutilgan, ammo oxirgi Team Lead qarori responsiv veb-sayt; PM bilan kelishish.
+8. **OQ-042/048:** responsiv veb-sayt tanlovi PM tomonidan tasdiqlangan.
 9. **OQ-043:** foydalanuvchi, parallel yuklama, faol loyihalar uchun sonli ko‘rsatkichlar.
 10. **OQ-045:** standart dastlabki interfeys tili.
 11. **OQ-046:** domen, RPO, zaxira nusxalar saqlash muddati va RTO=4 soat maqsadining amaliy bahosi.
 12. **OQ-047:** qabul sinovlari va jiddiy xato mezonlarining yozma ro‘yxati.
-13. **OQ-048:** dastlabki reliz faqat ombor bo‘lishini va keyingi bosqichlar taqvimini PM tasdiqlashi.
+13. **OQ-048:** dastlabki reliz faqat ombor bo‘lishi tasdiqlangan. Keyingi bosqichlar taqvimi keyin belgilanadi.
 
 ## Reliz chegarasi va Jira
 
 - **Hozir:** 1-qism — 9 ta boshlang‘ich kategoriya va nomenklatura; kirim, birlik narxi, qoldiq, chiqim, qo‘shimcha xarajatlar, operatsiyalar tarixi. [PCRM-1 (Epic)](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-1); [PCRM-5–9 vazifalar](https://shamsiyevshamsiddin19.atlassian.net/jira/software/projects/PCRM/boards/34/backlog).
 - **Keyingi qismlar:** buyurtmalar/model/normativlar, ishlab chiqarish/ishchilar, upakovka/yetkazish/yopilish — dastlabki ombor bosqichiga avtomatik kiritilmaydi.
 - **Platforma:** telefon, planshet va kompyuter uchun responsive veb-sayt. To‘liq onlayn ish rejimi.
-- **Qaror egasi:** Team Lead tomonidan taklif; **yakuniy tasdiqlovchi:** PM va buyurtmachi.
-- **Status:** barcha 48 ta javob suhbatda bildirilgan, lekin **hali rasman tasdiqlanmagan**.
+- **Tasdiqlovchi:** PM. **Tasdiq manbasi:** Team Leadning 2026-11-18 kungi xabari.
+- **Holat:** 48 ta javob PM tomonidan tasdiqlangan.

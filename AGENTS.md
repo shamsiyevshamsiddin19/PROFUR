@@ -18,3 +18,7 @@ Yangi qaror yoki jamoadoshga ta’sir qiladigan o‘zgarishda [birgalikda ishlas
 ## AI bilan amaliy bajarish
 
 Jamoa a’zolari dastlabki tajribaga ega. Vazifa berilganda [bajarish qo‘llanmasi](Подсказка/EXECUTION.md) va o‘z rol faylidagi “Navbatdagi ish” bo‘limiga tayanib o‘qish → kodlash → tekshirish → PR → topshirish yo‘lini bajaring. Faqat reja yoki maslahat bilan to‘xtamang. Oddiy texnik tanlovlarda o‘zingiz qaror qilib sababini tushuntiring. Umumiy API, moliyaviy hisob va biznes qoidasiga tegadigan ochiq masalani tegishli egasi yoki PM bilan kelishish uchun qayd eting.
+
+## PM tasdig‘i qaydi
+
+2026-11-18 kuni Team Lead OQ-001–OQ-048 javoblari PM tomonidan tasdiqlanganini xabar qildi. Agent tasdiqlangan talablar bilan ishni davom ettiradi. Noma’lum qiymat yoki algoritm haqidagi izoh tegishli masala bo‘yicha aniqlashtiriladi. Tafsilotlar docs/09-decisions/decision-log.md da.
