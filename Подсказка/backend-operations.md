@@ -32,3 +32,7 @@ Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha 
 4. **PCRM-47** da sana, amal va material bo‘yicha filtrlanadigan tarix API’sini Shamsiddin bilan kelishing. Ruxsat sinovini Jamoliddin accounts yechimi bilan bajaring.
 
 Har bir bandning mavjud PR yoki kodda bajarilganini tekshirib navbatdagi ishga o‘ting. Ozodbekka kerakli umumiy model o‘zgarishini bitta aniq diff bilan taklif qiling.
+
+## 2026-11-18 · Valyuta va til qarori
+
+Chiqim tannarxi va barcha xarajatlar USD ($)da. Boshqa valyuta qiymatini API rad etsin. Xato va tasdiqlash xabarlari uz/ru/en tillariga mos bo‘lsin. [Qarorlar jurnali](../docs/09-decisions/decision-log.md).

@@ -22,3 +22,7 @@ Jamoa a’zolari dastlabki tajribaga ega. Vazifa berilganda [bajarish qo‘llanm
 ## PM tasdig‘i qaydi
 
 2026-11-18 kuni Team Lead OQ-001–OQ-048 javoblari PM tomonidan tasdiqlanganini xabar qildi. Agent tasdiqlangan talablar bilan ishni davom ettiradi. Noma’lum qiymat yoki algoritm haqidagi izoh tegishli masala bo‘yicha aniqlashtiriladi. Tafsilotlar docs/09-decisions/decision-log.md da.
+
+## Yagona valyuta va uch til
+
+2026-11-18 kungi foydalanuvchi qarori — barcha pul summalari faqat USD ($). Interfeys tillari uz, ru, en. Bu qaror docs/09-decisions/decision-log.md da yozilgan va boshqa valyutalar/kurs haqidagi eski takliflarni almashtiradi. Har bir agent o‘z vazifasidagi eski API namunalari, shakllar va tekshiruvlarni shu qarorga moslashtiradi.

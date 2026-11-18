@@ -34,3 +34,7 @@ Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha 
 4. **PCRM-42** uchun mavjud qoldiq, minimal chegara va chiqim bilan umumiy qoldiq tekshiruvini Akbar bilan kelishing.
 
 Boshlashda har bir band allaqachon kod yoki PR’da bajarilganini tekshiring. Akbarga model nomi, identifikator, migratsiya va qoldiq amalining kirish/chiqishini aniq topshiring.
+
+## 2026-11-18 · Valyuta va til qarori
+
+Barcha kirimlar, birlik narxi va qoldiq qiymati faqat USD. API boshqa valyutani rad etsin. API shartnomasidagi ko‘p valyutali misollarni USD bilan moslashtiring. Xato xabarlari uz/ru/en tillariga mos bo‘lsin. [Qarorlar jurnali](../docs/09-decisions/decision-log.md).

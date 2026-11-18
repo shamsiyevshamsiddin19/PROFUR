@@ -30,3 +30,7 @@ Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha 
 ## Navbatdagi ish
 
 PCRM-48/PCRM-41 uchun Ozodbekning API taklifi va joriy main’ni tekshiring. Frontend texnologiyasi bo‘yicha tasdiqlangan tanlovni aniqlang. Kirim materialini tanlash, miqdor/birlik, sana, summa va valyuta maydonlari, server xato javobi va birlik narxi ko‘rinishini kelishing. Telefon, planshet, kompyuter va UZ/RU/EN holatlarida quring. Shartnoma kelishilsa API javob namunalari bilan davom etish mumkin. Yakunda haqiqiy kirim API’siga ulab, qoldiq va partiyani qayta yuklash orqali tekshiring.
+
+## 2026-11-18 · Valyuta va til qarori
+
+Barcha pul summalarini USD ($)da ko‘rsating. Barcha sahifa, shakl va xato xabarlari uchun uz/ru/en tarjimalarini bering. Til almashganda tanlov saqlansin va USD pul birligi qo‘llansin. [Qarorlar jurnali](../docs/09-decisions/decision-log.md).
