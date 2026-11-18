@@ -12,6 +12,21 @@ from rest_framework import serializers
 class RoleSerializer(serializers.ModelSerializer):
     """Rol ma'lumotlarini seriyalashtiruvchi serializer (OQ-037)."""
 
+    permissions = serializers.ListField(
+        child=serializers.CharField(allow_blank=False), required=False
+    )
+
+    def validate_code(self, value):
+        if (
+            self.instance
+            and (self.instance.is_system or self.instance.code == "ADMIN")
+            and value != self.instance.code
+        ):
+            raise serializers.ValidationError(
+                _("Tizimli rol kodini o'zgartirib bo'lmaydi.")
+            )
+        return value
+
     class Meta:
         model = Role
         fields = [
@@ -22,7 +37,7 @@ class RoleSerializer(serializers.ModelSerializer):
             "permissions",
             "is_system",
         ]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "is_system"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -191,6 +206,24 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
             "primary_role",
             "roles",
         ]
+
+    def validate(self, attrs):
+        actor = self.context["request"].user
+        if self.instance.pk == actor.pk:
+            if attrs.get("is_active") is False:
+                raise serializers.ValidationError(
+                    {"is_active": _("O'z hisobingizni faolsizlantira olmaysiz.")}
+                )
+            roles = attrs.get("roles")
+            if (
+                roles is not None
+                and not actor.is_superuser
+                and not any(role.code == "ADMIN" for role in roles)
+            ):
+                raise serializers.ValidationError(
+                    {"role_ids": _("O'zingizdan ADMIN rolini olib tashlay olmaysiz.")}
+                )
+        return attrs
 
     @transaction.atomic
     def update(self, instance, validated_data):

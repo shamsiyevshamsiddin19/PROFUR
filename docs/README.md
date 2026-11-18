@@ -1,6 +1,6 @@
 # PROFUR MVP — Loyiha hujjatlari
 
-**Holat:** Dastlabki nusxa. PM va buyurtmachi tasdig‘i kutilmoqda.  
+**Holat:** OQ-001–048 javoblari PM tasdiqlagan (Team Lead xabari, 2026-11-18). Joriy doira — TZning 1-qismi. Texnik topshirish va jonli muhit qabuli alohida yuritiladi.  
 **Asosiy manba:** `Profur_CRM_MVP_TZ.pdf` (9 sahifa). **Jira:** `PCRM`.
 
 ## Papkalar
@@ -28,3 +28,5 @@
 - **TASDIQLANGAN:** Mas'ul va tasdiq sanasi qayd etilgan.
 
 Repozitoriy ochiq: maxfiy ma'lumotlar, parollar va kalitlarni joylamang.
+
+**Joriy 1-qism natijasi:** [talablar, sinovlar va topshirish chegarasi](08-delivery/phase-one-acceptance.md).

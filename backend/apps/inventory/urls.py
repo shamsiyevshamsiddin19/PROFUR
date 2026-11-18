@@ -4,12 +4,14 @@ from rest_framework.routers import SimpleRouter
 
 from .approval_views import StockReturnViewSet, WriteOffViewSet
 from .issue_views import StockIssueViewSet
+from .notification_views import NotificationViewSet
 from .stock_views import MovementViewSet, StockViewSet
 from .views import ReceiptViewSet
 
 app_name = "inventory"
 
 router = SimpleRouter()
+router.register("notifications", NotificationViewSet, basename="notification")
 router.register("receipts", ReceiptViewSet, basename="receipt")
 router.register("issues", StockIssueViewSet, basename="issue")
 router.register("returns", StockReturnViewSet, basename="return")

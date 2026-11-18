@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  Users,
+  Bell,
   ArrowDownLeft,
   Box,
   ChevronRight,
@@ -26,13 +28,24 @@ import {
 import { Login } from "./components/Login";
 import { WarehouseContent } from "./pages/WarehouseContent";
 
+import { Administration } from "./pages/Administration";
+import { Notifications } from "./pages/Notifications";
 import { Catalog } from "./pages/Catalog";
 import { Operations } from "./pages/Operations";
 import { Expenses } from "./pages/Expenses";
 import { History } from "./pages/History";
 type Screen =
-  "receiving" | "materials" | "stock" | "operations" | "expenses" | "history";
+  | "receiving"
+  | "materials"
+  | "stock"
+  | "operations"
+  | "expenses"
+  | "history"
+  | "administration"
+  | "notifications";
 const screens = {
+  administration: Users,
+  notifications: Bell,
   receiving: ArrowDownLeft,
   materials: Box,
   stock: Layers3,
@@ -50,6 +63,7 @@ export function App() {
   const [checking, setChecking] = useState(true);
   const [authError, setAuthError] = useState<MessageKey | null>(null);
   const [screen, setScreen] = useState<Screen>(currentScreen);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [drawer, setDrawer] = useState(false);
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
 
@@ -99,6 +113,27 @@ export function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [drawer]);
 
+  useEffect(() => {
+    if (!user || !can(user, "inventory.view_stock")) return;
+    const controller = new AbortController();
+    const check = () =>
+      request<{ count: number }>("/api/v1/notifications/?unread=true", lang, {
+        signal: controller.signal,
+      })
+        .then((page) => {
+          if (!controller.signal.aborted) setUnreadCount(page.count);
+        })
+        .catch(() => {
+          /* Inbox itself shows read errors and retry. */
+        });
+    void check();
+    const interval = setInterval(check, 30000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
+  }, [user, lang, screen]);
+
   const languagePicker = (
     <select
       className="language"
@@ -135,14 +170,16 @@ export function App() {
     );
 
   const allowed = (key: Screen) =>
-    can(
-      user,
-      key === "materials"
-        ? "catalog.view_material"
-        : key === "expenses"
-          ? "expenses.view_expense"
-          : "inventory.view_stock",
-    );
+    key === "administration"
+      ? user.is_superuser || user.role_codes.includes("ADMIN")
+      : can(
+          user,
+          key === "materials"
+            ? "catalog.view_material"
+            : key === "expenses"
+              ? "expenses.view_expense"
+              : "inventory.view_stock",
+        );
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
@@ -200,6 +237,9 @@ export function App() {
                 >
                   <Icon size={19} />
                   {t(key)}
+                  {key === "notifications" && unreadCount > 0 && (
+                    <span className="notification-count">{unreadCount}</span>
+                  )}
                   {key === screen && <span className="nav-dot" />}
                 </a>
               ),
@@ -253,15 +293,19 @@ export function App() {
                 {screen === "receiving"
                   ? t("intro")
                   : t(
-                      screen === "materials"
-                        ? "catalogueHint"
-                        : screen === "operations"
-                          ? "operationsHint"
-                          : screen === "expenses"
-                            ? "expenseHint"
-                            : screen === "history"
-                              ? "historyHint"
-                              : "stockHint",
+                      screen === "administration"
+                        ? "administrationHint"
+                        : screen === "notifications"
+                          ? "notificationsHint"
+                          : screen === "materials"
+                            ? "catalogueHint"
+                            : screen === "operations"
+                              ? "operationsHint"
+                              : screen === "expenses"
+                                ? "expenseHint"
+                                : screen === "history"
+                                  ? "historyHint"
+                                  : "stockHint",
                     )}
               </p>
             </div>
@@ -283,6 +327,20 @@ export function App() {
           )}
           {!allowed(screen) ? (
             <div className="notice">{t("noPermission")}</div>
+          ) : screen === "administration" ? (
+            <Administration
+              lang={lang}
+              user={user}
+              onOwnPasswordReset={() => setUser(null)}
+              onSelfChange={async () =>
+                setUser(await request<User>("/api/auth/me/", lang))
+              }
+            />
+          ) : screen === "notifications" ? (
+            <Notifications
+              lang={lang}
+              onRead={() => setUnreadCount((n) => Math.max(0, n - 1))}
+            />
           ) : screen === "materials" ? (
             <Catalog lang={lang} user={user} />
           ) : screen === "operations" ? (

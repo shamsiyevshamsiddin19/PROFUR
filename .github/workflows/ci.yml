@@ -78,6 +78,18 @@ jobs:
             echo "Kod bazasi hali qo'shilmagan. Dastlabki CI tekshiruvi muvaffaqiyatli."
           fi
 
+      - name: Verify PostgreSQL backup and isolated restore
+        env:
+          DB_NAME: profur_db
+          DB_USER: profur_user
+          DB_PASSWORD: profur_password
+          DB_HOST: localhost
+          DB_PORT: 5432
+        run: |
+          python backend/manage.py migrate --noinput
+          python ops/backup.py --directory "$RUNNER_TEMP/profur-backup"
+          python ops/restore_drill.py "$RUNNER_TEMP"/profur-backup/*.dump
+
   frontend:
     name: Frontend Build & Tests
     runs-on: ubuntu-latest

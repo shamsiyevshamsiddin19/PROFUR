@@ -609,3 +609,38 @@ def test_user_create_rolls_back_if_role_assignment_fails(
             content_type="application/json",
         )
     assert not User.objects.filter(username="rollback_user").exists()
+
+
+@pytest.mark.django_db
+def test_admin_cannot_lock_self_out_or_remove_system_role(client, test_users):
+    client.login(username="admin_user", password="securepassword123")
+    admin = User.objects.get(username="admin_user")
+    admin_role = admin.roles.get(code="ADMIN")
+    for method, path, data in [
+        ("patch", f"/api/auth/users/{admin.pk}/", {"is_active": False}),
+        ("patch", f"/api/auth/users/{admin.pk}/", {"role_ids": []}),
+        ("post", f"/api/auth/users/{admin.pk}/deactivate/", {}),
+        ("patch", f"/api/auth/roles/{admin_role.pk}/", {"code": "RENAMED"}),
+        ("delete", f"/api/auth/roles/{admin_role.pk}/", {}),
+    ]:
+        result = getattr(client, method)(
+            path, data=data, content_type="application/json"
+        )
+        assert result.status_code == 400, result.content
+    admin.refresh_from_db()
+    assert admin.is_active and admin.has_role("ADMIN")
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "invalid", [{"x": "inventory.view_stock"}, [""], "inventory.view_stock"]
+)
+def test_role_permissions_must_be_string_list(client, test_users, invalid):
+    client.login(username="admin_user", password="securepassword123")
+    response = client.post(
+        "/api/auth/roles/",
+        data={"code": "BAD_PERMS", "name": "Bad", "permissions": invalid},
+        content_type="application/json",
+    )
+    assert response.status_code == 400
+    assert not Role.objects.filter(code="BAD_PERMS").exists()
