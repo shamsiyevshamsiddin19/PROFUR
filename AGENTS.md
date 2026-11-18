@@ -26,3 +26,7 @@ Jamoa a’zolari dastlabki tajribaga ega. Vazifa berilganda [bajarish qo‘llanm
 ## Yagona valyuta va uch til
 
 2026-11-18 kungi foydalanuvchi qarori — barcha pul summalari faqat USD ($). Interfeys tillari uz, ru, en. Bu qaror docs/09-decisions/decision-log.md da yozilgan va boshqa valyutalar/kurs haqidagi eski takliflarni almashtiradi. Har bir agent o‘z vazifasidagi eski API namunalari, shakllar va tekshiruvlarni shu qarorga moslashtiradi.
+
+## Frontend uslubi · 2026-11-18
+
+Yangi UI va komponentlarda [vizual uslub](docs/07-ux-ui/visual-style.md)ga amal qiling: to‘q ko‘kimtir navigatsiya, och ish maydoni va oltin aksent. Bu foydalanuvchining yangi loyiha qarori. PROFUR komponentlari, UZ/RU/EN va USD saqlanadi.
