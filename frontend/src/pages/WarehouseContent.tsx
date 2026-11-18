@@ -27,9 +27,13 @@ import {
   type Receipt,
   type ReceiptInput,
   type StockRow,
+  type User,
+  can,
 } from "../api";
 import { errorKey, localDate, money } from "../format";
 import { translate, unitLabel, type Language, type MessageKey } from "../i18n";
+
+import { StockDetail } from "./StockDetail";
 
 function newDraft() {
   return {
@@ -47,12 +51,15 @@ export function WarehouseContent({
   screen,
   lang,
   userId,
+  user,
 }: {
   screen: "receiving" | "materials" | "stock";
   lang: Language;
   userId: number;
+  user: User;
 }) {
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
+  const [detail, setDetail] = useState<StockRow | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockRows, setStockRows] = useState<StockRow[]>([]);
   const [belowMinOnly, setBelowMinOnly] = useState(false);
@@ -196,7 +203,7 @@ export function WarehouseContent({
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (saving) return;
+    if (saving || !can(user, "inventory.add_receipt")) return;
     if (!pending.current) {
       if (!selected || draft.received_on > localDate()) {
         setSaveError("invalid");
@@ -242,7 +249,7 @@ export function WarehouseContent({
       setSaving(false);
     }
   }
-  const locked = saving || uncertain;
+  const locked = saving || uncertain || !can(user, "inventory.add_receipt");
   const loadingNotice = loading && (
     <div className="load-line" role="status">
       <RefreshCw size={15} className="spin" />
@@ -263,6 +270,18 @@ export function WarehouseContent({
   if (screen !== "receiving")
     return (
       <>
+        {detail && (
+          <StockDetail
+            row={detail}
+            user={user}
+            lang={lang}
+            close={() => setDetail(null)}
+            saved={() => {
+              setDetail(null);
+              setRevision((n) => n + 1);
+            }}
+          />
+        )}
         <div className="toolbar-wrap">
           <div className="toolbar">
             <Search size={17} />
@@ -307,7 +326,12 @@ export function WarehouseContent({
                       <span className="material-symbol">
                         <Package size={16} />
                       </span>
-                      {row.material.display_name}
+                      <button
+                        className="text-button material-link"
+                        onClick={() => setDetail(row)}
+                      >
+                        {row.material.display_name}
+                      </button>
                     </td>
                     <td>{row.material.category.name}</td>
                     <td>{unitLabel(row.material.unit, lang)}</td>
@@ -507,6 +531,7 @@ export function WarehouseContent({
             <button
               className="primary"
               disabled={
+                !can(user, "inventory.add_receipt") ||
                 saving ||
                 (!uncertain && (Boolean(loadError) || loading || !selected))
               }

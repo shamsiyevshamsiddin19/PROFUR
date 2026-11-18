@@ -45,9 +45,16 @@ class UserSerializer(serializers.ModelSerializer):
             "primary_role",
             "phone",
             "is_active",
+            "is_superuser",
             "date_joined",
         ]
-        read_only_fields = ["id", "date_joined", "role_codes", "primary_role"]
+        read_only_fields = [
+            "id",
+            "date_joined",
+            "role_codes",
+            "primary_role",
+            "is_superuser",
+        ]
 
 
 class LoginSerializer(serializers.Serializer):

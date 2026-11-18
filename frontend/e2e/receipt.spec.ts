@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("mobile login and receipt persist one USD batch through the real API", async ({
+test("mobile warehouse workflow persists receipts, issues, approvals and expenses through the real API", async ({
   page,
 }) => {
   await page.goto("/");
@@ -12,11 +12,18 @@ test("mobile login and receipt persist one USD batch through the real API", asyn
     page.getByRole("heading", { name: "Material receipts" }),
   ).toBeVisible();
 
-  const material = page.getByRole("combobox", { name: "Material", exact: true });
+  const material = page.getByRole("combobox", {
+    name: "Material",
+    exact: true,
+  });
   await expect(material.locator("option")).toHaveCount(2);
   await material.selectOption({ label: "Browser MDF · sheet" });
-  await page.getByRole("spinbutton", { name: "Quantity", exact: true }).fill("15");
-  await page.getByRole("spinbutton", { name: "Total amount", exact: true }).fill("450.00");
+  await page
+    .getByRole("spinbutton", { name: "Quantity", exact: true })
+    .fill("15");
+  await page
+    .getByRole("spinbutton", { name: "Total amount", exact: true })
+    .fill("450.00");
   const response = page.waitForResponse(
     (res) =>
       res.url().endsWith("/api/v1/receipts/") &&
@@ -56,6 +63,104 @@ test("mobile login and receipt persist one USD batch through the real API", asyn
     `/api/v1/materials/${batch.material.id}/`,
   );
   expect((await catalogue.json()).quantity_on_hand).toBe("15.00");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+
+  // Shu haqiqiy sessiyada qolgan ombor oqimi ham bajariladi.
+  await page.goto("/#operations");
+  await page
+    .getByRole("combobox", { name: "Material", exact: true })
+    .selectOption({ label: "Browser MDF · 15.00" });
+  await page.getByLabel("Recipient", { exact: true }).fill("Sardor");
+  const batchQuantity = page.getByRole("spinbutton", {
+    name: `Batch #${batch.id}`,
+    exact: true,
+  });
+  await batchQuantity.fill("7");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByText("Issue saved.", { exact: true })).toBeVisible();
+  const issues = await (await page.request.get("/api/v1/issues/")).json();
+  expect(issues.count).toBe(1);
+  expect(issues.results[0].quantity).toBe("7.00");
+  await page.getByRole("tab", { name: "Return", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Original issue", exact: true })
+    .selectOption(String(issues.results[0].id));
+  await batchQuantity.fill("2");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(
+    page.getByText("Request saved. Awaiting approval.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Approve", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByText("Approved", { exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Write-off", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Material", exact: true })
+    .selectOption({ label: "Browser MDF · 10.00" });
+  await page.getByLabel("Reason", { exact: true }).fill("Damaged sheet");
+  await batchQuantity.fill("1");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(
+    page.getByText("Request saved. Awaiting approval.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Approve", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  const stock = await (
+    await page.request.get(`/api/v1/stock/${batch.material.id}/`)
+  ).json();
+  expect(stock.quantity_on_hand).toBe("9.00");
+
+  await page.goto("/#expenses");
+  await page
+    .getByLabel("Expense type", { exact: true })
+    .first()
+    .selectOption("tax");
+  await page.getByLabel("Amount · USD", { exact: true }).fill("12.50");
+  await page.getByLabel("Project number", { exact: true }).first().fill("7");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByText("Saved.", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Reverse expense", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByLabel("Reason", { exact: true })
+    .fill("Duplicate expense");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Reverse expense", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  const expenseRows = await (
+    await page.request.get("/api/v1/expenses/")
+  ).json();
+  expect(expenseRows.count).toBe(2);
+  expect(
+    expenseRows.results.map((row: { amount: string }) => row.amount).sort(),
+  ).toEqual(["-12.50", "12.50"]);
+
+  await page.goto("/#history");
+  await expect(
+    page.getByRole("heading", { name: "Movement history" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("row").filter({ hasText: "Write-off #" }),
+  ).toBeVisible();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download CSV", exact: true }).click();
+  expect((await download).suggestedFilename()).toBe("PROFUR-movements.csv");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,

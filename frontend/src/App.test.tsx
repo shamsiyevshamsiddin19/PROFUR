@@ -22,7 +22,18 @@ const user = {
   username: "operator",
   first_name: "",
   last_name: "",
-  roles: [],
+  roles: [
+    {
+      code: "OPERATOR",
+      name: "Operator",
+      permissions: [
+        "catalog.view_material",
+        "inventory.view_stock",
+        "inventory.add_receipt",
+        "inventory.view_purchase_price",
+      ],
+    },
+  ],
   role_codes: [],
 };
 const material = {

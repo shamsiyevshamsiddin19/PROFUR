@@ -84,3 +84,13 @@ Frontend qoldiq ekrani (`#stock`) Ozodbek yaratgan `/api/v1/stock/` API'siga to�
 - Qidiruv va «Faqat kam qolganlar» (`below_min=true`) filtri qo‘shildi.
 - Narx ko‘rish ruxsati bo‘lmaganda qiymat xatosiz yashiriladi (OQ-041).
 - Avtomatik sinovlar (`App.test.tsx` 6 ta test) va TypeScript build to‘liq o‘tdi.
+
+## Ombor ekranlari · 2026-11-18 · PCRM-39/43/45/47/48
+
+Holat: **Ko‘rikda**. Issue #38; `feat/PCRM-45-warehouse-workflows` branch.
+
+Material/kategoriya yaratish, tahrirlash va faolsizlantirish; qoldiqdan partiya tafsiloti va minimal chegara; chiqim, asl chiqimga qaytarish va hisobdan chiqarish so‘rovi/tasdiq/rad; loyiha xarajatlari va sababli teskari/to‘g‘ri yozuv; sana/material/amal filtrli tarix va barcha sahifalardan CSV eksporti qo‘shildi. Partiyani foydalanuvchi tanlaydi; FIFO yoki boshqa ochiq PM algoritmi tasdiqlangan deb qo‘llanmadi. Superuser belgisi auth javobida faqat o‘qiladi. Qolgan backend chegaralari buzilmadi.
+
+Barcha yangi matnlar uz/ru/en, barcha pul USD. Noma’lum chiqim/qaytarish/hisobdan chiqarish javobi ayni kalit va tana bilan qayta tiklanadi. Xarajat yaratish API’sida idempotency bo‘lmagani uchun noma’lum javobdan keyin ro‘yxatni tekshirish ko‘rsatiladi. Jadval surilishi uning konteyneri ichida.
+
+Dalil: TypeScript build va 9 frontend testi; Ruff va diff tekshiruvi. Alohida lokal bazada brauzer orqali material → 20 kirim → 7 chiqim → 2 qaytarish tasdig‘i → 1 hisobdan chiqarish tasdig‘i, $12.50 xarajat va −$12.50 teskari yozuv bajarildi. CI real Chromium ssenariysi shu amallar, tarix va CSV yuklashgacha kengaytirildi. Yakuniy PostgreSQL/Chromium CI dalili PR’da tekshiriladi. PM/buyurtmachi qabuli va ochiq algoritm qarorlari tugamaguncha 1-qism avtomatik Done qilinmaydi.

@@ -1216,3 +1216,257 @@ input:-webkit-autofill:focus {
     letter-spacing: -0.2px;
   }
 }
+
+/* Ombor amallari: oq yuzalar, bir xil maydonlar va moslashuvchan jadvallar. */
+.workflow-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.workflow-toolbar > input,
+.workflow-toolbar > select {
+  flex: 1 1 170px;
+  width: auto;
+  min-width: 0;
+}
+.workflow-toolbar > label {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.workflow-toolbar .secondary {
+  margin: 0;
+  min-height: 44px;
+}
+.workflow-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--surface);
+}
+.workflow-panel h2 {
+  font-size: 17px;
+  margin-bottom: 24px;
+}
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+fieldset:disabled {
+  opacity: 0.7;
+}
+.workflow-dialog {
+  width: min(680px, calc(100% - 28px));
+  max-height: calc(100dvh - 36px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 24px;
+  box-shadow: 0 20px 80px var(--shadow-panel);
+}
+.workflow-dialog::backdrop {
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+.dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.dialog-heading h2 {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 22px;
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.dialog-actions > span {
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--muted);
+}
+.dialog-actions .secondary {
+  margin-top: 0;
+}
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+}
+.check-label input {
+  width: 18px;
+  min-height: 18px;
+}
+.tabs {
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--surface-muted);
+  overflow: auto;
+  max-width: 100%;
+}
+.tabs button {
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 7px;
+  min-height: 40px;
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+.tabs .selected {
+  background: var(--surface);
+  color: var(--accent-ink);
+  box-shadow: 0 1px 4px var(--shadow-panel);
+  font-weight: 600;
+}
+.allocation-section {
+  margin-top: 24px;
+}
+.allocation-section h3,
+.workflow-dialog h3 {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.allocation-section .table-wrap {
+  margin-top: 14px;
+}
+.quantity-input {
+  width: 115px;
+}
+.row-actions {
+  display: flex;
+  gap: 12px;
+}
+.status-tag {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface-muted);
+  color: var(--muted);
+}
+.status-tag.pending {
+  background: var(--warning-surface);
+  color: var(--warning);
+}
+.status-tag.approved {
+  background: var(--success-surface);
+  color: var(--success);
+}
+.status-tag.rejected {
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+.danger-text {
+  color: var(--danger);
+}
+.inline-summary {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 0;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.inline-summary strong {
+  overflow-wrap: anywhere;
+}
+.minimum-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin: 18px 0 26px;
+}
+.minimum-form label {
+  flex: 1;
+}
+.minimum-form p {
+  width: 100%;
+  color: var(--muted);
+  font-size: 12px;
+}
+.material-link {
+  font: inherit;
+  text-align: left;
+}
+.wrap-cell {
+  white-space: normal;
+  min-width: 150px;
+  max-width: 280px;
+  overflow-wrap: anywhere;
+}
+.sidebar nav {
+  overflow-y: auto;
+  min-height: 0;
+}
+@media (max-width: 650px) {
+  .workflow-panel,
+  .workflow-dialog {
+    padding: 18px;
+  }
+  .workflow-toolbar {
+    gap: 10px;
+  }
+  .workflow-toolbar > .primary {
+    flex: 1 1 100%;
+  }
+  .workflow-dialog .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .tabs {
+    width: 100%;
+  }
+  .tabs button {
+    flex: 1;
+    font-size: 12px;
+    padding: 10px;
+  }
+  .dialog-actions .primary {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .breadcrumbs strong {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.category-panel {
+  margin-bottom: 22px;
+}
+.category-panel h2 {
+  margin: 0;
+}
+.category-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 24px;
+}
+.category-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--line);
+}

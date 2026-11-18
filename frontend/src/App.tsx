@@ -9,9 +9,12 @@ import {
   Menu,
   ShieldCheck,
   Warehouse,
+  ArrowUpRight,
+  History as HistoryIcon,
+  ReceiptText,
   X,
 } from "lucide-react";
-import { ApiError, request, write, type User } from "./api";
+import { ApiError, request, write, type User, can } from "./api";
 import { errorKey } from "./format";
 import {
   initialLanguage,
@@ -23,11 +26,23 @@ import {
 import { Login } from "./components/Login";
 import { WarehouseContent } from "./pages/WarehouseContent";
 
-type Screen = "receiving" | "materials" | "stock";
-const screens = { receiving: ArrowDownLeft, materials: Box, stock: Layers3 };
+import { Catalog } from "./pages/Catalog";
+import { Operations } from "./pages/Operations";
+import { Expenses } from "./pages/Expenses";
+import { History } from "./pages/History";
+type Screen =
+  "receiving" | "materials" | "stock" | "operations" | "expenses" | "history";
+const screens = {
+  receiving: ArrowDownLeft,
+  materials: Box,
+  stock: Layers3,
+  operations: ArrowUpRight,
+  expenses: ReceiptText,
+  history: HistoryIcon,
+};
 function currentScreen(): Screen {
   const hash = location.hash.slice(1);
-  return hash === "materials" || hash === "stock" ? hash : "receiving";
+  return Object.hasOwn(screens, hash) ? (hash as Screen) : "receiving";
 }
 export function App() {
   const [lang, setLang] = useState<Language>(initialLanguage);
@@ -119,6 +134,15 @@ export function App() {
       />
     );
 
+  const allowed = (key: Screen) =>
+    can(
+      user,
+      key === "materials"
+        ? "catalog.view_material"
+        : key === "expenses"
+          ? "expenses.view_expense"
+          : "inventory.view_stock",
+    );
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
@@ -162,19 +186,23 @@ export function App() {
         <div className="sidebar-label">{t("workspace")}</div>
         <nav>
           {(Object.entries(screens) as [Screen, typeof Box][]).map(
-            ([key, Icon]) => (
-              <a
-                href={"#" + key}
-                className={key === screen ? "nav-item active" : "nav-item"}
-                key={key}
-                onClick={() => setDrawer(false)}
-                aria-current={key === screen ? "page" : undefined}
-              >
-                <Icon size={19} />
-                {t(key)}
-                {key === screen && <span className="nav-dot" />}
-              </a>
-            ),
+            ([key, Icon]) =>
+              allowed(key) && (
+                <a
+                  href={"#" + key}
+                  className={key === screen ? "nav-item active" : "nav-item"}
+                  key={key}
+                  onClick={() => {
+                    setScreen(key);
+                    setDrawer(false);
+                  }}
+                  aria-current={key === screen ? "page" : undefined}
+                >
+                  <Icon size={19} />
+                  {t(key)}
+                  {key === screen && <span className="nav-dot" />}
+                </a>
+              ),
           )}
         </nav>
         <div className="sidebar-bottom">
@@ -221,7 +249,21 @@ export function App() {
           <div className="page-heading">
             <div>
               <h1>{t(screen)}</h1>
-              <p>{screen === "receiving" ? t("intro") : t("search")}</p>
+              <p>
+                {screen === "receiving"
+                  ? t("intro")
+                  : t(
+                      screen === "materials"
+                        ? "catalogueHint"
+                        : screen === "operations"
+                          ? "operationsHint"
+                          : screen === "expenses"
+                            ? "expenseHint"
+                            : screen === "history"
+                              ? "historyHint"
+                              : "stockHint",
+                    )}
+              </p>
             </div>
             <span className="currency-badge">
               <CircleDollarSign size={16} />
@@ -239,12 +281,26 @@ export function App() {
               </button>
             </div>
           )}
-          <WarehouseContent
-            key={screen}
-            screen={screen}
-            lang={lang}
-            userId={user.id}
-          />
+          {!allowed(screen) ? (
+            <div className="notice">{t("noPermission")}</div>
+          ) : screen === "materials" ? (
+            <Catalog lang={lang} user={user} />
+          ) : screen === "operations" ? (
+            <Operations lang={lang} user={user} />
+          ) : screen === "expenses" ? (
+            <Expenses lang={lang} user={user} />
+          ) : screen === "history" ? (
+            <History lang={lang} />
+          ) : (
+            <WarehouseContent
+              key={screen}
+              screen={screen}
+              lang={lang}
+              userId={user.id}
+              user={user}
+            />
+          )}
+
           <footer>
             <span>PROFUR</span>
             <span>{t("allMoney")} · USD</span>
