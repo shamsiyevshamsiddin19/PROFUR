@@ -25,11 +25,14 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 
 ## Oxirgi qayd
 
-2026-11-18 · PCRM-48/PCRM-41 · Ko‘rikda / Jarayonda · React/TypeScript frontend, uch til, Django login, USD kirim shakli · npm run build va 3 frontend testi o‘tdi, brauzerda 320/390/768 px va desktop tekshirildi · keyingi qadam mavjud katalogni tekshirish va kirim API’siga ulash.
+2026-11-18 · PCRM-39/41/43/45/47/48 · Bajarildi · PR #39 (`36787ec`) va #42 (`28ef64e`) main’da; Jira Done. Yakuniy CI: 206 backend testi, 10 frontend testi va haqiqiy Chromium/Django ombor oqimi (kategoriya/min. chegara ham). Quyidagi avvalgi sana qaydlari tarixiy; joriy holat shu bo‘lim va yakuniy topshirishda.
 
 ## Navbatdagi ish
 
-[PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17)dagi React/TypeScript/Vite frontendni davom ettiring. Yangi frontend yoki parallel maket boshlamang. Katalog PR #16 integratsiya tarkibida mavjud; PCRM-40 kirim API’si tayyor bo‘lgach, haqiqiy material tanlash va kirim saqlashni ulang. API maydonlari va ruxsatlarni shartnoma bilan solishtiring. Kirimdan keyin qoldiq/partiya yangilanishi hamda bir xil Idempotency-Key bilan takroriy so‘rov yangi kirim yaratmasligini haqiqiy backendda tekshiring. Backend integratsiyasi tugamaguncha PCRM-41 ni Done qilmang.
+1. **PCRM-50 qabulini qo‘llab-quvvatlang.** Jamoliddinning qabul matritsasi va yangi PR’ini joriy main ustida ko‘rib chiqing. Mavjud kirim → chiqim → qaytarish/tasdiq → hisobdan chiqarish/tasdiq → xarajat/teskari yozuv → tarix/CSV Chromium ssenariysini qayta yaratmang.
+2. **Ochiq PM qarorlari.** P1/P3/P5 bo‘yicha aniq qaror kelganda API va UI ta’sirini kelishing. FIFO yoki kirimni tuzatish mexanizmini o‘zingiz tasdiqlangan deb joriy qilmang.
+3. **Qolgan integratsiya.** Akkaunt boshqaruvi kabi yangi backend imkoniyatlari Jamoliddinning PR’ida tasdiqlangandan keyin tegishli ekran/API ulanishini alohida bajaring. Hali mavjud bo‘lmagan endpointni o‘ylab topmang.
+4. **PM/buyurtmachi qabuli.** Butun 1-qism faqat PCRM-50 va yakuniy qabul dalili bilan yopiladi. Frontend ticketlarining texnik Done holati shu umumiy qabulni almashtirmaydi.
 
 ## 2026-11-18 · Valyuta va til qarori
 
