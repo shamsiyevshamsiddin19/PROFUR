@@ -91,6 +91,10 @@ class StockBalance(models.Model):
         verbose_name=_("material"),
     )
     quantity_on_hand = models.DecimalField(_("qoldiq"), default=0, **QUANTITY)
+    # OQ-014: minimal chegarani admin belgilaydi; bo'sh — chegara yo'q.
+    min_quantity = models.DecimalField(
+        _("minimal qoldiq"), null=True, blank=True, **QUANTITY
+    )
     updated_at = models.DateTimeField(_("o'zgartirilgan"), auto_now=True)
 
     class Meta:
@@ -102,7 +106,17 @@ class StockBalance(models.Model):
                 condition=Q(quantity_on_hand__gte=0),
                 name="inventory_balance_not_negative",
             ),
+            models.CheckConstraint(
+                condition=Q(min_quantity__isnull=True) | Q(min_quantity__gte=0),
+                name="inventory_balance_min_not_negative",
+            ),
         ]
+
+    @property
+    def is_below_min(self) -> bool:
+        return (
+            self.min_quantity is not None and self.quantity_on_hand < self.min_quantity
+        )
 
     def __str__(self) -> str:
         return f"{self.material} · {self.quantity_on_hand}"
