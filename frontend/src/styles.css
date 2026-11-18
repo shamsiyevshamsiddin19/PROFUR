@@ -838,17 +838,16 @@ tbody tr:hover {
   gap: 15px;
 }
 .login-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 80px;
-  max-width: 1000px;
+  display: flex;
+  justify-content: center;
+  max-width: 420px;
   width: 100%;
+  min-width: 0;
   margin: auto;
   padding: 60px 0;
 }
 .login-form {
-  max-width: 390px;
+  width: 100%;
   padding: 30px;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -871,65 +870,6 @@ tbody tr:hover {
 .login-form .primary {
   width: 100%;
   margin-top: 27px;
-}
-.login-art {
-  position: relative;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  background: var(--sidebar);
-  overflow: hidden;
-}
-.login-art > span {
-  position: absolute;
-  bottom: 35px;
-  letter-spacing: 9px;
-  font-size: 11px;
-  color: var(--sidebar-gold);
-}
-.rack {
-  width: 260px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  padding: 30px 18px;
-  border: 2px solid var(--accent-border);
-  border-radius: 7px;
-  transform: rotate(-5deg);
-  box-shadow: 25px 25px 65px var(--shadow-strong);
-  position: relative;
-  background: var(--sidebar-panel);
-}
-.rack:before {
-  content: "";
-  height: 4px;
-  background: var(--sidebar-gold);
-  position: absolute;
-  top: 50%;
-  left: -8px;
-  right: -8px;
-  box-shadow: 0 9px 16px var(--shadow-strong);
-}
-.rack div {
-  height: 90px;
-  background: linear-gradient(
-    135deg,
-    var(--illustration-box),
-    var(--illustration-box-shade)
-  );
-  border: 1px solid var(--accent-border);
-  border-radius: 3px;
-  box-shadow: inset 0 1px 0 var(--illustration-highlight);
-}
-.rack div:nth-child(2),
-.rack div:nth-child(4) {
-  background: linear-gradient(
-    135deg,
-    var(--illustration-box-light),
-    var(--illustration-box-shade)
-  );
 }
 @media (min-width: 1450px) {
   .receipt-layout {
@@ -1009,13 +949,6 @@ tbody tr:hover {
   }
   .login-form h1 {
     font-size: 30px;
-  }
-  .rack {
-    width: 215px;
-    gap: 11px;
-  }
-  .rack div {
-    height: 77px;
   }
 }
 @media (max-width: 650px) {
@@ -1153,9 +1086,6 @@ tbody tr:hover {
     display: block;
     max-width: 380px;
     padding: 70px 0;
-  }
-  .login-art {
-    display: none;
   }
   .login-form {
     max-width: none;
