@@ -18,7 +18,7 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Katalog API qismi. UI egasi frontend | Bajarildi | [PR #16](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/16) → [#20](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/20) main’da, CI o‘tgan |
 | [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40) | Kirim API’si va birlik narxi | Bajarildi | [PR #21](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/21) main’da (`d53979d`), CI o‘tgan |
 | [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42) | Qoldiq, minimal chegara va manfiy qoldiqni bloklash | Bajarildi | [PR #27](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/27) main’da; parallel chiqim sinovi [PR #34](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/34) bilan PostgreSQL’da o‘tdi; main CI o‘tgan |
-| [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49) | ERD va API shartnomasini yig‘ish | Ko‘rikda | Shartnoma kodga moslandi, frontend topshirig‘i — branch `chore/PCRM-49-warehouse-sync`; chiqim/qaytarish qismi Akbarning hujjatlarida |
+| [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49) | ERD va API shartnomasini yig‘ish | Bajarildi | [PR #37](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/37) main’da (`bd25b2b`), CI o‘tgan; [warehouse-api-v1.md](../docs/06-api-contract/warehouse-api-v1.md), [frontend topshirig‘i](../docs/06-api-contract/warehouse-frontend-handoff.md) |
 
 **Qabul mezoni** — Bir materialning ikki xil narxdagi kirimi alohida partiya bo‘ladi. API javobi, qoldiq va harakat tarixi mos keladi.
 
@@ -36,14 +36,16 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 
 2026-11-18 · PCRM-42/PCRM-49 · Ko‘rikda · PR #27 va Akbarning #34, #35 main’da: kirim → chiqim → qaytarish/hisobdan chiqarish → qoldiq bitta `StockBalance` va `services.ensure_available()` orqali; `tests/test_warehouse_ledger.py` (qoldiq = ochiq partiyalar = harakatlar, rad etilgan chiqim hech narsani o‘zgartirmaydi, qaytarish va hisobdan chiqarish tasdiqdan keyin shu hisobda, 11 ta endpointda narx serverda yashiriladi); 409 javoblari bir xil `{"detail","code"}` shaklida; shartnoma haqiqiy xato shakli, ruxsatlar, `decrease()` imzosi bilan moslandi; `warehouse-frontend-handoff.md` haqiqiy javoblar bilan · main (#35) ustida PostgreSQL 18’da pytest 201 ta o‘tdi, «10 dan 7+7» parallel sinov PASSED · PR ko‘rigi; PM: P1, P3, P5; xabarnoma (OQ-014) alohida vazifa
 
+2026-11-18 · PCRM-49 · Bajarildi · PR #37 main’ga birlashdi (`bd25b2b`): shartnoma kodga mos, frontend topshirig‘i haqiqiy javoblar bilan, `test_warehouse_ledger.py` · main CI (Ruff, Tests & Migrations, Frontend) o‘tdi; Jira PCRM-42 va PCRM-49 «Готово» · PM javobi kutilmoqda: P1, P3, P5
+
 ## Navbatdagi ish
 
-1. **PCRM-38** bilan boshlang. Main’dagi Django asosini oling. requirements.txt, settings.py, OQ-005 va OQ-008 hamda ma’lumotlar modelini tekshiring. Katalog va kirim partiyasini ajratish, birliklar, o‘lchamlar va majburiy maydonlar bo‘yicha kichik model taklifini docs/05-data-model ichidagi mavjud hujjatda yozing. Birinchi ishlaydigan kategoriya/material modeli, migratsiya va haqiqiy saqlash sinovini PR qiling.
-2. **PCRM-39 / PCRM-49** doirasida kategoriya/material qidiruvi va kirim so‘rovining API manzili, maydonlari, majburiyligi, xato va javob namunalarini docs/06-api-contract ichidagi hujjatda aniqlang. Shamsiddin va Akbar uchun tayyor qismini yozing.
-3. **PCRM-40** bilan kirimni bazaga saqlash, asl narx/valyuta, birlik narxi, qoldiq va tarixni bitta tranzaksiyada yozishni quring. Har xil narxdagi ikki partiya va takror so‘rov sinovini bajaring. Yaxlitlash yoki partiya tanlashdagi ochiq qarorni PMga qayd eting.
-4. **PCRM-42** uchun mavjud qoldiq, minimal chegara va chiqim bilan umumiy qoldiq tekshiruvini Akbar bilan kelishing.
+PCRM-38, 39 (API), 40, 42 va 49 bajarildi. 1-qism ombor backendida qolganlar:
 
-Boshlashda har bir band allaqachon kod yoki PR’da bajarilganini tekshiring. Akbarga model nomi, identifikator, migratsiya va qoldiq amalining kirish/chiqishini aniq topshiring.
+1. **PM qarorlari (Team Lead orqali).** P1 — chiqimda partiya tanlash (FIFO taklif). Qaror chiqqach `allocations` ni server o‘zi FIFO bo‘yicha to‘ldiradigan qilinadi (Akbar bilan). P3 — miqdor aniqligi; P5 — xato kirimni tuzatish (`adjustment`).
+2. **Minimal chegara xabarnomasi (OQ-014).** Qoldiq chegaradan pastga tushganda admin va mas’ulga xabar — alohida Jira vazifasi kerak.
+3. **Ruxsat kodlari.** Jamoliddin bilan standart rollarga `inventory.add_issue` va `inventory.change_min_quantity` ni berish.
+4. **Frontendni qo‘llab-quvvatlash.** Shamsiddin [topshiriq](../docs/06-api-contract/warehouse-frontend-handoff.md) bo‘yicha savol bersa, javob shaklini o‘zgartirmasdan oldin kelishish.
 
 ## 2026-11-18 · Valyuta va til qarori
 
