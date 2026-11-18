@@ -59,3 +59,9 @@ Lokal: 76 backend testi o‘tdi, 2 PostgreSQL cheklovi sinovi SQLite’da o‘tk
 Foydalanuvchi yangi Warehouse Inventory System rasmining uslubini ma’qulladi va amalga oshirishni buyurdi. Mavjud frontendning ko‘rinishi yangilandi: to‘q ko‘kimtir menyu, och ish maydoni, oltin aksent, ixcham oq shakllar va jadvallar. [Vizual uslub](../docs/07-ux-ui/visual-style.md) keyingi komponentlar uchun asos. API va biznes oqimlari o‘zgarmadi.
 
 Tekshiruv: frontend build va mavjud 3 test o‘tdi; brauzerda login/logout, UZ/RU/EN, materiallar jadvali va mobil menyu tekshirildi. 320/390/768 px hamda desktopda sahifa gorizontal chiqmaydi. Kirim backendiga bog‘liqlik saqlanadi.
+
+## PCRM-48 · Barcha ranglarni qayta ishlash · 2026-11-18
+
+Foydalanuvchi «ranglarini ham hammasini boshidan» qayta ishlashni buyurdi. Barcha komponent ranglari `frontend/src/tokens.css`ga yig‘ildi: fon, matn, tugma, jadval, shakl, fokus/disabled/autofill, status xabarlari, soyalar va brauzer theme-color. Tarqoq hex ranglar styles.css ichida qolmadi. Vizual uslub hujjati yangi qiymatlar bilan yangilandi.
+
+Tekshiruv: build va 3 mavjud test o‘tdi; brauzerda haqiqiy kirish/chiqish va xato, fokus, mobil menyu, ru/en/uz hamda 320/768 px va desktop ko‘rinishlari tekshirildi. Qabul qilingan matn/yuza juftliklari kontrasti hisoblandi. Biznes/API oqimi o‘zgarmadi.

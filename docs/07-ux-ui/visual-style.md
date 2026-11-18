@@ -6,16 +6,25 @@
 
 | Vazifa | Rang |
 |---|---|
-| Chap navigatsiya | `#142231` — to‘q ko‘kimtir |
-| Ish maydoni | `#f3f5f7` — och kulrang |
-| Shakl, jadval va yuqori panel | `#ffffff` |
-| Asosiy matn | `#202b38` |
-| Ikkilamchi matn | `#687585` |
-| Asosiy tugma va faol bo‘lim aksenti | `#e7b554` — vazmin oltin |
-| Och fondagi oltin matn | `#79540f` |
-| Ajratgich | `#e6eaef` |
+| Chap navigatsiya | `#101f32` — chuqur ko‘kimtir |
+| Ish maydoni | `#f4f6f9` — och sovuq kulrang |
+| Asosiy yuza | `#ffffff` |
+| Maydonlar | `#fbfcfe` |
+| Hisob-kitob paneli | `#fffcf5` — iliq oq |
+| Asosiy matn | `#1c2b3e` |
+| Ikkilamchi matn | `#647187` |
+| Asosiy tugma | `#e1ac45` — oltin |
+| Oltin matn | `#77500b` |
+| Ajratgich | `#e1e6ee` |
+| Xato | `#a7302a`, och yuza `#fff1ef` |
+| Muvaffaqiyat | `#216342`, och yuza `#edf8f0` |
+| Ogohlantirish | `#79520d`, och yuza `#fff8e7` |
 
-Asosiy ranglar `frontend/src/styles.css` ichidagi CSS o‘zgaruvchilarida. Butun ilovani yana to‘liq dark uslubga almashtirmang. Yangi komponentlarni shu palitra bilan yarating.
+Barcha ranglar `frontend/src/tokens.css`da saqlanadi. Komponent uslublarida tayyor CSS o‘zgaruvchilarini ishlating; alohida hex yoki nomlangan rang yozmang. `styles.css` joylashuv va shaklni, `tokens.css` esa ranglarni boshqaradi. Brauzer paneli uchun `index.html`dagi `theme-color` navigatsiya rangiga mos bo‘lishi kerak.
+
+Faol, hover, fokus, disabled, autofill, matn tanlash, surish paneli va soyalar ham yagona palitradan foydalanadi. Disabled holatni faqat shaffoflik bilan belgilanmaydi: alohida neytral yuza va matn qo‘llanadi. Gold aksent dekor va asosiy amal uchun, holat xabarlari esa o‘z semantik ranglari uchun ishlatiladi.
+
+Asosiy tekshirilgan matn/yuza juftliklari kamida 4.5:1 kontrastga ega: asosiy/ikkilamchi matn, placeholder, tugma, menyu, xato/muvaffaqiyat/ogohlantirish. Bu butun ilovaning accessibility auditi o‘rnini bosmaydi. Butun ilovani yana to‘liq dark uslubga almashtirmang.
 
 ## Komponentlar
 
