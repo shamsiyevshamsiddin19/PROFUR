@@ -28,11 +28,13 @@ import {
   type ReceiptInput,
   type StockRow,
   type User,
+  type Category,
   can,
 } from "../api";
 import { errorKey, localDate, money } from "../format";
 import { translate, unitLabel, type Language, type MessageKey } from "../i18n";
 
+import { useRecords } from "../hooks/useRecords";
 import { StockDetail } from "./StockDetail";
 
 function newDraft() {
@@ -62,6 +64,13 @@ export function WarehouseContent({
   const [detail, setDetail] = useState<StockRow | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockRows, setStockRows] = useState<StockRow[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const categories = useRecords<Category>(
+    screen === "stock" && can(user, "catalog.view_material")
+      ? "/api/v1/categories/"
+      : null,
+    lang,
+  );
   const [belowMinOnly, setBelowMinOnly] = useState(false);
   const [next, setNext] = useState<string | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -110,6 +119,7 @@ export function WarehouseContent({
           const params = new URLSearchParams();
           if (search) params.set("search", search);
           if (belowMinOnly) params.set("below_min", "true");
+          if (categoryFilter) params.set("category", categoryFilter);
           const query = params.toString() ? "?" + params.toString() : "";
           const page = await request<Page<StockRow>>(
             "/api/v1/stock/" + query,
@@ -146,7 +156,7 @@ export function WarehouseContent({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [lang, screen, search, belowMinOnly, revision]);
+  }, [lang, screen, search, belowMinOnly, categoryFilter, revision]);
 
   async function more() {
     if (!next || loading) return;
@@ -292,6 +302,23 @@ export function WarehouseContent({
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          {screen === "stock" && categories.data.length > 0 && (
+            <select
+              className="stock-category"
+              aria-label={t("category")}
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="">
+                {t("category")}: {t("all")}
+              </option>
+              {categories.data.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
           {screen === "stock" && (
             <label className="filter-chip">
               <input
@@ -305,7 +332,11 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {unavailable}
-        <div className="table-wrap">
+        <div
+          className={
+            screen === "stock" ? "table-wrap stock-ledger" : "table-wrap"
+          }
+        >
           {screen === "stock" ? (
             <table>
               <thead>
@@ -333,9 +364,13 @@ export function WarehouseContent({
                         {row.material.display_name}
                       </button>
                     </td>
-                    <td>{row.material.category.name}</td>
-                    <td>{unitLabel(row.material.unit, lang)}</td>
-                    <td>
+                    <td data-label={t("category")}>
+                      {row.material.category.name}
+                    </td>
+                    <td data-label={t("unit")}>
+                      {unitLabel(row.material.unit, lang)}
+                    </td>
+                    <td data-label={t("stock")}>
                       <strong>{row.quantity_on_hand}</strong>
                       {row.is_below_min && (
                         <span className="badge-warning" title={t("lowStock")}>
@@ -344,9 +379,11 @@ export function WarehouseContent({
                         </span>
                       )}
                     </td>
-                    <td>{row.open_batches}</td>
-                    <td>{row.min_quantity ?? "—"}</td>
-                    <td>
+                    <td data-label={t("batches")}>{row.open_batches}</td>
+                    <td data-label={t("minLimit")}>
+                      {row.min_quantity ?? "—"}
+                    </td>
+                    <td data-label={t("stockValue")}>
                       {row.value_by_currency?.[0]?.amount
                         ? money(row.value_by_currency[0].amount, lang)
                         : "—"}

@@ -1487,3 +1487,72 @@ fieldset:disabled {
 .minimum-form > .field {
   flex: 1;
 }
+.stock-category {
+  width: auto;
+  max-width: 230px;
+}
+@media (max-width: 650px) {
+  .stock-category {
+    max-width: none;
+    flex: 1;
+  }
+  .stock-ledger {
+    overflow: visible;
+    border: 0;
+    background: none;
+  }
+  .stock-ledger table,
+  .stock-ledger tbody {
+    display: block;
+  }
+  .stock-ledger thead {
+    display: none;
+  }
+  .stock-ledger tbody {
+    display: grid;
+    gap: 14px;
+  }
+  .stock-ledger tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .stock-ledger td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .stock-ledger td:first-child {
+    grid-column: 1/-1;
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .stock-ledger td[data-label]::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .stock-ledger .material-link {
+    padding: 0;
+    line-height: 1.6;
+  }
+  .stock-ledger .material-symbol {
+    margin-right: 0;
+    flex-shrink: 0;
+  }
+  .stock-ledger .badge-warning {
+    margin-left: 0;
+  }
+}

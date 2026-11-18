@@ -99,3 +99,10 @@ Dalil: TypeScript build va 9 frontend testi; Ruff va diff tekshiruvi. Alohida lo
 ### PR #39 · yakuniy integratsiya yangilanishi
 
 Ozodbekning #37/#40 va Akbarning #41 PR’lari ko‘rikdan o‘tib main’ga qo‘shildi. Xarajat yaratish va teskari yozuv ham frontendda Idempotency-Key, sessiyada tana/kalitni saqlash va ayni so‘rovni davom ettirishga ulandi; oldingi «xarajat API’sida idempotency yo‘q» cheklovi #41 bilan bartaraf etildi. Formadagi yorliqlar boshqaruvlarga alohida bog‘landi, tanlov variantlari yorliq matniga aralashmaydi. Build va 10 frontend testi o‘tdi; yakuniy integratsiya CI’si kutilmoqda.
+
+
+## PR #39 main’da · 2026-11-18
+
+PR #39 `36787ec` bilan main’ga birlashdi. Tekshirilgan head: `4f9df46`. CI’da 206 backend testi (PostgreSQL), 10 frontend testi va haqiqiy Chromium/Django ombor ssenariysi o‘tdi. Ozodbekning #37/#40 va Akbarning #41 ishlari ko‘rikdan o‘tib main’da. Jira PCRM-39/41/43/45/47/48 — yakuniy mezon tekshiruvi sabab Jarayonda.
+
+PCRM-43 mezonini to‘liq yopish uchun kichik ekranda qoldiq jadvali bitta DOM asosidagi kartalarga o‘tkazildi (kategoriya, birlik, miqdor, min. chegara, qiymat va partiyalar), kategoriya filtri qo‘shildi. Partiya/minimal chegara oynasi saqlanadi. Takroriy satrlar yo‘q; narx ruxsati API tomonidan boshqariladi. Browser ssenariysiga kategoriya filtri va min. chegara qo‘shildi. Build va 10 frontend testi o‘tdi; shu qo‘shimchaning CI’si kutilmoqda.
