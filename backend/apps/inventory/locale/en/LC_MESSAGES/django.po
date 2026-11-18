@@ -1,0 +1,49 @@
+# PROFUR · ombor chiqimi (PCRM-44) tarjimalari.
+# Manba tili — o'zbekcha (lotin).
+msgid ""
+msgstr ""
+"Project-Id-Version: profur-inventory\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "chiqim"
+msgstr "issue"
+
+msgid "chiqimlar"
+msgstr "issues"
+
+msgid "chiqim sanasi"
+msgstr "issue date"
+
+msgid "kim oldi"
+msgstr "recipient"
+
+msgid "loyiha raqami"
+msgstr "project number"
+
+msgid "chiqim partiyasi"
+msgstr "issue batch"
+
+msgid "chiqim partiyalari"
+msgstr "issue batches"
+
+msgid "Chiqim sanasi kelajakda bo'lishi mumkin emas."
+msgstr "The issue date cannot be in the future."
+
+msgid "Bitta partiya ikki marta ko'rsatilgan."
+msgstr "The same batch is listed twice."
+
+msgid "Partiya bu materialga tegishli emas: {ids}."
+msgstr "Batch does not belong to this material: {ids}."
+
+msgid "Partiyada yetarli miqdor qolmagan."
+msgstr "Not enough quantity left in the batch."
+
+msgid "Omborda yetarli material yo'q."
+msgstr "Not enough material in stock."
+
+msgid "Butun son bo'lishi kerak."
+msgstr "Must be a whole number."

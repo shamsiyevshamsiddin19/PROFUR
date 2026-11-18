@@ -12,6 +12,8 @@ Shartnoma: docs/06-api-contract/warehouse-api-v1.md, 6-bo'lim.
 Yagona valyuta — USD (qarorlar jurnali, 2026-11-18).
 """
 
+from decimal import ROUND_HALF_UP, Decimal
+
 from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
@@ -20,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 QUANTITY = {"max_digits": 12, "decimal_places": 2}
 AMOUNT = {"max_digits": 14, "decimal_places": 2}
 UNIT_PRICE = {"max_digits": 18, "decimal_places": 6}
+MONEY_STEP = Decimal("0.01")
 
 
 class Currency(models.TextChoices):
@@ -201,3 +204,103 @@ class IdempotencyKey(models.Model):
                 fields=["user", "endpoint", "key"], name="inventory_idempotency_unique"
             ),
         ]
+
+
+class StockIssue(models.Model):
+    """Chiqim hujjati (PCRM-44): material ombordan ishchiga amalda berildi.
+
+    OQ-002: qoldiq aynan shu paytda kamayadi. Qaysi partiyadan qancha olingani
+    ``StockIssueAllocation`` qatorlarida, qoldiq harakati esa ``StockMovement``
+    da (``reference_kind="issue"``) saqlanadi. Hujjat o'zgartirilmaydi.
+
+    ``project_id`` — loyiha raqami; loyihalar moduli kelguncha oddiy son
+    (``expenses.Expense.project_id`` bilan bir xil yondashuv).
+    """
+
+    material = models.ForeignKey(
+        "catalog.Material",
+        on_delete=models.PROTECT,
+        related_name="issues",
+        verbose_name=_("material"),
+    )
+    quantity = models.DecimalField(_("miqdor"), **QUANTITY)
+    issued_on = models.DateField(_("chiqim sanasi"))
+    recipient_name = models.CharField(_("kim oldi"), max_length=200)
+    project_id = models.PositiveBigIntegerField(
+        _("loyiha raqami"), null=True, blank=True
+    )
+    note = models.CharField(_("izoh"), max_length=500, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="+",
+        verbose_name=_("kiritgan"),
+    )
+    created_at = models.DateTimeField(_("yaratilgan"), auto_now_add=True)
+
+    class Meta:
+        ordering = ["-issued_on", "-id"]
+        verbose_name = _("chiqim")
+        verbose_name_plural = _("chiqimlar")
+        indexes = [models.Index(fields=["project_id"], name="inventory_issue_project")]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(quantity__gt=0), name="inventory_issue_quantity_positive"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        """Chiqimni qisqa ko'rinishda qaytaradi: raqam, material va miqdor."""
+        return f"#{self.pk} · {self.material} · {self.quantity}"
+
+    def total_cost(self) -> Decimal:
+        """Chiqim tannarxi USD'da: har qism miqdori × partiya narxi, sentgacha.
+
+        Oraliq ko'paytmalar yaxlitlanmaydi, faqat yakuniy yig'indi 0.01 gacha
+        ``ROUND_HALF_UP`` bilan yaxlitlanadi.
+        """
+        total = sum(
+            (part.quantity * part.batch.unit_price for part in self.allocations.all()),
+            Decimal("0"),
+        )
+        return total.quantize(MONEY_STEP, rounding=ROUND_HALF_UP)
+
+
+class StockIssueAllocation(models.Model):
+    """Chiqimning bitta partiyadan olingan qismi.
+
+    Tannarx partiyaning o'zgarmas ``unit_price`` idan olinadi (USD), shuning
+    uchun keyingi kirimlar eski chiqim qiymatini o'zgartirmaydi.
+    """
+
+    issue = models.ForeignKey(
+        StockIssue,
+        on_delete=models.PROTECT,
+        related_name="allocations",
+        verbose_name=_("chiqim"),
+    )
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.PROTECT,
+        related_name="issue_allocations",
+        verbose_name=_("partiya"),
+    )
+    quantity = models.DecimalField(_("miqdor"), **QUANTITY)
+
+    class Meta:
+        ordering = ["id"]
+        verbose_name = _("chiqim partiyasi")
+        verbose_name_plural = _("chiqim partiyalari")
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(quantity__gt=0),
+                name="inventory_issue_alloc_quantity_positive",
+            ),
+            models.UniqueConstraint(
+                fields=["issue", "batch"], name="inventory_issue_alloc_unique_batch"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        """Qismni ko'rsatadi: chiqim, partiya va miqdor."""
+        return f"#{self.issue_id} ← partiya #{self.batch_id} · {self.quantity}"

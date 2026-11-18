@@ -14,7 +14,7 @@ Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bil
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Reja | — |
+| [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Jarayonda | 1-qism (chiqim): `feat/PCRM-44-stock-issue`, [issues-api.md](../docs/06-api-contract/issues-api.md) |
 | [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Jarayonda | `akbar` branch (73e1691), [expenses-api.md](../docs/06-api-contract/expenses-api.md) |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Operatsiyalar tarixi API qismi. UI egasi frontend | Reja | — |
 
@@ -42,3 +42,7 @@ Chiqim tannarxi va barcha xarajatlar USD ($)da. Boshqa valyuta qiymatini API rad
 PR #16 (katalog), #17 (frontend) va #18 (xarajatlar) bir integratsiya tarmog‘ida tekshirildi. `config/urls.py` to‘qnashuvi ikkala API yo‘lini saqlab yechildi. Admin panelida xarajat turining kodi o‘zgarmas qilindi; xarajat yaratish muallifni server belgilaydigan API orqali amalga oshadi. Sessiya/CSRF va dinamik ruxsatlarni ikkala xizmatda tekshiruvchi integratsiya sinovi qo‘shildi.
 
 Lokal: 76 backend testi o‘tdi, 2 PostgreSQL cheklovi sinovi SQLite’da o‘tkazildi; qo‘shimcha 2 integratsiya sinovi ham o‘tdi. Frontend build va 3 testi o‘tdi. PostgreSQL cheklovlari birlashtirish PR’ining CI’sida tekshiriladi. Katalog API va frontend ro‘yxati mavjud; kirim/partiya/qoldiq backend hali PCRM-40/42 vazifasi. PCRM-39 to‘liq UI mezonlari, PCRM-48 barcha sahifalar va PCRM-46 teskari yozuv jarayoni avtomatik Done qilinmaydi.
+
+## PCRM-44 · 1-qism · 2026-11-18
+
+`2026-11-18 · PCRM-44 · Jarayonda · chiqim: StockIssue va StockIssueAllocation modellari, services.decrease() va issue_stock() (avval qoldiq, keyin partiyalar id tartibida qulflanadi), POST/GET /api/v1/issues/ (Idempotency-Key majburiy, 409 insufficient_stock va batch_insufficient, narx OQ-041 bo‘yicha yashiriladi, PUT/PATCH/DELETE 405), tannarx partiya narxida USD, ru/en tarjimalar · partiyani mijoz tanlaydi, chunki OQ-001 PM’da · PR #27 (PCRM-42) ustiga qurilgan, avval u birlashishi kerak · lokal (SQLite): pytest 144 o‘tdi, 3 tasi o‘tkazildi; ruff va makemigrations --check toza; PostgreSQL’dagi «10 dan 7 + 7» parallel sinovi CI’da · keyingi qadam: qaytarish so‘rovi va tasdiqlash (OQ-003), keyin hisobdan chiqarish (OQ-007); `inventory.add_issue` kodini rollarga berish — Jamoliddin`
