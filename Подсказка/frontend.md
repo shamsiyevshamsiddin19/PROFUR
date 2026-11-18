@@ -14,12 +14,12 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-48](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-48) | Responsive ekran tuzilmasi, navigatsiya va UZ/RU/EN | Ko‘rikda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17) |
-| [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Material katalogi UI | Reja | — |
-| [PCRM-41](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-41) | Kirim formasi va API integratsiyasi | Jarayonda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17), kirim backendiga bog‘liq |
-| [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Jarayonda | Ozodbekning `/api/v1/stock/` API'si frontendga ulandi |
-| [PCRM-45](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-45) | Chiqim, qaytarish va tasdiqlash ekranlari | Reja | — |
-| [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Tarix va hisobot UI | Reja | — |
+| [PCRM-48](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-48) | Responsive ekran tuzilmasi, navigatsiya va UZ/RU/EN | Bajarildi | [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) va [#42](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/42) main’da; CI va Jira Done |
+| [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Material katalogi UI | Bajarildi | [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) va [#42](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/42) main’da; CI va Jira Done |
+| [PCRM-41](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-41) | Kirim formasi va API integratsiyasi | Bajarildi | [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) va [#42](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/42) main’da; CI va Jira Done |
+| [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Bajarildi | [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) va [#42](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/42) main’da; CI va Jira Done |
+| [PCRM-45](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-45) | Chiqim, qaytarish va tasdiqlash ekranlari | Bajarildi | [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) va [#42](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/42) main’da; CI va Jira Done |
+| [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Tarix va hisobot UI | Bajarildi | [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) va [#42](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/42) main’da; CI va Jira Done |
 
 **Qabul mezoni** — Kirim formasi telefon, planshet va desktopda ishlaydi. Saqlashdan keyin API qaytargan qoldiq va harakat ko‘rinadi.
 
@@ -106,3 +106,9 @@ Ozodbekning #37/#40 va Akbarning #41 PR’lari ko‘rikdan o‘tib main’ga qo�
 PR #39 `36787ec` bilan main’ga birlashdi. Tekshirilgan head: `4f9df46`. CI’da 206 backend testi (PostgreSQL), 10 frontend testi va haqiqiy Chromium/Django ombor ssenariysi o‘tdi. Ozodbekning #37/#40 va Akbarning #41 ishlari ko‘rikdan o‘tib main’da. Jira PCRM-39/41/43/45/47/48 — yakuniy mezon tekshiruvi sabab Jarayonda.
 
 PCRM-43 mezonini to‘liq yopish uchun kichik ekranda qoldiq jadvali bitta DOM asosidagi kartalarga o‘tkazildi (kategoriya, birlik, miqdor, min. chegara, qiymat va partiyalar), kategoriya filtri qo‘shildi. Partiya/minimal chegara oynasi saqlanadi. Takroriy satrlar yo‘q; narx ruxsati API tomonidan boshqariladi. Browser ssenariysiga kategoriya filtri va min. chegara qo‘shildi. Build va 10 frontend testi o‘tdi; shu qo‘shimchaning CI’si kutilmoqda.
+
+## Yakuniy texnik topshirish · 2026-11-18
+
+**PCRM-39/41/43/45/47/48 — Bajarildi.** PR #39 (`36787ec`) va #42 (`28ef64e`) main’da. Jira holatlari tekshirilgan natija va PR/CI havolali izoh bilan Done ga o‘tkazildi. Yakuniy kod head’i `f4ec008` uchun CI: 206 backend testi, 10 frontend testi va haqiqiy Chromium/Django ombor ssenariysi o‘tdi (kategoriya filtri, minimal chegara, chiqim, qaytarish/tasdiq, hisobdan chiqarish/tasdiq, xarajat/teskari yozuv, tarix/CSV). Oq fon, uz/ru/en va USD saqlangan.
+
+**Keyingi qadam — PCRM-50:** Jamoliddinning yakuniy qabul matritsasi va qolgan integratsiya ishlari, PM/buyurtmachi qabuli. P1 (partiya tanlash), P3 (aniqlik), P5 (kirimni tuzatish) bo‘yicha ochiq qarorlar frontend ticketlari Done bo‘lishi bilan tasdiqlangan hisoblanmaydi. Yangi ishda avval main, ochiq PR va [API topshirig‘i](../docs/06-api-contract/warehouse-frontend-handoff.md)ni o‘qing; mavjud ekranlarni qayta yaratmang.
