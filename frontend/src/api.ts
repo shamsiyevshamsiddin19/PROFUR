@@ -14,17 +14,61 @@ export type Material = {
   display_name: string;
   unit: string;
   category: { id: number; name: string };
+  color?: string;
+  length_cm?: string | null;
+  width_cm?: string | null;
+  thickness_cm?: string | null;
+  is_active?: boolean;
   quantity_on_hand?: string | null;
+};
+export type StockRow = {
+  material: {
+    id: number;
+    display_name: string;
+    unit: string;
+    category: { id: number; name: string };
+  };
+  quantity_on_hand: string;
+  open_batches: number;
+  min_quantity: string | null;
+  is_below_min: boolean;
+  value_by_currency?: { currency: "USD"; amount: string }[];
+};
+export type StockBatch = {
+  id: number;
+  received_on: string;
+  quantity: string;
+  quantity_remaining: string;
+  unit_price?: string;
+  currency?: "USD";
+};
+export type StockMovement = {
+  id: number;
+  type: string;
+  material: { id: number; display_name: string; unit: string };
+  batch_id: number | null;
+  quantity: string;
+  quantity_on_hand_after: string;
+  reference: { kind: string; id: number };
+  reason: string;
+  created_by: { id: number; name: string };
+  created_at: string;
 };
 export type Receipt = {
   id: number;
   received_on: string;
   quantity: string;
-  total_amount: string;
-  currency: "USD";
-  unit_price: string;
+  quantity_remaining?: string;
+  total_amount?: string;
+  currency?: "USD";
+  unit_price?: string;
   quantity_on_hand_after?: string;
-  material: { display_name: string; unit: string };
+  supplier?: string;
+  document_number?: string;
+  note?: string;
+  created_by?: { id: number; name: string };
+  created_at?: string;
+  material: { id?: number; display_name: string; unit: string };
 };
 export type Page<T> = { count: number; next: string | null; results: T[] };
 export type ReceiptInput = {

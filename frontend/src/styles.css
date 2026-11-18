@@ -752,6 +752,53 @@ tbody tr:hover {
   background: none;
   box-shadow: none;
 }
+.toolbar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.toolbar-wrap .toolbar {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.filter-chip input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.badge-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: var(--warning-surface);
+  color: var(--warning);
+  border: 1px solid var(--warning-line);
+  margin-left: 8px;
+}
 .secondary {
   padding: 11px 14px;
   border: 1px solid var(--border-strong);
