@@ -33,9 +33,20 @@ IDEMPOTENCY_TTL = timedelta(hours=24)
 
 
 class IdempotencyConflictError(APIException):
+    """409: shu kalit boshqa tana bilan ishlatilgan.
+
+    Javob boshqa 409 xatolar bilan bir xil: ``{"detail": "…", "code": "…"}``.
+    """
+
     status_code = status.HTTP_409_CONFLICT
     default_detail = _("Bu kalit boshqa so'rov uchun ishlatilgan.")
     default_code = "idempotency_conflict"
+
+    def __init__(self):
+        code = self.default_code
+        super().__init__(
+            {"detail": ErrorDetail(str(self.default_detail), code), "code": code}
+        )
 
 
 def idempotency_key(request: Request) -> uuid.UUID:
