@@ -148,7 +148,7 @@ test("unavailable catalogue cannot submit a fabricated receipt", async () => {
   ).toBe(false);
 });
 
-test("mobile viewport receipt form submission saves single batch and calculates unit price", async () => {
+test("receipt component submits one USD request with an idempotency key", async () => {
   localStorage.setItem("profur.language", "uz");
   const writes: RequestInit[] = [];
   vi.stubGlobal(
@@ -192,4 +192,3 @@ test("mobile viewport receipt form submission saves single batch and calculates 
   expect(payload.total_amount).toBe("450.00");
   expect(new Headers(writes[0].headers).get("Idempotency-Key")).toBeTruthy();
 });
-
