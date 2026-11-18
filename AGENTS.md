@@ -29,4 +29,4 @@ Jamoa a’zolari dastlabki tajribaga ega. Vazifa berilganda [bajarish qo‘llanm
 
 ## Frontend uslubi · 2026-11-18
 
-Yangi UI va komponentlarda [vizual uslub](docs/07-ux-ui/visual-style.md)ga amal qiling: to‘q ko‘kimtir navigatsiya, och ish maydoni va oltin aksent. Bu foydalanuvchining yangi loyiha qarori. PROFUR komponentlari, UZ/RU/EN va USD saqlanadi.
+Foydalanuvchi oq fonni saqlash va tizim ranglari hamda dizayn kamchiliklarini yaxshilashni so‘radi. Joriy [vizual uslub](docs/07-ux-ui/visual-style.md): oq ish maydoni, safir ko‘k asosiy amallar, grafit matn va to‘q neytral navigatsiya. Avvalgi oltin palitra va rad etilgan login bezagi qaytarilmasin. UZ/RU/EN va USD saqlanadi.
