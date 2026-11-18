@@ -6,7 +6,7 @@
 
 ## Ish tartibi
 
-Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material va partiyani ajrating. Kirim va qoldiqni bitta tranzaksiyada yozing. Qoldiqni o‘zgartiradigan umumiy amalni @thealiiheere bilan kelishing va birgalikda tekshiring.
+Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material va partiyani ajrating. Kirim va qoldiqni bitta tranzaksiyada yozing. Qoldiqni o‘zgartiradigan umumiy amalni Akbar (@thealiiheere) bilan kelishing va birgalikda tekshiring.
 
 ## Vazifalar va holat
 
