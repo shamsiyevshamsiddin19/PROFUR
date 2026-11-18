@@ -148,6 +148,37 @@ test("unavailable catalogue cannot submit a fabricated receipt", async () => {
   ).toBe(false);
 });
 
+test("the mobile drawer closes after sign out and a new sign in", async () => {
+  localStorage.setItem("profur.language", "en");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (path: string) => {
+      if (path === "/api/auth/logout/") return response({});
+      if (path === "/api/auth/login/") return response({ user });
+      return baseFetch(path);
+    }),
+  );
+  render(<App />);
+  await screen.findByRole("heading", { name: "Material receipts" });
+  await userEvent.click(screen.getByRole("button", { name: "Open menu" }));
+  expect(
+    screen
+      .getByRole("button", { name: "Open menu" })
+      .getAttribute("aria-expanded"),
+  ).toBe("true");
+  await userEvent.click(screen.getByRole("button", { name: "Sign out" }));
+  await screen.findByLabelText("Username");
+  await userEvent.type(screen.getByLabelText("Username"), "operator");
+  await userEvent.type(screen.getByLabelText("Password"), "password");
+  await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+  await screen.findByRole("heading", { name: "Material receipts" });
+  expect(
+    screen
+      .getByRole("button", { name: "Open menu" })
+      .getAttribute("aria-expanded"),
+  ).toBe("false");
+});
+
 test("mobile viewport receipt form submission saves single batch and calculates unit price", async () => {
   localStorage.setItem("profur.language", "uz");
   const writes: RequestInit[] = [];
@@ -192,4 +223,3 @@ test("mobile viewport receipt form submission saves single batch and calculates 
   expect(payload.total_amount).toBe("450.00");
   expect(new Headers(writes[0].headers).get("Idempotency-Key")).toBeTruthy();
 });
-
