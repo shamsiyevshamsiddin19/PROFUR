@@ -44,10 +44,11 @@ def drill(archive: Path):
             check=True,
         )
         sql = """
-        SELECT count(*) FROM inventory_stockbalance s
-        WHERE s.quantity_on_hand < 0
-           OR s.quantity_on_hand <> COALESCE((SELECT sum(b.quantity_remaining) FROM inventory_batch b WHERE b.material_id=s.material_id),0)
-           OR s.quantity_on_hand <> COALESCE((SELECT sum(m.quantity) FROM inventory_stockmovement m WHERE m.material_id=s.material_id),0);
+        SELECT count(*) FROM catalog_material material
+        LEFT JOIN inventory_stockbalance s ON s.material_id=material.id
+        WHERE COALESCE(s.quantity_on_hand,0) < 0
+           OR COALESCE(s.quantity_on_hand,0) <> COALESCE((SELECT sum(b.quantity_remaining) FROM inventory_batch b WHERE b.material_id=material.id),0)
+           OR COALESCE(s.quantity_on_hand,0) <> COALESCE((SELECT sum(m.quantity) FROM inventory_stockmovement m WHERE m.material_id=material.id),0);
         """
         check = subprocess.run(
             [

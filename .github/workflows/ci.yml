@@ -87,6 +87,7 @@ jobs:
           DB_PORT: 5432
         run: |
           python backend/manage.py migrate --noinput
+          python backend/manage.py shell -c 'from accounts.models import User; from apps.catalog.models import Category, Material; from apps.inventory import services; from django.utils import timezone; from decimal import Decimal; u=User.objects.create_user(username="ci_restore"); m=Material.objects.create(name="CI restore material", category=Category.objects.first(), unit="sheet"); services.receive(material=m, user=u, received_on=timezone.localdate(), quantity=Decimal("20"), total_amount=Decimal("600"))'
           python ops/backup.py --directory "$RUNNER_TEMP/profur-backup"
           python ops/restore_drill.py "$RUNNER_TEMP"/profur-backup/*.dump
 
