@@ -35,7 +35,12 @@ def test_session_login_and_both_api_routes_enforce_csrf_and_permissions():
     role.permissions += ["expenses.view_expense", "expenses.add_expense"]
     role.save()
     assert client.get("/api/v1/expenses/").status_code == 200
-    payload = {"expense_type": "tax", "amount": "12.50", "spent_on": "2026-11-18"}
+    payload = {
+        "expense_type": "tax",
+        "amount": "12.50",
+        "spent_on": "2026-11-18",
+        "project_id": 1,
+    }
     assert client.post("/api/v1/expenses/", payload, format="json").status_code == 403
     fresh = client.get("/api/auth/csrf/").data["csrfToken"]
     response = client.post(

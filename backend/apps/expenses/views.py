@@ -11,14 +11,38 @@ ro'yxatida bo'lishi kerak (docs/06-api-contract/auth-api.md).
 
 from accounts.permissions import HasPermissionCode
 from django.db.models import QuerySet
-from rest_framework import mixins, viewsets
+from django.utils.translation import gettext_lazy as _
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import APIException, ErrorDetail
+from rest_framework.request import Request
+from rest_framework.response import Response
 
+from . import services
 from .models import Expense, ExpenseType
 from .serializers import (
     ExpenseFilterSerializer,
+    ExpenseReverseSerializer,
     ExpenseSerializer,
     ExpenseTypeSerializer,
 )
+
+REVERSE_MESSAGES = {
+    "already_reversed": _("Bu xarajat avval bekor qilingan."),
+    "reversal_not_reversible": _("Teskari yozuvni bekor qilib bo'lmaydi."),
+}
+
+
+class ExpenseConflictError(APIException):
+    """409: xarajatni bekor qilib bo'lmaydi (``already_reversed`` va boshqalar)."""
+
+    status_code = status.HTTP_409_CONFLICT
+
+    def __init__(self, code: str):
+        """Xato kodiga mos tarjima qilingan matn bilan javob tuzadi."""
+        super().__init__(
+            {"detail": ErrorDetail(str(REVERSE_MESSAGES[code]), code), "code": code}
+        )
 
 
 class ActionPermissionMixin:
@@ -80,14 +104,17 @@ class ExpenseViewSet(
 
     serializer_class = ExpenseSerializer
     view_permission = "expenses.view_expense"
-    action_permissions = {"create": "expenses.add_expense"}
+    action_permissions = {
+        "create": "expenses.add_expense",
+        "reverse": "expenses.reverse_expense",
+    }
 
     def get_queryset(self) -> QuerySet[Expense]:
         """Xarajatlarni qaytaradi; ro'yxatda so'rovdagi filtrlarni qo'llaydi.
 
         Noto'g'ri filtr qiymati (masalan, sana formati) 400 xato beradi.
         """
-        queryset = Expense.objects.select_related("expense_type")
+        queryset = Expense.objects.select_related("expense_type", "reversal")
         if self.action != "list":
             return queryset
 
@@ -107,3 +134,35 @@ class ExpenseViewSet(
     def perform_create(self, serializer: ExpenseSerializer) -> None:
         """Yangi xarajatni saqlaydi va uni kiritgan foydalanuvchini yozib qo'yadi."""
         serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def reverse(self, request: Request, pk: str | None = None) -> Response:
+        """Xarajatni teskari yozuv bilan bekor qiladi (TZ 6.8, BR-12).
+
+        Javob ``201``: ``{"reversal": {...}, "replacement": {...} | null}``.
+        Asl yozuv o'zgarmaydi. Ikkinchi marta bekor qilish — 409.
+        """
+        expense = self.get_object()
+        body = ExpenseReverseSerializer(data=request.data, context={"request": request})
+        body.is_valid(raise_exception=True)
+        try:
+            reversal, replacement = services.reverse_expense(
+                expense=expense,
+                reason=body.validated_data["reason"],
+                replacement=body.validated_data.get("replacement"),
+                user=request.user,
+            )
+        except services.ExpenseNotReversibleError as error:
+            raise ExpenseConflictError(error.code) from error
+        context = self.get_serializer_context()
+        return Response(
+            {
+                "reversal": ExpenseSerializer(reversal, context=context).data,
+                "replacement": (
+                    ExpenseSerializer(replacement, context=context).data
+                    if replacement
+                    else None
+                ),
+            },
+            status=status.HTTP_201_CREATED,
+        )

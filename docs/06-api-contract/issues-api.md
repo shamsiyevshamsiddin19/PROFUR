@@ -3,7 +3,7 @@
 **2026-11-18 · Taklif, ko‘rib chiqish kutilmoqda.** Jira: [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44), 1-qism (chiqim). Egasi: [Akbar (@thealiiheere)](https://github.com/thealiiheere).
 Manbalar: TZ 6.3 va 6.8, [OQ-001, OQ-002, OQ-006, OQ-041](../01-requirements/open-questions.md), [valyuta va til qarori](../09-decisions/decision-log.md), [ombor API shartnomasi](warehouse-api-v1.md) 6-bo‘lim. Umumiy qoidalar (sana formati, sahifalash, o‘nlik sonlar satr ko‘rinishida, `Idempotency-Key`) shartnoma bilan bir xil.
 
-Qaytarish (OQ-003, tasdiqlash bilan) va hisobdan chiqarish (OQ-007, admin tasdig‘i) keyingi qismlarda qo‘shiladi.
+Qaytarish (OQ-003) va hisobdan chiqarish (OQ-007): [returns-write-offs-api.md](returns-write-offs-api.md).
 
 ## Qoidalar
 
@@ -94,8 +94,21 @@ Bir xil kalit va tana qayta yuborilsa, yangi chiqim yozilmaydi: birinchi javob `
 
 `tests/test_inventory_issues.py`: qoldiq/partiya kamayishi va harakat, ikki partiyali tannarx, yaxlitlash, ikkala `409`, validatsiya, idempotentlik, ruxsatlar, narxni yashirish, `405`, filtrlar, uz/ru/en xabarlari. PostgreSQL’da: qoldiq 10 bo‘lganda ikki ulanishdan bir vaqtda 7 tadan chiqim — bittasi `201`, ikkinchisi `409`, qoldiq 3 (CI’da ishlaydi).
 
-## Ochiq savollar
+## Ochiq savol — OQ-001 partiya tanlash (Shamsiddin → PM)
 
-- **OQ-001 (PM: P1).** Partiya tanlash qoidasi (FIFO yoki qo‘lda). Qaror chiqsa, `allocations` ixtiyoriy bo‘lib, server o‘zi taqsimlaydi; mavjud mijozlar o‘zgarishsiz ishlayveradi.
+PM tasdiqlagan qism: har kirim partiyasi o‘z narxida alohida hisobga olinadi. **Tasdiqlanmagan qism:** chiqimga qaysi partiya bog‘lanadi. Shartnomadagi FIFO faqat taklif, shuning uchun server partiyani o‘zi tanlamaydi.
+
+> **Savol:** Chiqim va hisobdan chiqarishda partiya qanday tanlansin?
+>
+> - **A. FIFO avtomatik** — server eng eski partiyadan boshlab o‘zi taqsimlaydi; ombor mas’uli tanlamaydi.
+> - **B. Qo‘lda** — ombor mas’uli har safar partiyani tanlaydi (hozirgi API).
+> - **C. FIFO taklif + qo‘lda o‘zgartirish** — forma eng eski partiyalarni oldindan to‘ldiradi, ombor mas’uli o‘zgartira oladi. Server yuborilgan taqsimotni saqlaydi; `allocations` yuborilmasa FIFO qo‘llanadi.
+>
+> **Tavsiya: C.** Hozirgi API’ni buzmaydi, tannarx haqiqiy partiya narxida qoladi, xato tanlovni tuzatish imkonini beradi.
+
+Qaror chiqquncha bog‘liq bo‘lmagan barcha ish (qoldiq, qaytarish, hisobdan chiqarish, idempotentlik, tarix) tayyor. A yoki C tanlansa, `services.decrease()` ga bitta taqsimlash funksiyasi qo‘shiladi; mavjud mijozlar o‘zgarishsiz ishlaydi.
+
+## Boshqa qaydlar
+
 - **`recipient_name`** hozir erkin matn. Ishchilar ro‘yxati paydo bo‘lsa, `recipient_id` qo‘shiladi.
-- **`inventory.add_issue`** kodini admin rollarga berishi kerak (Jamoliddin, accounts).
+- **`inventory.add_issue`** kodini admin ombor mas’uli roliga beradi (Jamoliddin, accounts).

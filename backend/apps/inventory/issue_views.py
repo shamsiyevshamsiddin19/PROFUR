@@ -43,8 +43,30 @@ class StockConflictError(APIException):
         )
 
 
+CONFLICT_ERRORS = (
+    services.InsufficientStockError,
+    services.BatchUnavailableError,
+    services.ReturnLimitError,
+    services.AlreadyDecidedError,
+)
+
+
 def conflict_from(error: Exception) -> StockConflictError:
     """Servis xatosini frontend tushunadigan 409 javobiga aylantiradi."""
+    if isinstance(error, services.AlreadyDecidedError):
+        return StockConflictError(
+            "already_decided",
+            _("So'rov bo'yicha boshqa qaror qabul qilingan."),
+            status=error.status,
+        )
+    if isinstance(error, services.ReturnLimitError):
+        return StockConflictError(
+            "return_exceeds_issue",
+            _("Qaytarish asl chiqimning qaytarilmagan qismidan oshadi."),
+            batch_id=str(error.batch_id),
+            available=str(error.available),
+            requested=str(error.requested),
+        )
     if isinstance(error, services.BatchUnavailableError):
         return StockConflictError(
             "batch_insufficient",
@@ -181,10 +203,7 @@ class StockIssueViewSet(
                 issue, on_hand = services.issue_stock(
                     user=request.user, **serializer.service_kwargs()
                 )
-            except (
-                services.InsufficientStockError,
-                services.BatchUnavailableError,
-            ) as error:
+            except CONFLICT_ERRORS as error:
                 raise conflict_from(error) from error
             return {
                 **IssueSerializer(issue, context={"request": request}).data,

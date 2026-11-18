@@ -63,6 +63,10 @@ class ExpenseSerializer(serializers.ModelSerializer):
         error_messages={"invalid_choice": _("Faqat USD valyutasi qabul qilinadi.")},
     )
 
+    reversal = serializers.SerializerMethodField(
+        help_text=_("Bu yozuvni bekor qilgan teskari yozuv (bo'lmasa null).")
+    )
+
     class Meta:
         model = Expense
         fields = [
@@ -74,21 +78,64 @@ class ExpenseSerializer(serializers.ModelSerializer):
             "spent_on",
             "project_id",
             "note",
+            "reverses",
+            "reversal",
             "created_by",
             "created_at",
         ]
-        read_only_fields = ["created_by", "created_at"]
-        extra_kwargs = {"project_id": {"min_value": 1}}
+        read_only_fields = ["reverses", "created_by", "created_at"]
+        # OQ-010 (PM tasdiqlagan): har bir qo'shimcha xarajat aniq loyihaga
+        # biriktiriladi. Loyihalar moduli kelguncha raqam tekshirilmaydi, lekin
+        # bo'sh qoldirilmaydi. Baza ustuni eski yozuvlar uchun ``null`` ga ruxsat beradi.
+        extra_kwargs = {
+            "project_id": {"min_value": 1, "required": True, "allow_null": False}
+        }
 
     def get_expense_type_name(self, expense: Expense) -> str:
         """Xarajat turi nomini so'rov tilida qaytaradi."""
         return expense.expense_type.localized_name()
+
+    def get_reversal(self, expense: Expense) -> dict | None:
+        """Yozuv bekor qilingan bo'lsa — teskari yozuv raqami, sababi va vaqti."""
+        reversal = getattr(expense, "reversal", None)
+        if reversal is None:
+            return None
+        return {
+            "id": reversal.pk,
+            "reason": reversal.note,
+            "created_by": reversal.created_by_id,
+            "created_at": reversal.created_at.isoformat(),
+        }
 
     def validate_expense_type(self, expense_type: ExpenseType) -> ExpenseType:
         """Faolsizlantirilgan turga yangi xarajat yozishni rad etadi."""
         if not expense_type.is_active:
             raise serializers.ValidationError(_("Bu xarajat turi faol emas."))
         return expense_type
+
+
+class ExpenseReverseSerializer(serializers.Serializer):
+    """``POST /api/v1/expenses/{id}/reverse/`` tanasi (TZ 6.8, BR-12).
+
+    ``reason`` majburiy. ``replacement`` — ixtiyoriy to'g'ri yozuv; u oddiy
+    xarajat kabi tekshiriladi va teskari yozuv bilan birga saqlanadi.
+    """
+
+    reason = serializers.CharField(max_length=1000)
+    replacement = serializers.DictField(required=False)
+
+    def validate_reason(self, reason: str) -> str:
+        """Sababni bo'sh joylardan tozalaydi; bo'sh sababni rad etadi."""
+        reason = reason.strip()
+        if not reason:
+            raise serializers.ValidationError(_("Bekor qilish sababini yozing."))
+        return reason
+
+    def validate_replacement(self, data: dict) -> dict:
+        """Yangi yozuvni ``ExpenseSerializer`` qoidalari bilan tekshiradi."""
+        serializer = ExpenseSerializer(data=data, context=self.context)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data
 
 
 class ExpenseFilterSerializer(serializers.Serializer):

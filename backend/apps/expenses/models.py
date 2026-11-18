@@ -92,15 +92,28 @@ class Expense(models.Model):
         verbose_name=_("kim kiritdi"),
     )
     created_at = models.DateTimeField(_("kiritilgan vaqt"), auto_now_add=True)
+    # TZ 6.8, BR-11/12: xato xarajat o'chirilmaydi. Uni teskari yozuv bekor
+    # qiladi: summasi manfiy, ``reverses`` — asl yozuv, ``note`` — sabab.
+    # Asl yozuv o'zgarmaydi; bitta yozuvni faqat bir marta bekor qilish mumkin.
+    reverses = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reversal",
+        verbose_name=_("bekor qilingan yozuv"),
+    )
 
     class Meta:
         ordering = ["-spent_on", "-id"]
         verbose_name = _("qo'shimcha xarajat")
         verbose_name_plural = _("qo'shimcha xarajatlar")
         constraints = [
+            # Oddiy yozuv musbat, teskari yozuv manfiy: yig'indi o'zi to'g'ri chiqadi.
             models.CheckConstraint(
-                condition=Q(amount__gt=0),
-                name="expenses_expense_amount_positive",
+                condition=(Q(reverses__isnull=True) & Q(amount__gt=0))
+                | (Q(reverses__isnull=False) & Q(amount__lt=0) & ~Q(note="")),
+                name="expenses_expense_amount_sign",
             ),
             models.CheckConstraint(
                 condition=Q(currency=USD),
@@ -114,3 +127,8 @@ class Expense(models.Model):
     def __str__(self) -> str:
         """Xarajatni qisqa ko'rinishda qaytaradi: tur, summa va sana."""
         return f"{self.expense_type} · ${self.amount} · {self.spent_on}"
+
+    @property
+    def is_reversal(self) -> bool:
+        """Bu yozuv boshqa xarajatni bekor qiluvchi teskari yozuvmi."""
+        return self.reverses_id is not None

@@ -47,3 +47,75 @@ msgstr "На складе недостаточно материала."
 
 msgid "Butun son bo'lishi kerak."
 msgstr "Должно быть целым числом."
+
+msgid "kutilmoqda"
+msgstr "ожидает"
+
+msgid "tasdiqlangan"
+msgstr "одобрено"
+
+msgid "rad etilgan"
+msgstr "отклонено"
+
+msgid "holati"
+msgstr "статус"
+
+msgid "qaror qilgan"
+msgstr "решение принял"
+
+msgid "qaror vaqti"
+msgstr "время решения"
+
+msgid "qaror izohi"
+msgstr "комментарий к решению"
+
+msgid "qaytarish"
+msgstr "возврат"
+
+msgid "qaytarishlar"
+msgstr "возвраты"
+
+msgid "asl chiqim"
+msgstr "исходный расход"
+
+msgid "qaytarilgan sana"
+msgstr "дата возврата"
+
+msgid "sabab"
+msgstr "причина"
+
+msgid "qaytarish partiyasi"
+msgstr "партия возврата"
+
+msgid "qaytarish partiyalari"
+msgstr "партии возврата"
+
+msgid "hisobdan chiqarish"
+msgstr "списание"
+
+msgid "hisobdan chiqarishlar"
+msgstr "списания"
+
+msgid "hisobdan chiqarish partiyasi"
+msgstr "партия списания"
+
+msgid "hisobdan chiqarish partiyalari"
+msgstr "партии списания"
+
+msgid "Qaytarish sanasi kelajakda bo'lishi mumkin emas."
+msgstr "Дата возврата не может быть в будущем."
+
+msgid "Partiya asl chiqimda yo'q: {ids}."
+msgstr "Партии нет в исходном расходе: {ids}."
+
+msgid "Qaytarish sanasi chiqim sanasidan oldin bo'lmasin."
+msgstr "Дата возврата не может быть раньше даты расхода."
+
+msgid "So'rov bo'yicha boshqa qaror qabul qilingan."
+msgstr "По заявке уже принято другое решение."
+
+msgid "Qaytarish asl chiqimning qaytarilmagan qismidan oshadi."
+msgstr "Возврат превышает невозвращённую часть исходного расхода."
+
+msgid "Noma'lum holat."
+msgstr "Неизвестный статус."

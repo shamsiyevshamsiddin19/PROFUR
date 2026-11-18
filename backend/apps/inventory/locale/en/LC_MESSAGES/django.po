@@ -47,3 +47,75 @@ msgstr "Not enough material in stock."
 
 msgid "Butun son bo'lishi kerak."
 msgstr "Must be a whole number."
+
+msgid "kutilmoqda"
+msgstr "pending"
+
+msgid "tasdiqlangan"
+msgstr "approved"
+
+msgid "rad etilgan"
+msgstr "rejected"
+
+msgid "holati"
+msgstr "status"
+
+msgid "qaror qilgan"
+msgstr "decided by"
+
+msgid "qaror vaqti"
+msgstr "decided at"
+
+msgid "qaror izohi"
+msgstr "decision note"
+
+msgid "qaytarish"
+msgstr "return"
+
+msgid "qaytarishlar"
+msgstr "returns"
+
+msgid "asl chiqim"
+msgstr "original issue"
+
+msgid "qaytarilgan sana"
+msgstr "return date"
+
+msgid "sabab"
+msgstr "reason"
+
+msgid "qaytarish partiyasi"
+msgstr "return batch"
+
+msgid "qaytarish partiyalari"
+msgstr "return batches"
+
+msgid "hisobdan chiqarish"
+msgstr "write-off"
+
+msgid "hisobdan chiqarishlar"
+msgstr "write-offs"
+
+msgid "hisobdan chiqarish partiyasi"
+msgstr "write-off batch"
+
+msgid "hisobdan chiqarish partiyalari"
+msgstr "write-off batches"
+
+msgid "Qaytarish sanasi kelajakda bo'lishi mumkin emas."
+msgstr "The return date cannot be in the future."
+
+msgid "Partiya asl chiqimda yo'q: {ids}."
+msgstr "Batch is not part of the original issue: {ids}."
+
+msgid "Qaytarish sanasi chiqim sanasidan oldin bo'lmasin."
+msgstr "The return date cannot be earlier than the issue date."
+
+msgid "So'rov bo'yicha boshqa qaror qabul qilingan."
+msgstr "A different decision has already been made on this request."
+
+msgid "Qaytarish asl chiqimning qaytarilmagan qismidan oshadi."
+msgstr "The return exceeds the unreturned part of the original issue."
+
+msgid "Noma'lum holat."
+msgstr "Unknown status."
