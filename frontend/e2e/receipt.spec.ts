@@ -159,6 +159,31 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     expenseRows.results.map((row: { amount: string }) => row.amount).sort(),
   ).toEqual(["-12.50", "12.50"]);
 
+  await page.goto("/#stock");
+  await page
+    .getByRole("combobox", { name: "Category", exact: true })
+    .selectOption({ label: "LMDF" });
+  await page.getByRole("button", { name: "Browser MDF", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByLabel("Min. limit", { exact: true })
+    .fill("10");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Apply", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByText("Low stock", { exact: true })).toBeVisible();
+  const minimum = await (
+    await page.request.get(`/api/v1/stock/${batch.material.id}/`)
+  ).json();
+  expect(minimum.min_quantity).toBe("10.00");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+
   await page.goto("/#history");
   await expect(
     page.getByRole("heading", { name: "Movement history" }),
