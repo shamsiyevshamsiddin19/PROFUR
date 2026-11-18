@@ -1,16 +1,16 @@
 # Qarorlar jurnali
 
-**Hozircha buyurtmachi talablariga yoki arxitekturaga doir yakuniy qarorlar tasdiqlanmagan.** Team Leadning OQ-001–OQ-048 bo‘yicha [dastlabki 48 ta javobi](../01-requirements/oq-001-048-team-lead-answers.md) 2026-11-17 sanasida alohida hujjatga kiritilgan. Ularning barchasi **TAKLIF / PROPOSED** holatida, PM va buyurtmachi tasdig‘ini kutadi.
+**PM OQ-001–OQ-048 javoblarini tasdiqlagan.** PM OQ-001–OQ-048 javoblarini tasdiqlagani Team Lead tomonidan 2026-11-18 kuni xabar qilindi. Bu sana tasdiq haqidagi xabar qayd etilgan sanadir. [Tasdiqlangan javoblar](../01-requirements/oq-001-048-team-lead-answers.md).
 
-**Joriy qo‘llanilayotgan doira:** TZning 1-qismi — kirim-chiqim va ombor, telefon/planshet/kompyuterga mos **responsive veb-sayt**; bu TZdagi mobil ilova ko‘rsatilgan avvalgi konsepsiyani o‘zgartiradi va PM tasdig‘i kerak.
+**Tasdiqlangan joriy doira** — TZning 1-qismi, ombor/kirim-chiqim va barcha ekranlarga mos veb-sayt.
 
 | ID | Qaror mavzusi | Holat | Mas'ul | Sana |
 |---|---|---|---|---|
-| Q-001 | Material tannarxini hisoblash usuli | OCHIQ | PM / buyurtmachi | — |
-| Q-002 | Materialni zaxiraga olish va qoldiqdan ayirish vaqti | OCHIQ | PM / buyurtmachi | — |
-| Q-003 | Admin yangi rol va ruxsat yarata olishi | OCHIQ | PM / buyurtmachi | — |
-| Q-004 | Guruh akkauntida shaxsiy hisob va ishbay stavkalar | OCHIQ | PM / buyurtmachi | — |
-| Q-005 | Mobil platforma va internetsiz ishlash | OCHIQ | PM / buyurtmachi | — |
+| Q-001 | Material tannarxini hisoblash usuli | PM tasdiqlagan; tafsilotlar tegishli OQ izohida | PM | Xabar 2026-11-18 |
+| Q-002 | Materialni zaxiraga olish va qoldiqdan ayirish vaqti | PM tasdiqlagan; tafsilotlar tegishli OQ izohida | PM | Xabar 2026-11-18 |
+| Q-003 | Admin yangi rol va ruxsat yarata olishi | PM tasdiqlagan; tafsilotlar tegishli OQ izohida | PM | Xabar 2026-11-18 |
+| Q-004 | Guruh akkauntida shaxsiy hisob va ishbay stavkalar | PM tasdiqlagan; tafsilotlar tegishli OQ izohida | PM | Xabar 2026-11-18 |
+| Q-005 | Mobil platforma va internetsiz ishlash | PM tasdiqlagan; tafsilotlar tegishli OQ izohida | PM | Xabar 2026-11-18 |
 | Q-006 | Dasturlash texnologiyalarini tanlash | TAKLIF | Jamoa yetakchisi / PM | — |
 
 ## Qaror qaydi namunasi
