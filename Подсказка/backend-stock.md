@@ -16,8 +16,8 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 |---|---|---|---|
 | [PCRM-38](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-38) | Kategoriya va material modellari. Partiya PCRM-40 bilan | Bajarildi | [PR #11](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/11) → [#15](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/15) main’da, CI o‘tgan |
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Katalog API qismi. UI egasi frontend | Bajarildi | [PR #16](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/16) → [#20](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/20) main’da, CI o‘tgan |
-| [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40) | Kirim API’si va birlik narxi | Jarayonda | branch `feat/PCRM-40-receipt-api` |
-| [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42) | Qoldiq, minimal chegara va manfiy qoldiqni bloklash | Reja | — |
+| [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40) | Kirim API’si va birlik narxi | Bajarildi | [PR #21](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/21) main’da (`d53979d`), CI o‘tgan |
+| [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42) | Qoldiq, minimal chegara va manfiy qoldiqni bloklash | Jarayonda | branch `feat/PCRM-42-stock-api` |
 | [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49) | ERD va API shartnomasini yig‘ish | Jarayonda | Katalog/kirim/qoldiq qismi [PR #13](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/13) → [#15](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/15) main’da; chiqim/xarajat qismi Akbar bilan |
 
 **Qabul mezoni** — Bir materialning ikki xil narxdagi kirimi alohida partiya bo‘ladi. API javobi, qoldiq va harakat tarixi mos keladi.
@@ -31,6 +31,8 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 2026-11-18 · PCRM-39 · Ko‘rikda · `/api/v1/categories/` va `/api/v1/materials/`: ro‘yxat, qidiruv/filtr, yaratish, PATCH; ruxsat `accounts.permissions.HasPermissionCode` va shartnoma kodlari (`catalog.view_material`, `catalog.add_material` …) bilan; `material_duplicate` + `existing_id`, `category_inactive`; DELETE/PUT yo‘q · main (#15) ustida PostgreSQL 18’da pytest 56 ta o‘tdi, ruff va makemigrations --check toza · Jira’da PCRM-39 Shamsiddinga biriktirilgan — backend qismini kelishish; `quantity_on_hand` va `material_has_history` PCRM-40 da; standart rollarga `catalog.*` kodlarini qo‘shishni Jamoliddin bilan kelishish
 
 2026-11-18 · PCRM-40 · Jarayonda · `apps.inventory`: `Batch`, `StockBalance`, `StockMovement`, `IdempotencyKey` + 0001 migratsiya; `services.receive()` bitta tranzaksiyada, qoldiq qatori `select_for_update`; `POST/GET /api/v1/receipts/` (`Idempotency-Key`, 409 conflict, USD-only, narx `inventory.view_purchase_price` bilan) ; katalogda `quantity_on_hand` endi qoldiqdan, kirimi bor materialda birlik/o‘lcham o‘zgarishi 409 `material_has_history` · main (#20) ustida PostgreSQL 18’da pytest 108 ta o‘tdi, ruff, makemigrations --check, manage.py check toza · `settings.INSTALLED_APPS` ga `apps.inventory` — Jamoliddin ko‘rsin; Akbar `decrease/increase` ni shu `services` ga qo‘shadi; keyin PCRM-42 (qoldiq va harakatlar API’si)
+
+2026-11-18 · PCRM-42 · Jarayonda · `GET /api/v1/stock/` (+ `{material_id}/`, `batches/`), `PATCH` minimal chegara (`inventory.change_min_quantity`, OQ-014), `GET /api/v1/movements/`; `StockBalance.min_quantity` + `0002` migratsiya; umumiy `services.ensure_available()` / `InsufficientStockError` (OQ-006) · main ustida PostgreSQL 18’da pytest 124 ta o‘tdi, ruff, makemigrations --check toza · Akbar `decrease()` da `locked_balance` + `ensure_available` ishlatadi va «10 dan 7+7» parallel sinovini birga quramiz; chegaradan pastga tushganda xabarnoma — alohida vazifa
 
 ## Navbatdagi ish
 
