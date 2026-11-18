@@ -13,6 +13,10 @@ class ExpenseTypeAdmin(admin.ModelAdmin):
     list_filter = ["is_active"]
     search_fields = ["code", "name_uz", "name_ru", "name_en"]
 
+    def get_readonly_fields(self, request, obj=None):
+        """Mavjud turning API ishlatadigan kodini saqlaydi."""
+        return ("code",) if obj is not None else ()
+
     def has_delete_permission(self, request, obj=None) -> bool:
         """Turni o'chirishni yopadi: tarix uchun u faqat faolsizlantiriladi."""
         return False
@@ -25,6 +29,10 @@ class ExpenseAdmin(admin.ModelAdmin):
     list_display = ["spent_on", "expense_type", "amount", "currency", "project_id"]
     list_filter = ["expense_type", "spent_on"]
     search_fields = ["note"]
+
+    def has_add_permission(self, request) -> bool:
+        """Xarajat faqat muallifni server belgilaydigan API orqali yaratiladi."""
+        return False
 
     def has_change_permission(self, request, obj=None) -> bool:
         """Mavjud xarajatni tahrirlashni yopadi (TZ 6.8)."""

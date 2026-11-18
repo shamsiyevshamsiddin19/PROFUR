@@ -14,7 +14,7 @@ export type Material = {
   display_name: string;
   unit: string;
   category: { id: number; name: string };
-  quantity_on_hand?: string;
+  quantity_on_hand?: string | null;
 };
 export type Receipt = {
   id: number;

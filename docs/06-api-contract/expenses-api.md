@@ -1,7 +1,7 @@
 # Qo‘shimcha xarajatlar API’si · v1
 
 **2026-11-18 · Taklif, ko‘rib chiqish kutilmoqda.** Jira: [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46). Egasi: [Akbar (@thealiiheere)](https://github.com/thealiiheere).
-Manbalar: TZ 6.6 va 6.8, [OQ-010](../01-requirements/open-questions.md), [valyuta va til qarori](../09-decisions/decision-log.md). Umumiy qoidalar (sana formati, sahifalash, o‘nlik sonlar satr ko‘rinishida) [ombor API shartnomasi](https://github.com/shamsiyevshamsiddin19/PROFUR/blob/docs/PCRM-49-api-contract/docs/06-api-contract/warehouse-api-v1.md) bilan bir xil.
+Manbalar: TZ 6.6 va 6.8, [OQ-010](../01-requirements/open-questions.md), [valyuta va til qarori](../09-decisions/decision-log.md). Umumiy qoidalar (sana formati, sahifalash, o‘nlik sonlar satr ko‘rinishida) [ombor API shartnomasi](warehouse-api-v1.md) bilan bir xil.
 
 ## Qoidalar
 

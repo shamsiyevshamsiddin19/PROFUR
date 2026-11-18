@@ -25,11 +25,11 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 
 ## Oxirgi qayd
 
-2026-11-18 · PCRM-48/PCRM-41 · Ko‘rikda / Jarayonda · React/TypeScript frontend, uch til, Django login, USD kirim shakli · npm run build va 3 frontend testi o‘tdi, brauzerda 320/390/768 px va desktop tekshirildi · keyingi qadam katalog/kirim API’siga ulash.
+2026-11-18 · PCRM-48/PCRM-41 · Ko‘rikda / Jarayonda · React/TypeScript frontend, uch til, Django login, USD kirim shakli · npm run build va 3 frontend testi o‘tdi, brauzerda 320/390/768 px va desktop tekshirildi · keyingi qadam mavjud katalogni tekshirish va kirim API’siga ulash.
 
 ## Navbatdagi ish
 
-[PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17)dagi React/TypeScript/Vite frontendni davom ettiring. Yangi frontend yoki parallel maket boshlamang. Ozodbekning katalog PR #16 va PCRM-40 kirim API’si tayyor bo‘lgach, haqiqiy material tanlash va kirim saqlashni ulang. API maydonlari va ruxsatlarni shartnoma bilan solishtiring. Kirimdan keyin qoldiq/partiya yangilanishi hamda bir xil Idempotency-Key bilan takroriy so‘rov yangi kirim yaratmasligini haqiqiy backendda tekshiring. Backend integratsiyasi tugamaguncha PCRM-41 ni Done qilmang.
+[PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17)dagi React/TypeScript/Vite frontendni davom ettiring. Yangi frontend yoki parallel maket boshlamang. Katalog PR #16 integratsiya tarkibida mavjud; PCRM-40 kirim API’si tayyor bo‘lgach, haqiqiy material tanlash va kirim saqlashni ulang. API maydonlari va ruxsatlarni shartnoma bilan solishtiring. Kirimdan keyin qoldiq/partiya yangilanishi hamda bir xil Idempotency-Key bilan takroriy so‘rov yangi kirim yaratmasligini haqiqiy backendda tekshiring. Backend integratsiyasi tugamaguncha PCRM-41 ni Done qilmang.
 
 ## 2026-11-18 · Valyuta va til qarori
 
@@ -47,3 +47,9 @@ Brauzerda 320, 390 va 768 px hamda desktop ko‘rinishlari, til almashishi,
 tanlov saqlanishi va mobil menyu tekshirildi.
 Holat — frontend asosi ko‘rikda, kirim integratsiyasi backendga bog‘liq. Keyingi qadam — Ozodbekning
 PCRM-39 va PCRM-40 API’larini haqiqiy ma’lumotlar bilan ulab sinash.
+
+## Birgalikdagi PR ko‘rigi · 2026-11-18
+
+PR #16 (katalog), #17 (frontend) va #18 (xarajatlar) bir integratsiya tarmog‘ida tekshirildi. `config/urls.py` to‘qnashuvi ikkala API yo‘lini saqlab yechildi. Admin panelida xarajat turining kodi o‘zgarmas qilindi; xarajat yaratish muallifni server belgilaydigan API orqali amalga oshadi. Sessiya/CSRF va dinamik ruxsatlarni ikkala xizmatda tekshiruvchi integratsiya sinovi qo‘shildi.
+
+Lokal: 76 backend testi o‘tdi, 2 PostgreSQL cheklovi sinovi SQLite’da o‘tkazildi; qo‘shimcha 2 integratsiya sinovi ham o‘tdi. Frontend build va 3 testi o‘tdi. PostgreSQL cheklovlari birlashtirish PR’ining CI’sida tekshiriladi. Katalog API va frontend ro‘yxati mavjud; kirim/partiya/qoldiq backend hali PCRM-40/42 vazifasi. PCRM-39 to‘liq UI mezonlari, PCRM-48 barcha sahifalar va PCRM-46 teskari yozuv jarayoni avtomatik Done qilinmaydi.
