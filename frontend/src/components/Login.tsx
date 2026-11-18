@@ -50,17 +50,6 @@ export function Login({
         {languagePicker}
       </header>
       <div className="login-content">
-        <div className="login-art" aria-hidden="true">
-          <div className="rack">
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-          </div>
-          <span>PROFUR</span>
-        </div>
         <form className="login-form" onSubmit={submit}>
           <span className="eyebrow">{t("warehouse")}</span>
           <h1>{t("loginTitle")}</h1>

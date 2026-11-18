@@ -147,3 +147,79 @@ test("unavailable catalogue cannot submit a fabricated receipt", async () => {
     fetchMock.mock.calls.some(([path]) => path === "/api/v1/receipts/"),
   ).toBe(false);
 });
+
+test("the mobile drawer closes after sign out and a new sign in", async () => {
+  localStorage.setItem("profur.language", "en");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (path: string) => {
+      if (path === "/api/auth/logout/") return response({});
+      if (path === "/api/auth/login/") return response({ user });
+      return baseFetch(path);
+    }),
+  );
+  render(<App />);
+  await screen.findByRole("heading", { name: "Material receipts" });
+  await userEvent.click(screen.getByRole("button", { name: "Open menu" }));
+  expect(
+    screen
+      .getByRole("button", { name: "Open menu" })
+      .getAttribute("aria-expanded"),
+  ).toBe("true");
+  await userEvent.click(screen.getByRole("button", { name: "Sign out" }));
+  await screen.findByLabelText("Username");
+  await userEvent.type(screen.getByLabelText("Username"), "operator");
+  await userEvent.type(screen.getByLabelText("Password"), "password");
+  await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+  await screen.findByRole("heading", { name: "Material receipts" });
+  expect(
+    screen
+      .getByRole("button", { name: "Open menu" })
+      .getAttribute("aria-expanded"),
+  ).toBe("false");
+});
+
+test("receipt component submits one USD request with an idempotency key", async () => {
+  localStorage.setItem("profur.language", "uz");
+  const writes: RequestInit[] = [];
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (path: string, init?: RequestInit) => {
+      if (path === "/api/auth/me/") return response(user);
+      if (path === "/api/v1/receipts/" && init?.method === "POST") {
+        writes.push(init);
+        return response({
+          id: 77,
+          quantity_on_hand_after: "15.00",
+          quantity: "15.00",
+          total_amount: "450.00",
+          currency: "USD",
+          unit_price: "30.000000",
+          received_on: "2026-11-18",
+          material,
+        });
+      }
+      return baseFetch(path);
+    }),
+  );
+  render(<App />);
+  await screen.findByRole("option", { name: "MDF 18 mm · list" });
+  fireEvent.change(screen.getByLabelText("Material"), {
+    target: { value: "41" },
+  });
+  fireEvent.change(screen.getByLabelText("Miqdor"), {
+    target: { value: "15" },
+  });
+  fireEvent.change(screen.getByLabelText("Jami summa"), {
+    target: { value: "450.00" },
+  });
+  const saveBtn = screen.getByRole("button", { name: "Kirimni saqlash" });
+  await userEvent.click(saveBtn);
+  await screen.findByText(/Partiya #77/);
+  expect(writes).toHaveLength(1);
+  const payload = JSON.parse(String(writes[0].body));
+  expect(payload.currency).toBe("USD");
+  expect(payload.quantity).toBe("15");
+  expect(payload.total_amount).toBe("450.00");
+  expect(new Headers(writes[0].headers).get("Idempotency-Key")).toBeTruthy();
+});

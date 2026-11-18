@@ -14,22 +14,23 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Ko‘rikda | [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) |
+| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Bajarildi | [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) |
 | [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Bajarildi | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8) |
-| [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Reja | — |
+| [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Ko‘rikda | [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26) |
 
 **Qabul mezoni** — To‘rt jamoadosh loyihani mahalliy ishga tushira oladi. Ruxsatsiz amal rad etiladi. birinchi brauzer sinovida kirim bir marta saqlanib, qoldiq yangilanadi.
 
 ## Jamoadoshlarga topshirish (Handoff)
 
 - **PCRM-37 (Umumiy asos):** PR #8 orqali main’ga birlashtirildi. Django + DRF, Ruff, docker-compose va CI to‘liq ishlamoqda.
-- **PCRM-32 (Accounts va Ruxsatlar):** `accounts` ilovasi, kengaytirilgan `User` modeli (`Role` ko‘pdan-ko‘p bog‘lanishi bilan, OQ-037), login/logout/me/csrf hamda rollar API nuqtalari (`/api/auth/roles/`) va DRF ruxsatlari (`IsAdminRole`, `IsWarehouseManager`, `IsProductionSupervisor`, `IsProjectManager`) tayyorlandi. Login CSRF himoyasi bilan ta'minlandi, xabarlar 3 tilda (UZ/RU/EN) tarjima qilindi.
+- **PCRM-32 (Accounts va Ruxsatlar):** `accounts` ilovasi, kengaytirilgan `User` modeli (`Role` ko‘pdan-ko‘p bog‘lanishi bilan, OQ-037), login/logout/me/csrf hamda rollar API nuqtalari (`/api/auth/roles/`) va DRF ruxsatlari (`IsAdminRole`, `IsWarehouseManager`, `IsProductionSupervisor`, `IsProjectManager`) tayyorlandi va PR #12 orqali main'ga birlashtirildi.
+- **PCRM-50 (Qabul va Tizim Sinovlari):** Kirimdan qoldiqqacha bo‘lgan to‘liq zanjir (Login, CSRF, Material tanlash, Idempotency-Key bilan kirim, partiya va qoldiq yangilanishi), tarmoq uzilishida takrorlanmaslik, faqat USD qabul qilinishi, uz/ru/en tillarida xabarlar qabul sinovlari ([`tests/test_pcrm50_acceptance.py`](../tests/test_pcrm50_acceptance.py)) va mobil ekran formasi sinovlari ([`frontend/src/App.test.tsx`](../frontend/src/App.test.tsx)) bilan to‘liq qoplandi. PR [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26).
 - **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [Akbar (@thealiiheere)](https://github.com/thealiiheere)):** Katalog, ombor va xarajatlar modullarida foydalanuvchi tekshiruvi uchun `request.user` va `accounts.permissions` ruxsatnomalaridan foydalanishingiz mumkin.
 - **Frontend va Team Leadga (Shamsiddin):** Kirish, chiqish, joriy foydalanuvchi ma'lumoti, CSRF token hamda rol boshqaruvi (OQ-037) API shartnomasi [docs/06-api-contract/auth-api.md](../docs/06-api-contract/auth-api.md) hujjatiga kiritildi.
 
 ## Oxirgi qayd
 
-2026-11-18 · PCRM-32 · Ko‘rikda · Review asosida login CSRF himoyasi, 3 tildagi xabarlar (UZ/RU/EN) va OQ-037 dinamik rollar qo‘shildi · 12 ta test muvaffaqiyatli (pytest, ruff pass), PR [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) · Team Lead va jamoadoshlar ko‘rigidan so‘ng main'ga birlashtirish
+2026-11-18 · PCRM-50 · Ko‘rikda · Review asosida narx yashirish testi haqiqiy kirim bilan to'g'rilandi va mobil ekran formasi testi qo'shildi · 16 ta backend testi, 4 ta frontend testi (CI: pass), PR [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26) · Ko‘rikdan so'ng main'ga birlashtirish
 
 
 
@@ -51,3 +52,11 @@ USD qabul qilinishi, boshqa valyuta rad etilishi va uz/ru/en til almashishi bo�
 ## Birlashtirish tekshiruvi · 2026-11-18
 
 PR #11, #12 va #13 bitta integratsiya tarmog‘ida tekshirildi. Katalogning 9 ta boshlang‘ich kategoriyasi migratsiyada qo‘shildi. Login CSRF va uch til sinovlari saqlandi, dinamik ruxsatni berish/olib tashlash regressiya sinovlari qo‘shildi. Holat — main’ga birlashtirish uchun tekshiruvda. Keyingi ish — PCRM-39/40 va frontend bilan kirimni ulash.
+
+## PR #26 · Sinov qamrovi aniqlashtirildi
+
+API qabul sinovlari tests/test_pcrm50_acceptance.py da. Narx yashirish sinovi haqiqiy kirimni ro‘yxat va tafsilot javobida tekshiradi, ruxsatli foydalanuvchi natijasi bilan solishtiradi.
+
+Haqiqiy Chromium mobil brauzer sinovi frontend/e2e/receipt.spec.ts da. U Pixel 7 o‘lchamida login, material tanlash, kirim yuborish, haqiqiy Django API javobi, qayta yuklanganda saqlangan qoldiq va takror so‘rovning bitta partiya bo‘lib qolishini tekshiradi. API almashtirilmaydi. Sinov alohida vaqtinchalik SQLite bazasi bilan ishlaydi, PostgreSQL cheklovlari backend CI’da tekshiriladi. Mahalliy yo‘l — Python bog‘liqliklarini o‘rnatib, frontend ichida npm ci, npx playwright install chromium, npm run test:e2e. Virtual muhit tashqarisida E2E_PYTHON bilan Python yo‘lini ko‘rsatish mumkin.
+
+PCRM-50’ning chiqim, qaytarish va hisobdan chiqarish kabi qolgan mezonlari tegishli funksiyalar tayyor bo‘lganda tekshiriladi. Ushbu PR kirim oqimining qabul sinovlarini beradi.

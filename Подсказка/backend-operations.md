@@ -14,15 +14,17 @@ Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bil
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Jarayonda | 1-qism (chiqim): `feat/PCRM-44-stock-issue`, [issues-api.md](../docs/06-api-contract/issues-api.md) |
-| [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Jarayonda | `akbar` branch (73e1691), [expenses-api.md](../docs/06-api-contract/expenses-api.md) |
+| [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Jarayonda | 1-qism (chiqim): [PR #34](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/34) birlashgan, [issues-api.md](../docs/06-api-contract/issues-api.md) |
+| [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Jarayonda | API [PR #18](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/18) birlashgan, CI (PostgreSQL) o‘tgan; qolgani — teskari yozuv bilan bekor qilish. [expenses-api.md](../docs/06-api-contract/expenses-api.md) |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Operatsiyalar tarixi API qismi. UI egasi frontend | Reja | — |
 
 **Qabul mezoni** — Parallel chiqimda qoldiq manfiy qolmaydi. Qayta yuborilgan so‘rov bitta harakat yozadi, tasdiqlash qoldiqni faqat bir marta o‘zgartiradi.
 
 ## Oxirgi qayd
 
-`2026-11-18 · PCRM-46 · Jarayonda · expenses ilovasi: xarajat turi (uz/ru/en nom, 3 ta boshlang‘ich tur) va xarajat (faqat USD, summa > 0, loyiha ixtiyoriy, o‘chirish/tahrirlash yo‘q), /api/v1/expenses/ va /api/v1/expense-types/, ru/en tarjimalar, ruxsat `accounts.permissions.HasPermissionCode` orqali (`expenses.*` kodlari) · main (#15) bilan birlashtirilgandan keyin pytest 50 o‘tdi, 2 tasi o‘tkazildi (SQLite), ruff check/format va makemigrations --check toza; PostgreSQL’da lokal sinov bajarilmadi (Docker ishlamayapti), CI tekshiradi · keyingi qadam: PR ko‘rigi (Shamsiddin, Jamoliddin); OQ-010 bo‘yicha savol [expenses-api.md](../docs/06-api-contract/expenses-api.md) da`
+`2026-11-18 · PCRM-46 · Jarayonda · xarajatlar API’si main’ga birlashdi: PR #18 (fefc0a7), CI’dagi Ruff hamda PostgreSQL’dagi test va migratsiya tekshiruvlari o‘tdi; PR #20 da admin panel himoyalandi · qolgan ish: noto‘g‘ri xarajatni teskari yozuv va sabab bilan bekor qilish (TZ 6.8, BR-12) — Team Lead qaydiga ko‘ra shusiz Bajarildi qilinmaydi · ochiq savol: OQ-010 va TZ 6.6 (loyiha majburiymi), [expenses-api.md](../docs/06-api-contract/expenses-api.md) · parallel: PCRM-40 birlashgani uchun PCRM-44 boshlanishi mumkin`
+
+Avvalgi qayd: `2026-11-18 · PCRM-46 · Jarayonda · expenses ilovasi: xarajat turi (uz/ru/en nom, 3 ta boshlang‘ich tur) va xarajat (faqat USD, summa > 0, loyiha ixtiyoriy, o‘chirish/tahrirlash yo‘q), /api/v1/expenses/ va /api/v1/expense-types/, ru/en tarjimalar, ruxsat `accounts.permissions.HasPermissionCode` orqali (`expenses.*` kodlari) · main (#15) bilan birlashtirilgandan keyin pytest 50 o‘tdi, 2 tasi o‘tkazildi (SQLite), ruff check/format va makemigrations --check toza; PostgreSQL’da lokal sinov bajarilmadi (Docker ishlamayapti), CI tekshiradi · keyingi qadam: PR ko‘rigi (Shamsiddin, Jamoliddin); OQ-010 bo‘yicha savol [expenses-api.md](../docs/06-api-contract/expenses-api.md) da`
 
 ## Navbatdagi ish
 
