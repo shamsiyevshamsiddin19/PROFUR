@@ -1470,3 +1470,20 @@ fieldset:disabled {
   font-size: 13px;
   border-bottom: 1px solid var(--line);
 }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.field > label {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.workflow-toolbar > .field {
+  flex: 1 1 160px;
+}
+.minimum-form > .field {
+  flex: 1;
+}

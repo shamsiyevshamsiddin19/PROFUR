@@ -79,11 +79,22 @@ export function Field({
   children: ReactNode;
   wide?: boolean;
 }) {
+  const id = useId();
+  const controls = Children.map(children, (child) => {
+    if (
+      isValidElement(child) &&
+      typeof child.type === "string" &&
+      ["input", "select", "textarea"].includes(child.type)
+    ) {
+      return cloneElement(child as ReactElement<{ id?: string }>, { id });
+    }
+    return child;
+  });
   return (
-    <label className={wide ? "wide" : ""}>
-      <span>{label}</span>
-      {children}
-    </label>
+    <div className={wide ? "field wide" : "field"}>
+      <label htmlFor={id}>{label}</label>
+      {controls}
+    </div>
   );
 }
 export function Modal({
