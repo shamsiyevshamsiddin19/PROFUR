@@ -16,7 +16,7 @@ PM OQ-001–OQ-048 javoblarini tasdiqlagani Team Lead tomonidan 2026-11-18 kuni 
 | OQ-001 | Har bir kirim partiyasi asl birlik narxi bilan alohida hisobga olinadi; o‘rtacha narxga majburiy birlashtirilmaydi. | Partiya qaysi chiqimga bog‘lanishi va loyihaga narx taqsimoti algoritmi PM bilan aniqlashtiriladi. |
 | OQ-002 | Qoldiq materialni loyiha uchun rejalashtirganda emas, ombordan ishchiga amalda berilganda kamayadi. | Loyiha rezervi alohida ko‘rsatilishi zarur bo‘lsa, keyinchalik aniqlanadi. |
 | OQ-003 | Foydalanilmagan material omborga qaytarilishi mumkin; ombor mas’uli tasdiqlagandan keyin qoldiq oshadi. | — |
-| OQ-004 | Kirim sanasi va valyutasi saqlanadi; yetkazib beruvchi va hujjat raqami majburiy emas. | — |
+| OQ-004 | Kirim sanasi va valyutasi saqlanadi. Barcha kirimlar AQSH dollarida (USD, $). Yetkazib beruvchi va hujjat raqami majburiy emas. | — |
 | OQ-005 | Birliklar: list/dona, kg, litr, metr, m²; o‘lchamlar santimetrda. Faqat fizik jihatdan asosli avtomatik konvertatsiya. | Konvertatsiya uchun zarur o‘lcham/zichlik kabi parametrlar bo‘lmasa, konvertatsiya bajarilmaydi. |
 | OQ-006 | Ombor qoldig‘i manfiy bo‘lishi taqiqlanadi; yetarli material bo‘lmasa chiqim rad etiladi. | — |
 | OQ-007 | Yaroqsiz materialni hisobdan chiqarish so‘rovini ombor mas’uli yuboradi; admin sabab ko‘rsatilgan so‘rovni tasdiqlaydi. | — |
@@ -33,7 +33,7 @@ PM OQ-001–OQ-048 javoblarini tasdiqlagani Team Lead tomonidan 2026-11-18 kuni 
 | OQ-013 | Material hisoblari ikki kasr xona aniqligida ko‘rsatiladi; foydalanuvchi 'yaxlitlanmasin' degan talabni ham bildirdi. | Ikki kasr xona va yaxlitlamaslik o‘rtasidagi ziddiyatni PM bilan aniqlashtirish zarur. |
 | OQ-014 | Zarur material yetishmasa loyihani saqlash/ishlab chiqarishni boshlash bloklanadi va admin hamda mas’ulga xabar beriladi. Admin minimal qoldiq chegarasini belgilaydi. | — |
 | OQ-015 | Model miqdorlari umumiy buyurtmadan oshsa saqlash taqiqlanadi. Kam bo‘lsa farq haqida ogohlantirish va tasdiqlash belgisi; ishlab chiqarishga o‘tishdan oldin miqdor teng bo‘lishi kerak. | Kam miqdorli loyihani ogohlantirishdan keyin saqlash tafsiloti PM bilan tasdiqlansin. |
-| OQ-016 | Buyurtma summasi va mijoz to‘lovlari AQSH dollarida (USD) yuritiladi. | Ombor kirimlarida boshqa valyutalar bo‘lishi mumkin. |
+| OQ-016 | Buyurtma summasi va mijoz to‘lovlari AQSH dollarida (USD) yuritiladi. | 2026-11-18 aniqlashtirishi bo‘yicha barcha pul summalari, jumladan ombor kirimlari va xarajatlar, faqat USD ($)da yuritiladi. |
 | OQ-017 | Har bir qisman to‘lov miqdori, sanasi va qolgan qarz saqlanadi; deadline ixtiyoriy; muddati o‘tgan qarz haqida admin va mas’ulga xabar beriladi. | — |
 | OQ-018 | Bekor qilingan buyurtma o‘chirilmaydi, tarixi saqlanadi; son o‘zgarsa kelgusidagi ehtiyoj qayta hisoblanadi, oldin bajarilgan ish va sarflar saqlanadi. Admin yoki loyiha mas’uli o‘zgartiradi. | — |
 | OQ-019 | Mustaqil kalkulyator hisob va tarixni saqlaydi; bir tugma orqali hisobni buyurtmaga aylantirish mumkin, ombor tekshiruvi bajariladi. | — |
@@ -61,7 +61,7 @@ PM OQ-001–OQ-048 javoblarini tasdiqlagani Team Lead tomonidan 2026-11-18 kuni 
 | OQ-031 | Upakovka 3 ta ichki turga ajraladi; administrator turlarni qo‘shish, tahrirlash, faolsizlantirish huquqiga ega; tur model/o‘lcham bo‘yicha belgilanadi. | Uchta tur nomi noma’lum — PM/buyurtmachidan olinishi shart. |
 | OQ-032 | Upakovka miqdor, sana, ishchi, model/o‘lcham va turi bo‘yicha qayd etiladi; admin/loyiha mas’uli tasdiqlaydi; qisman partiyalar mumkin; rasm ixtiyoriy. | — |
 | OQ-033 | Qisman yetkazib berish mumkin; har jo‘natma sana, model/o‘lcham, miqdor, manzil, mas’ul, status bilan alohida; admin/loyiha mas’uli tasdiqlaydi; barcha jo‘natmalar tasdiqlangach loyiha yopiladi. | — |
-| OQ-034 | Loyiha xarajati: material, ishbay haq, upakovka, yetkazib berish, yaroqsiz/qayta ish, boshqa loyiha xarajatlari. Tranzaksiya vaqtidagi kurs bo‘yicha USDga keltirish; rejadagi va haqiqiy tannarx/foyda ajratiladi. | Valyuta kursining manbasi va aniqligi PM bilan belgilanadi. |
+| OQ-034 | Loyiha xarajati: material, ishbay haq, upakovka, yetkazib berish, yaroqsiz/qayta ish, boshqa loyiha xarajatlari. Barcha summalar USD ($)da saqlanadi; rejadagi va haqiqiy tannarx/foyda ajratiladi. | 2026-11-18 aniqlashtirishi — yagona valyuta USD ($). |
 | OQ-035 | Shartnoma summasiga asoslangan foyda va real pul oqimi alohida ko‘rsatiladi; jami summa, tushum va qarz ajratiladi. Yetkazilgan loyiha qarz bo‘lsa ham yopilishi mumkin, qarz ochiq qoladi. | — |
 | OQ-036 | Yopilgan loyihani admin yoki loyiha mas’uli sabab ko‘rsatib qayta ochishi mumkin; eski tasdiqlangan yozuvlarni faqat tasdiqlanadigan tuzatish bilan o‘zgartirish; kim/qachon/sabab auditi. | — |
 
@@ -94,7 +94,7 @@ PM OQ-001–OQ-048 javoblarini tasdiqlagani Team Lead tomonidan 2026-11-18 kuni 
 3. **OQ-015:** umumiy miqdordan kam modelli buyurtmani saqlash mumkinligi bo‘yicha yakuniy qoida.
 4. **OQ-022:** ishbay haqning aniq stavkalari.
 5. **OQ-031:** upakovkaning uchta ichki turi nomi.
-6. **OQ-034:** valyuta kursi manbasi.
+6. **OQ-034:** 2026-11-18 kuni yagona valyuta USD ($) deb aniqlandi.
 7. **OQ-037/039:** dinamik ruxsatlar auditi va umumiy akkaunt identifikatsiyasi xavfsizligi.
 8. **OQ-042/048:** responsiv veb-sayt tanlovi PM tomonidan tasdiqlangan.
 9. **OQ-043:** foydalanuvchi, parallel yuklama, faol loyihalar uchun sonli ko‘rsatkichlar.
