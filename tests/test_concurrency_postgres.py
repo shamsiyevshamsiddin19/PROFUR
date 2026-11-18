@@ -30,7 +30,7 @@ User = get_user_model()
 
 # SQLite yoki mock qabul qilinmaydi:
 pytestmark = [
-    pytest.mark.django_db(transaction=True),
+    pytest.mark.django_db(transaction=True, serialized_rollback=True),
     pytest.mark.skipif(
         connection.vendor != "postgresql",
         reason="Parallel sinovlar faqat haqiqiy PostgreSQL bazasida ishlaydi (SQLite row-level lock qo'llab-quvvatlamaydi)",
@@ -106,57 +106,60 @@ def test_concurrent_stock_decreases_never_go_negative():
         category=category, name="Profil truba", unit=Unit.METER
     )
 
-    # 10 metr kirim qilamiz
-    services.receive(
+    batch, _ = services.receive(
         material=material,
         received_on=date(2026, 11, 18),
         quantity=Decimal("10.00"),
         total_amount=Decimal("200.00"),
         user=user,
         currency=Currency.USD,
-        document_number="INIT-10",
     )
-
+    role = Role.objects.create(
+        code="PG_ISSUER", name="Chiqimchi", permissions=["inventory.add_issue"]
+    )
+    user.roles.add(role)
     barrier = threading.Barrier(2)
-    results: list[str] = []
+    results: list[int] = []
+    errors: list[Exception] = []
 
-    def issue_worker(amount: Decimal):
+    def issue_worker():
         connection.close()
         try:
+            client = APIClient()
+            client.force_authenticate(user=user)
             barrier.wait(timeout=10)
-            with transaction.atomic():
-                bal = services.locked_balance(material)
-                services.ensure_available(bal, amount)
-                bal.quantity_on_hand -= amount
-                bal.save(update_fields=["quantity_on_hand", "updated_at"])
-                StockMovement.objects.create(
-                    type=MovementType.ISSUE,
-                    material=material,
-                    quantity=amount,
-                    quantity_on_hand_after=bal.quantity_on_hand,
-                    reference_kind="issue",
-                    reference_id=1,
-                    created_by=user,
-                )
-            results.append("SUCCESS")
-        except services.InsufficientStockError:
-            results.append("INSUFFICIENT_STOCK")
-        except Exception as e:
-            results.append(f"ERROR: {type(e).__name__}")
+            response = client.post(
+                "/api/v1/issues/",
+                {
+                    "material_id": material.pk,
+                    "recipient_name": "Sardor",
+                    "allocations": [{"batch_id": batch.pk, "quantity": "7.00"}],
+                },
+                format="json",
+                HTTP_IDEMPOTENCY_KEY=str(uuid.uuid4()),
+            )
+            results.append(response.status_code)
+        except Exception as error:
+            errors.append(error)
         finally:
             connection.close()
 
-    t1 = threading.Thread(target=issue_worker, args=(Decimal("7.00"),))
-    t2 = threading.Thread(target=issue_worker, args=(Decimal("7.00"),))
-
-    t1.start()
-    t2.start()
-    t1.join(timeout=30)
-    t2.join(timeout=30)
-
-    assert sorted(results) == ["INSUFFICIENT_STOCK", "SUCCESS"]
-    balance = StockBalance.objects.get(material=material)
-    assert balance.quantity_on_hand == Decimal("3.00")
+    threads = [threading.Thread(target=issue_worker) for _ in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=30)
+    assert all(not thread.is_alive() for thread in threads)
+    assert not errors, errors
+    assert sorted(results) == [201, 409]
+    assert StockBalance.objects.get(material=material).quantity_on_hand == Decimal(
+        "3.00"
+    )
+    batch.refresh_from_db()
+    assert batch.quantity_remaining == Decimal("3.00")
+    assert StockMovement.objects.get(
+        material=material, type=MovementType.ISSUE
+    ).quantity == Decimal("-7.00")
 
 
 def test_transaction_rollback_leaves_no_traces_in_postgres():
@@ -167,32 +170,23 @@ def test_transaction_rollback_leaves_no_traces_in_postgres():
         category=category, name="Rollback Test Material", unit=Unit.PIECE
     )
 
-    try:
+    with pytest.raises(ValueError, match="rollback drill"):
         with transaction.atomic():
-            bal = services.locked_balance(material)
-            bal.quantity_on_hand += Decimal("50.00")
-            bal.save(update_fields=["quantity_on_hand", "updated_at"])
-            Batch.objects.create(
+            services.receive(
                 material=material,
                 received_on=date(2026, 11, 18),
                 quantity=Decimal("50.00"),
-                quantity_remaining=Decimal("50.00"),
                 total_amount=Decimal("500.00"),
-                unit_price=Decimal("10.00"),
-                currency=Currency.USD,
-                created_by=user,
+                user=user,
             )
-            raise ValueError(
-                "Kutilmagan server xatosi — tranzaksiya bekor qilinishi kerak"
-            )
-    except ValueError:
-        pass
+            raise ValueError("rollback drill")
 
     # Tekshiramiz: baza toza qolishi kerak
     balance = StockBalance.objects.filter(material=material).first()
     if balance:
         assert balance.quantity_on_hand == Decimal("0.00")
     assert Batch.objects.filter(material=material).count() == 0
+    assert StockMovement.objects.filter(material=material).count() == 0
 
 
 def test_concurrent_idempotency_key_replay_returns_same_batch():
@@ -222,6 +216,7 @@ def test_concurrent_idempotency_key_replay_returns_same_batch():
     barrier = threading.Barrier(2)
     statuses: list[int] = []
     batch_ids: list[int] = []
+    errors: list[Exception] = []
 
     def client_worker():
         connection.close()
@@ -238,6 +233,8 @@ def test_concurrent_idempotency_key_replay_returns_same_batch():
             statuses.append(res.status_code)
             if res.status_code in (200, 201):
                 batch_ids.append(res.json()["id"])
+        except Exception as error:
+            errors.append(error)
         finally:
             connection.close()
 
@@ -248,8 +245,10 @@ def test_concurrent_idempotency_key_replay_returns_same_batch():
     t1.join(timeout=30)
     t2.join(timeout=30)
 
-    # Ikkala so'rov ham muvaffaqiyatli (biri yaratdi 201, biri qaytardi 200/201)
-    assert all(s in (status.HTTP_200_OK, status.HTTP_201_CREATED) for s in statuses)
+    assert not t1.is_alive() and not t2.is_alive()
+    assert not errors, errors
+    assert sorted(statuses) == [status.HTTP_200_OK, status.HTTP_201_CREATED]
+    assert len(batch_ids) == 2
     # Partiyalar faqat 1 ta yaratilgan bo'lishi shart!
     assert len(set(batch_ids)) == 1
     assert Batch.objects.filter(material=material).count() == 1
