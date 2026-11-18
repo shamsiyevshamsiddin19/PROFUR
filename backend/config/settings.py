@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     # Local apps bo'lsa backend/apps papkasiga qo'shiladi
+    "apps.catalog",
 ]
 
 MIDDLEWARE = [
