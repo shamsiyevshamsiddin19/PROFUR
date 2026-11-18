@@ -91,3 +91,19 @@ msgstr "Successfully logged in."
 #: apps/accounts/views.py:65
 msgid "Tizimdan muvaffaqiyatli chiqildi."
 msgstr "Successfully logged out."
+
+#: apps/accounts/views.py
+msgid "Foydalanuvchi topilmadi."
+msgstr "User not found."
+
+#: apps/accounts/views.py
+msgid "Foydalanuvchi muvaffaqiyatli faolsizlantirildi."
+msgstr "User successfully deactivated."
+
+#: apps/accounts/views.py
+msgid "Parol muvaffaqiyatli yangilandi."
+msgstr "Password successfully updated."
+
+#: apps/accounts/serializers.py
+msgid "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak."
+msgstr "New password must be at least 6 characters long."

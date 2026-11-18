@@ -62,6 +62,13 @@ class LoginSerializer(serializers.Serializer):
 
         user = authenticate(username=username, password=password)
         if not user:
+            existing_user = User.objects.filter(username=username).first()
+            if (
+                existing_user
+                and existing_user.check_password(password)
+                and not existing_user.is_active
+            ):
+                raise serializers.ValidationError(_("Ushbu hisob faolsizlantirilgan."))
             raise serializers.ValidationError(
                 _("Login yoki parol noto'g'ri kiritildi.")
             )
@@ -70,3 +77,114 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+class UserAdminCreateSerializer(serializers.ModelSerializer):
+    """Admin tomonidan yangi foydalanuvchi yaratish (OQ-040)."""
+
+    password = serializers.CharField(write_only=True, required=True, min_length=6)
+    role_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        many=True,
+        required=False,
+        write_only=True,
+        source="roles",
+    )
+    roles = RoleSerializer(many=True, read_only=True)
+    role_codes = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+    )
+    primary_role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+            "role_ids",
+            "roles",
+            "role_codes",
+            "primary_role",
+            "is_active",
+            "date_joined",
+        ]
+        read_only_fields = ["id", "date_joined", "role_codes", "primary_role", "roles"]
+
+    def create(self, validated_data):
+        roles = validated_data.pop("roles", [])
+        password = validated_data.pop("password")
+        user = User.objects.create_user(password=password, **validated_data)
+        if roles:
+            user.roles.set(roles)
+        return user
+
+
+class UserAdminUpdateSerializer(serializers.ModelSerializer):
+    """Admin tomonidan foydalanuvchini tahrirlash va rollarni almashtirish (OQ-040)."""
+
+    role_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        many=True,
+        required=False,
+        write_only=True,
+        source="roles",
+    )
+    roles = RoleSerializer(many=True, read_only=True)
+    role_codes = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+    )
+    primary_role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+            "role_ids",
+            "roles",
+            "role_codes",
+            "primary_role",
+            "is_active",
+            "date_joined",
+        ]
+        read_only_fields = [
+            "id",
+            "username",
+            "date_joined",
+            "role_codes",
+            "primary_role",
+            "roles",
+        ]
+
+    def update(self, instance, validated_data):
+        roles = validated_data.pop("roles", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if roles is not None:
+            instance.roles.set(roles)
+        return instance
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    """Admin tomonidan foydalanuvchi parolini tiklash (OQ-040)."""
+
+    new_password = serializers.CharField(write_only=True, required=True, min_length=6)
+
+    def validate_new_password(self, value):
+        if not value or len(value.strip()) < 6:
+            raise serializers.ValidationError(
+                _("Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.")
+            )
+        return value

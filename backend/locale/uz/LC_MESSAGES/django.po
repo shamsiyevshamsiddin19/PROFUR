@@ -91,3 +91,19 @@ msgstr "Tizimga muvaffaqiyatli kirildi."
 #: apps/accounts/views.py:65
 msgid "Tizimdan muvaffaqiyatli chiqildi."
 msgstr "Tizimdan muvaffaqiyatli chiqildi."
+
+#: apps/accounts/views.py
+msgid "Foydalanuvchi topilmadi."
+msgstr "Foydalanuvchi topilmadi."
+
+#: apps/accounts/views.py
+msgid "Foydalanuvchi muvaffaqiyatli faolsizlantirildi."
+msgstr "Foydalanuvchi muvaffaqiyatli faolsizlantirildi."
+
+#: apps/accounts/views.py
+msgid "Parol muvaffaqiyatli yangilandi."
+msgstr "Parol muvaffaqiyatli yangilandi."
+
+#: apps/accounts/serializers.py
+msgid "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak."
+msgstr "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak."

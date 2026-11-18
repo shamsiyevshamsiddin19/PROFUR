@@ -362,3 +362,179 @@ def test_view_permission_code_is_checked(factory):
     assert gate.has_permission(request, ReceiptView()) is True
     assert gate.has_permission(request, IssueView()) is False
     assert gate.has_permission(request, None) is False
+
+
+# ==============================================================================
+# 4. Admin Foydalanuvchi Boshqaruvi Testlari (OQ-040)
+# ==============================================================================
+
+
+@pytest.mark.django_db
+def test_admin_can_create_user(client, test_users, default_roles):
+    """Admin yangi foydalanuvchi yaratishi va unga rol biriktirishi mumkin (OQ-040)."""
+    client.login(username="admin_user", password="securepassword123")
+    response = client.post(
+        "/api/auth/users/",
+        data={
+            "username": "omborchi_sardor",
+            "password": "Password123!",
+            "first_name": "Sardor",
+            "last_name": "Rahimov",
+            "email": "sardor@profur.uz",
+            "phone": "+998901112233",
+            "role_ids": [default_roles["warehouse"].id],
+            "is_active": True,
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    data = response.json()
+    assert data["username"] == "omborchi_sardor"
+    assert "WAREHOUSE_MANAGER" in data["role_codes"]
+    assert "password" not in data
+
+    # Yangi yaratilgan foydalanuvchi tizimga kira olishini tekshiramiz
+    login_client = Client()
+    login_res = login_client.post(
+        "/api/auth/login/",
+        data={"username": "omborchi_sardor", "password": "Password123!"},
+        content_type="application/json",
+    )
+    assert login_res.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_non_admin_cannot_create_user(client, test_users):
+    """Admin bo'lmagan foydalanuvchi yangi hisob yarata olmaydi (403)."""
+    client.login(username="warehouse_user", password="securepassword123")
+    response = client.post(
+        "/api/auth/users/",
+        data={"username": "hacker", "password": "Password123!"},
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_admin_can_list_and_search_users(client, test_users):
+    """Admin foydalanuvchilar ro'yxatini ko'rishi va qidirishi mumkin."""
+    client.login(username="admin_user", password="securepassword123")
+    response = client.get("/api/auth/users/")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    items = data["results"] if isinstance(data, dict) and "results" in data else data
+    assert len(items) >= 4
+
+    # Qidiruv
+    search_res = client.get("/api/auth/users/?search=Hasan")
+    assert search_res.status_code == status.HTTP_200_OK
+    search_data = search_res.json()
+    results = (
+        search_data["results"]
+        if isinstance(search_data, dict) and "results" in search_data
+        else search_data
+    )
+    assert len(results) == 1
+    assert results[0]["username"] == "warehouse_user"
+
+
+@pytest.mark.django_db
+def test_admin_can_update_user_and_change_roles(client, test_users, default_roles):
+    """Admin foydalanuvchi ma'lumotlarini va rollarini o'zgartira oladi."""
+    client.login(username="admin_user", password="securepassword123")
+    worker = test_users["worker"]
+    response = client.patch(
+        f"/api/auth/users/{worker.id}/",
+        data={
+            "first_name": "Botirbek",
+            "role_ids": [default_roles["supervisor"].id],
+        },
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["first_name"] == "Botirbek"
+    assert "PRODUCTION_SUPERVISOR" in data["role_codes"]
+
+
+@pytest.mark.django_db
+def test_user_cannot_be_deleted_only_deactivated(client, test_users):
+    """OQ-040: Akkaunt o'chirilmaydi (DELETE 405), faolsizlantiriladi."""
+    client.login(username="admin_user", password="securepassword123")
+    worker = test_users["worker"]
+
+    # DELETE so'rovi 405 berishi shart
+    delete_res = client.delete(f"/api/auth/users/{worker.id}/")
+    assert delete_res.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    # Faolsizlantirish (Deactivate)
+    deact_res = client.post(f"/api/auth/users/{worker.id}/deactivate/")
+    assert deact_res.status_code == status.HTTP_200_OK
+    assert deact_res.json()["user"]["is_active"] is False
+
+    worker.refresh_from_db()
+    assert worker.is_active is False
+
+    # Faolsizlangan hisob login qila olmasligi kerak
+    worker_client = Client()
+    login_res = worker_client.post(
+        "/api/auth/login/",
+        data={"username": "worker_user", "password": "securepassword123"},
+        content_type="application/json",
+    )
+    assert login_res.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Ushbu hisob faolsizlantirilgan." in login_res.json()["non_field_errors"]
+
+
+@pytest.mark.django_db
+def test_admin_can_reset_user_password(client, test_users):
+    """Admin foydalanuvchi parolini tiklashi mumkin (OQ-040)."""
+    client.login(username="admin_user", password="securepassword123")
+    worker = test_users["worker"]
+
+    response = client.post(
+        f"/api/auth/users/{worker.id}/reset-password/",
+        data={"new_password": "BrandNewSecretPassword999!"},
+        content_type="application/json",
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["message"] == "Parol muvaffaqiyatli yangilandi."
+
+    # Yangi parol bilan kirish muvaffaqiyatli
+    worker_client = Client()
+    login_res = worker_client.post(
+        "/api/auth/login/",
+        data={"username": "worker_user", "password": "BrandNewSecretPassword999!"},
+        content_type="application/json",
+    )
+    assert login_res.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_empty_admin_role_name_does_not_grant_authority(factory):
+    """Rol nomining o'zi ('ADMIN') ruxsat bermasligi kerak (Rol nomining o'zi vakolat bermasin)."""
+    empty_admin_role = Role.objects.create(
+        code="ADMIN_EMPTY", name="Empty Admin", permissions=[]
+    )
+    user = User.objects.create_user(username="fake_admin")
+    user.roles.add(empty_admin_role)
+
+    req = factory.get("/")
+    req.user = user
+    assert IsAdminRole().has_permission(req, None) is False
+    assert user.has_permission_code("catalog.view_material") is False
+
+
+@pytest.mark.django_db
+def test_wildcard_prefix_permission(factory):
+    """catalog.* yoki inventory.* ruxsat kodi uning ichidagi barcha kodlarni qamrab oladi."""
+    catalog_admin_role = Role.objects.create(
+        code="CATALOG_ADMIN", name="Katalogchi", permissions=["catalog.*"]
+    )
+    user = User.objects.create_user(username="catalog_admin")
+    user.roles.add(catalog_admin_role)
+
+    assert user.has_permission_code("catalog.view_material") is True
+    assert user.has_permission_code("catalog.add_category") is True
+    assert user.has_permission_code("catalog.change_material") is True
+    assert user.has_permission_code("inventory.add_receipt") is False
