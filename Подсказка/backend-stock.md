@@ -18,13 +18,15 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Katalog API qismi. UI egasi frontend | Reja | — |
 | [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40) | Kirim API’si va birlik narxi | Reja | — |
 | [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42) | Qoldiq, minimal chegara va manfiy qoldiqni bloklash | Reja | — |
-| [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49) | ERD va API shartnomasini yig‘ish | Reja | — |
+| [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49) | ERD va API shartnomasini yig‘ish | Jarayonda | [warehouse-api-v1.md](../docs/06-api-contract/warehouse-api-v1.md), branch `docs/PCRM-49-api-contract` |
 
 **Qabul mezoni** — Bir materialning ikki xil narxdagi kirimi alohida partiya bo‘ladi. API javobi, qoldiq va harakat tarixi mos keladi.
 
 ## Oxirgi qayd
 
 2026-11-18 · PCRM-38 · Ko‘rikda · `catalog` ilovasi: Category, Material, Unit, 0001_initial migratsiyasi, admin, docs/05-data-model dagi taklif · PostgreSQL 16 da ruff, makemigrations --check va pytest (15 ta) o‘tdi, [PR #11](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/11) · Akbar va Jamoliddin ko‘rigi, «list/dona» bo‘yicha Team Lead javobi; keyingi ish — PCRM-49 API shartnomasi
+
+2026-11-18 · PCRM-49 · Jarayonda · `docs/06-api-contract/warehouse-api-v1.md`: katalog, kirim (idempotentlik, summa → birlik narxi), qoldiq va tarix API’si, ruxsat kodlari, `inventory` moduli chegarasi, PMga 5 ta savol · Faqat hujjat, kod sinovi yo‘q; PR #11 ustiga qurilgan · Shamsiddin (forma), Akbar (`inventory` xizmatlari), Jamoliddin (xato shakli, ruxsatlar) bilan kelishish; P1–P5 ni Team Lead orqali PMga
 
 ## Navbatdagi ish
 
