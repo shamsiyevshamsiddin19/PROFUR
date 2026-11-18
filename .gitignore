@@ -83,3 +83,6 @@ Thumbs.db
 
 # Docker / Logs
 *.log
+
+# Vite frontend build
+frontend/dist/
