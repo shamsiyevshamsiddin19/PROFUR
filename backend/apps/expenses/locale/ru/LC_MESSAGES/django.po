@@ -1,0 +1,85 @@
+# PROFUR · qo'shimcha xarajatlar (PCRM-46) tarjimalari.
+# Manba tili — o'zbekcha (lotin).
+msgid ""
+msgstr ""
+"Project-Id-Version: profur-expenses\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "AQSH dollari"
+msgstr "Доллар США"
+
+msgid "kod"
+msgstr "код"
+
+msgid "nomi (o'zbekcha)"
+msgstr "название (узбекский)"
+
+msgid "nomi (ruscha)"
+msgstr "название (русский)"
+
+msgid "nomi (inglizcha)"
+msgstr "название (английский)"
+
+msgid "faol"
+msgstr "активен"
+
+msgid "xarajat turi"
+msgstr "тип расхода"
+
+msgid "xarajat turlari"
+msgstr "типы расходов"
+
+msgid "summa"
+msgstr "сумма"
+
+msgid "valyuta"
+msgstr "валюта"
+
+msgid "xarajat sanasi"
+msgstr "дата расхода"
+
+msgid "loyiha raqami"
+msgstr "номер проекта"
+
+msgid "izoh"
+msgstr "комментарий"
+
+msgid "kim kiritdi"
+msgstr "кто внёс"
+
+msgid "kiritilgan vaqt"
+msgstr "время внесения"
+
+msgid "qo'shimcha xarajat"
+msgstr "дополнительный расход"
+
+msgid "qo'shimcha xarajatlar"
+msgstr "дополнительные расходы"
+
+msgid "Qo'shimcha xarajatlar"
+msgstr "Дополнительные расходы"
+
+msgid "Foydalanuvchi tilidagi nom."
+msgstr "Название на языке пользователя."
+
+msgid "Xarajat turining kodini o'zgartirib bo'lmaydi."
+msgstr "Код типа расхода изменить нельзя."
+
+msgid "Summa 0 dan katta bo'lishi kerak."
+msgstr "Сумма должна быть больше 0."
+
+msgid "Summada verguldan keyin ko'pi bilan 2 ta raqam bo'lsin."
+msgstr "В сумме допускается не более 2 знаков после запятой."
+
+msgid "Faqat USD valyutasi qabul qilinadi."
+msgstr "Принимается только валюта USD."
+
+msgid "Bu xarajat turi faol emas."
+msgstr "Этот тип расхода неактивен."
+
+msgid "Tugash sanasi boshlanish sanasidan oldin bo'lmasin."
+msgstr "Дата окончания не может быть раньше даты начала."

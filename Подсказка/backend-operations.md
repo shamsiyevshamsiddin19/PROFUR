@@ -15,14 +15,14 @@ Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bil
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
 | [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Reja | — |
-| [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Reja | — |
+| [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Jarayonda | `feat/PCRM-46-expenses-api`, [expenses-api.md](../docs/06-api-contract/expenses-api.md) |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Operatsiyalar tarixi API qismi. UI egasi frontend | Reja | — |
 
 **Qabul mezoni** — Parallel chiqimda qoldiq manfiy qolmaydi. Qayta yuborilgan so‘rov bitta harakat yozadi, tasdiqlash qoldiqni faqat bir marta o‘zgartiradi.
 
 ## Oxirgi qayd
 
-Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha kiriting.
+`2026-11-18 · PCRM-46 · Jarayonda · expenses ilovasi: xarajat turi (uz/ru/en nom, 3 ta boshlang‘ich tur) va xarajat (faqat USD, summa > 0, loyiha ixtiyoriy, o‘chirish/tahrirlash yo‘q), /api/v1/expenses/ va /api/v1/expense-types/, ru/en tarjimalar · pytest 23 o‘tdi (SQLite), ruff check/format va makemigrations --check toza; PostgreSQL’da lokal sinov bajarilmadi (Docker ishlamayapti), CI tekshiradi · keyingi qadam: PR ochish, Shamsiddin va Jamoliddin ko‘rigi; OQ-010 va ruxsat modeli bo‘yicha savollar [expenses-api.md](../docs/06-api-contract/expenses-api.md) da`
 
 ## Navbatdagi ish
 
