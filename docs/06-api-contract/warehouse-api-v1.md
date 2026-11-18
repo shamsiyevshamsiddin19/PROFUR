@@ -253,8 +253,8 @@ Baza cheklovlari: `quantity_on_hand >= 0` va `0 <= quantity_remaining <= quantit
 
 ```python
 def receive(
-    *, material, received_on, quantity, total_amount, currency, user, **extra
-) -> Batch: ...
+    *, material, received_on, quantity, total_amount, user, currency="USD", **extra
+) -> tuple[Batch, StockBalance]: ...
 def decrease(
     *, material, quantity, movement_type, user, reference, reason="", allocations=None
 ) -> list[StockMovement]: ...
