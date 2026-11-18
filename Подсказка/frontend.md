@@ -6,7 +6,7 @@
 
 ## Ish tartibi
 
-API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quring. Namuna javobdan haqiqiy API’ga o‘ting. Formada kutish, muvaffaqiyat, validatsiya va server xatosiga mos holatlarni ko‘rsating. @ozodbek101 bilan katalog va qoldiqni, @thealiiheere bilan chiqim va tarixni, @jamoliddinusarov1-create bilan login va qabul sinovini ulang.
+API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quring. Namuna javobdan haqiqiy API’ga o‘ting. Formada kutish, muvaffaqiyat, validatsiya va server xatosiga mos holatlarni ko‘rsating. @ozodbek101 bilan katalog va qoldiqni, Akbar (@thealiiheere) bilan chiqim va tarixni, @jamoliddinusarov1-create bilan login va qabul sinovini ulang.
 
 ## Vazifalar va holat
 
