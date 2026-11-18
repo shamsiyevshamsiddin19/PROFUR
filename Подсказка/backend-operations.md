@@ -23,3 +23,12 @@ Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bil
 ## Oxirgi qayd
 
 Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha kiriting.
+
+## Navbatdagi ish
+
+1. **PCRM-46** bilan boshlang. Main’dagi Django va docs/06-api-contract hujjatini o‘qing. Xarajat turi, summa, valyuta, sana va loyiha havolasini tekshiring. OQ-010 bo‘yicha loyiha havolasi kelishilmagan bo‘lsa, muqobil usullarni PM uchun yozing. Mustaqil xarajat validatsiyasi va uning sinovlarini tayyorlang, saqlash/API yo‘lini kelishilgan shartnoma bilan tugating.
+2. **PCRM-44** oldidan Ozodbek yaratgan katalog, partiya va qoldiq modelini tekshiring. Chiqim, qaytarish so‘rovi, hisobdan chiqarish so‘rovi hamda kim tasdiqlashini OQ-002,003,006,007 bilan moslashtiring. Yangi qoldiq modeli yaratish o‘rniga mavjud model bilan ishlang.
+3. Qoldiq 10 bo‘lganda ikki alohida ulanishdan 7 tadan chiqim, qayta yuborilgan so‘rov va ikki marta tasdiqlash uchun PostgreSQL sinovini quring. Qaytarish asl chiqimning qaytarilmagan qismidan oshmasin.
+4. **PCRM-47** da sana, amal va material bo‘yicha filtrlanadigan tarix API’sini Shamsiddin bilan kelishing. Ruxsat sinovini Jamoliddin accounts yechimi bilan bajaring.
+
+Har bir bandning mavjud PR yoki kodda bajarilganini tekshirib navbatdagi ishga o‘ting. Ozodbekka kerakli umumiy model o‘zgarishini bitta aniq diff bilan taklif qiling.

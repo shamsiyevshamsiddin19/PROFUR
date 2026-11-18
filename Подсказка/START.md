@@ -31,3 +31,7 @@
 **Jamoa holatini ko‘rish**
 
 > PROFUR bo‘yicha to‘rtta rol faylini Jira va GitHub bilan solishtir. Har bir a’zo uchun bajarilgan ish, davom etayotgan ish va keyingi qadamni havolasi bilan ayt. Tekshirib bo‘lmagan holatni alohida ko‘rsat.
+
+**Vazifani bajarishga beriladigan umumiy matn**
+
+> Men ushbu repozitoriyda o‘z GitHub loginimga biriktirilgan rol bo‘yicha ishlayman. AGENTS.md va Подсказка/EXECUTION.md ni o‘qi. Loginimni aniqlab, rol faylimdagi navbatdagi bajarilmagan vazifani GitHub, Jira va mavjud kod bilan solishtir. Mavjud ishni davom ettir, kodni yoz, tegishli sinovlarni bajar, dalil bilan rol faylimni yangila va PR tayyorla. Oddiy texnik qarorlarni tushuntirib o‘zing hal qil. PM qarori yoki umumiy API kelishuvi kerak bo‘lsa aniq savol va variantni yozib, mustaqil davom etadigan ishni bajar. Men yangi boshlovchiman, natijani qanday tekshirishni sodda tushuntir.
