@@ -22,6 +22,8 @@ Kelishish kerak bo‘lgan qismlar **[Kelishish]** belgisi bilan ko‘rsatilgan. 
 | Sahifalash | Ro‘yxatlar: `?page=2`. Javob: `{"count", "next", "previous", "results"}`. Bir sahifada 20 ta yozuv bo‘ladi (amaldagi sozlama). |
 | O‘chirish | Ombor yozuvlari o‘chirilmaydi. Katalog `is_active=false` bilan faolsizlantiriladi. Kirimdagi xato tuzatish harakati bilan to‘g‘rilanadi ([8-bo‘lim](#8-pmga-ochiq-savollar-team-lead-orqali), P5). |
 
+**Amaldagi ruxsat ulanishi:** endpointlar accounts.permissions.HasPermissionCode va ko‘rinishdagi required_permission orqali jadvaldagi kodni tekshiradi. Masalan, kirim uchun inventory.add_receipt.
+
 ### Xato javobi **[Kelishish: Shamsiddin, Jamoliddin]**
 
 Barcha xatolar bir xil shaklda qaytadi. Shunda frontend xatoni bitta joyda ko‘rsatadi va `code` bo‘yicha tarjima qila oladi.
@@ -41,7 +43,7 @@ Barcha xatolar bir xil shaklda qaytadi. Shunda frontend xatoni bitta joyda ko‘
 | HTTP | `code` | Qachon |
 |---|---|---|
 | 400 | `validation_error` | Maydon xatosi. Tafsiloti `fields` ichida. Umumiy xato `fields.non_field_errors` da keladi. |
-| 401 | `not_authenticated` | Sessiya yo‘q yoki tugagan. |
+| 403 | `not_authenticated` | Sessiya yo‘q yoki tugagan (SessionAuthentication). |
 | 403 | `permission_denied` | Rolda bu amalga ruxsat yo‘q. |
 | 404 | `not_found` | Manzildagi yozuv yo‘q. |
 | 405 | `method_not_allowed` | Masalan, `DELETE` qo‘llab-quvvatlanmaydi. |
@@ -271,7 +273,7 @@ def increase(
 2. Bir xil `Idempotency-Key` va tana bilan ikki marta POST yuboriladi → bitta partiya, ikkinchi javob `200`. Kalit bir xil, `quantity` boshqa bo‘lsa → `409`.
 3. `total_amount = 100.00` va `quantity = 3` yuboriladi → `unit_price = "33.333333"`, `total_amount` esa aynan `"100.00"` bo‘lib qoladi.
 4. Narx ko‘rish ruxsati yo‘q foydalanuvchining javobida `total_amount`, `unit_price`, `currency` maydonlari yo‘q.
-5. `inventory.add_receipt` ruxsati yo‘q foydalanuvchi kirim yuboradi → `403`. Tizimga kirmagan foydalanuvchi → `401`.
+5. `inventory.add_receipt` ruxsati yo‘q foydalanuvchi kirim yuboradi → `403`. Tizimga kirmagan foydalanuvchi → `403` (SessionAuthentication).
 6. Faol bo‘lmagan material, kelajak sana, `quantity = 0` → `400` va to‘g‘ri `code`.
 7. Kirimi bor materialning `unit` maydonini o‘zgartirish → `409 material_has_history`.
 8. Kirim ichida xato yuzaga keladi (masalan, harakat yozilmaydi) → partiya ham, qoldiq o‘zgarishi ham saqlanmaydi.

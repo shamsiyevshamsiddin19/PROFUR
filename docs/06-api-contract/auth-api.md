@@ -162,3 +162,13 @@ Backend dasturchilari o‘z modullarida (`catalog`, `inventory`, `operations`):
 * `IsWarehouseManager` — Ombor mas'uli yoki administrator uchun.
 * `IsProductionSupervisor` — Ishlab chiqarish nazoratchisi yoki admin uchun.
 * `IsProjectManager` — Loyiha mas'uli yoki admin uchun.
+
+
+## Endpoint ruxsatini ulash
+
+Har bir biznes endpointida accounts.permissions.HasPermissionCode ishlatiladi.
+Ko‘rinish required_permission orqali kerakli kodni beradi, masalan
+inventory.add_receipt. Kod Role.permissions ro‘yxatidagi qiymat bilan aynan
+mos kelishi kerak. Administrator rollarni shu kodlar bilan sozlaydi.
+IsWarehouseManager umumiy manage_inventory kodini tekshiradi.
+Rolga kod berish va undan kodni olib tashlash keyingi so‘rovga ta’sir qiladi.

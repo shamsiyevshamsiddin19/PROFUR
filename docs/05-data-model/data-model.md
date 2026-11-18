@@ -30,7 +30,7 @@ Katalog «qanday material bor»ligini saqlaydi. Narx, miqdor va kirim sanasi kat
 
 | Model | Maydon | Turi | Majburiy | Izoh |
 |---|---|---|---|---|
-| `Category` | `name` | matn, 100 | ha | Noyob. 9 ta boshlang‘ich nom hujjatlarda yo‘q, shuning uchun migratsiya ularni yaratmaydi — admin qo‘shadi. |
+| `Category` | `name` | matn, 100 | ha | Noyob. PCRM-5 bo‘yicha 9 ta boshlang‘ich kategoriya 0002_initial_categories migratsiyasida yaratiladi. |
 | | `is_active` | mantiqiy | ha, `true` | O‘chirish o‘rniga faolsizlantiriladi. |
 | `Material` | `category` | `Category`ga havola | ha | Materiali bor kategoriyani o‘chirish bazada bloklanadi. |
 | | `name` | matn, 200 | ha | |

@@ -40,3 +40,7 @@ Boshlashda har bir band allaqachon kod yoki PR’da bajarilganini tekshiring. Ak
 ## 2026-11-18 · Valyuta va til qarori
 
 Barcha kirimlar, birlik narxi va qoldiq qiymati faqat USD. API boshqa valyutani rad etsin. API shartnomasidagi ko‘p valyutali misollarni USD bilan moslashtiring. Xato xabarlari uz/ru/en tillariga mos bo‘lsin. [Qarorlar jurnali](../docs/09-decisions/decision-log.md).
+
+## Birlashtirish tekshiruvi · 2026-11-18
+
+PR #11, #12 va #13 bitta integratsiya tarmog‘ida tekshirildi. Katalogning 9 ta boshlang‘ich kategoriyasi migratsiyada qo‘shildi. Login CSRF va uch til sinovlari saqlandi, dinamik ruxsatni berish/olib tashlash regressiya sinovlari qo‘shildi. Holat — main’ga birlashtirish uchun tekshiruvda. Keyingi ish — PCRM-39/40 va frontend bilan kirimni ulash.

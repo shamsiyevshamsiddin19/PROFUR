@@ -310,3 +310,55 @@ def test_role_permissions_classes(factory, test_users):
     req.user = test_users["worker"]
     assert admin_perm.has_permission(req, None) is False
     assert warehouse_perm.has_permission(req, None) is False
+
+
+@pytest.mark.django_db
+def test_custom_role_can_receive_and_lose_warehouse_permission(factory):
+    role = Role.objects.create(
+        code="CUSTOM_STORE", name="Yordamchi", permissions=["manage_inventory"]
+    )
+    user = User.objects.create_user(username="custom_store")
+    user.roles.add(role)
+    request = factory.get("/")
+    request.user = user
+    gate = IsWarehouseManager()
+    assert gate.has_permission(request, None) is True
+    role.permissions = []
+    role.save(update_fields=["permissions"])
+    assert gate.has_permission(request, None) is False
+
+
+@pytest.mark.django_db
+def test_warehouse_name_without_permission_does_not_grant_access(factory):
+    role = Role.objects.create(
+        code="WAREHOUSE_MANAGER", name="Omborchi", permissions=[]
+    )
+    user = User.objects.create_user(username="empty_warehouse")
+    user.roles.add(role)
+    request = factory.get("/")
+    request.user = user
+    assert IsWarehouseManager().has_permission(request, None) is False
+
+
+@pytest.mark.django_db
+def test_view_permission_code_is_checked(factory):
+    from accounts.permissions import HasPermissionCode
+
+    role = Role.objects.create(
+        code="RECEIVING", name="Kirimchi", permissions=["inventory.add_receipt"]
+    )
+    user = User.objects.create_user(username="receiving")
+    user.roles.add(role)
+    request = factory.get("/")
+    request.user = user
+
+    class ReceiptView:
+        required_permission = "inventory.add_receipt"
+
+    class IssueView:
+        required_permission = "inventory.add_issue"
+
+    gate = HasPermissionCode()
+    assert gate.has_permission(request, ReceiptView()) is True
+    assert gate.has_permission(request, IssueView()) is False
+    assert gate.has_permission(request, None) is False

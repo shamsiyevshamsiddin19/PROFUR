@@ -1,10 +1,10 @@
-"""DRF uchun maxsus ruxsatlar (permissions)."""
+"""DRF uchun ruxsat kodlari asosidagi tekshiruvlar."""
 
 from rest_framework.permissions import BasePermission
 
 
 class IsAdminRole(BasePermission):
-    """Faqat administrator roliga ega foydalanuvchilarga ruxsat beradi."""
+    """Rol boshqaruvini administratorga ochadi."""
 
     def has_permission(self, request, view) -> bool:
         return bool(
@@ -14,34 +14,34 @@ class IsAdminRole(BasePermission):
         )
 
 
-class IsWarehouseManager(BasePermission):
-    """Ombor mas'uli yoki administratorga ruxsat beradi."""
+class HasPermissionCode(BasePermission):
+    """Ko‘rinish yoki sinf belgilagan ruxsatni foydalanuvchi rollaridan tekshiradi."""
+
+    required_permission = ""
 
     def has_permission(self, request, view) -> bool:
+        code = getattr(view, "required_permission", self.required_permission)
         return bool(
             request.user
             and request.user.is_authenticated
-            and request.user.is_warehouse_manager
+            and code
+            and request.user.has_permission_code(code)
         )
 
 
-class IsProductionSupervisor(BasePermission):
-    """Ishlab chiqarish nazoratchisi yoki administratorga ruxsat beradi."""
+class IsWarehouseManager(HasPermissionCode):
+    """Ombor boshqaruvi ruxsatini tekshiradi."""
 
-    def has_permission(self, request, view) -> bool:
-        return bool(
-            request.user
-            and request.user.is_authenticated
-            and request.user.is_production_supervisor
-        )
+    required_permission = "manage_inventory"
 
 
-class IsProjectManager(BasePermission):
-    """Loyiha mas'uli yoki administratorga ruxsat beradi."""
+class IsProductionSupervisor(HasPermissionCode):
+    """Ishlab chiqarishni boshqarish ruxsatini tekshiradi."""
 
-    def has_permission(self, request, view) -> bool:
-        return bool(
-            request.user
-            and request.user.is_authenticated
-            and request.user.is_project_manager
-        )
+    required_permission = "manage_production"
+
+
+class IsProjectManager(HasPermissionCode):
+    """Loyihalarni boshqarish ruxsatini tekshiradi."""
+
+    required_permission = "manage_projects"

@@ -19,7 +19,7 @@ postgres_only = pytest.mark.skipif(
 
 @pytest.fixture
 def category() -> Category:
-    return Category.objects.create(name="LDSP")
+    return Category.objects.get_or_create(name="LDSP")[0]
 
 
 def make_sheet(category: Category, **overrides) -> Material:
@@ -101,3 +101,18 @@ def test_category_with_materials_cannot_be_deleted(category):
 def test_category_name_is_unique(category):
     with pytest.raises(IntegrityError), transaction.atomic():
         Category.objects.create(name="LDSP")
+
+
+def test_initial_categories_are_available():
+    expected = {
+        "Furnitura",
+        "Bo‘yoq",
+        "Astar",
+        "LMDF",
+        "LDSP",
+        "Faner",
+        "PVC",
+        "DSP",
+        "Qadoqlash",
+    }
+    assert expected.issubset(set(Category.objects.values_list("name", flat=True)))
