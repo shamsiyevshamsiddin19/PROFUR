@@ -336,3 +336,47 @@ def test_receive_service_directly(storekeeper_user, egger):
     assert batch.unit_price == Decimal("4.000000")
     assert batch.currency == "USD"
     assert balance.quantity_on_hand == Decimal("2.50")
+
+
+# --- Katalog bilan bog'liqlik --------------------------------------------------
+
+
+def test_catalog_shows_quantity_on_hand_after_receipt(storekeeper, egger):
+    catalog = client_for(
+        make_user("catalog_viewer", "catalog.view_material", "inventory.view_stock")
+    )
+    url = f"/api/v1/materials/{egger.pk}/"
+    assert catalog.get(url).data["quantity_on_hand"] == "0.00"
+
+    post(storekeeper, payload(egger, quantity="20"))
+    post(storekeeper, payload(egger, quantity="15", total_amount="450"))
+
+    assert catalog.get(url).data["quantity_on_hand"] == "35.00"
+
+
+def test_material_with_receipts_keeps_unit_and_dimensions(storekeeper, egger):
+    post(storekeeper, payload(egger))
+    editor = client_for(
+        make_user("editor", "catalog.view_material", "catalog.change_material")
+    )
+    url = f"/api/v1/materials/{egger.pk}/"
+
+    for change in ({"unit": "piece"}, {"thickness_cm": "1.80"}):
+        response = editor.patch(url, change, format="json")
+        assert response.status_code == 409
+        assert response.data["detail"].code == "material_has_history"
+
+    assert editor.patch(url, {"name": "LDSP Egger W980"}).status_code == 200
+    assert editor.patch(url, {"unit": "sheet"}).status_code == 200  # o'zgarmagan
+    egger.refresh_from_db()
+    assert (egger.unit, egger.thickness_cm) == ("sheet", Decimal("1.60"))
+
+
+def test_material_without_receipts_can_change_unit(egger):
+    editor = client_for(
+        make_user("editor", "catalog.view_material", "catalog.change_material")
+    )
+
+    response = editor.patch(f"/api/v1/materials/{egger.pk}/", {"unit": "piece"})
+
+    assert response.status_code == 200

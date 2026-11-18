@@ -199,7 +199,7 @@ def test_material_detail_matches_contract(viewer, egger):
         "unit": "sheet",
         "display_name": "LDSP Egger · oq · 280×207×1.6",
         "is_active": True,
-        "quantity_on_hand": None,
+        "quantity_on_hand": "0.00",
     }
 
 

@@ -9,8 +9,8 @@ from accounts.permissions import HasPermissionCode
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q, QuerySet
 from django.utils.translation import gettext_lazy as _
-from rest_framework import mixins, viewsets
-from rest_framework.exceptions import ErrorDetail, ValidationError
+from rest_framework import mixins, status, viewsets
+from rest_framework.exceptions import APIException, ErrorDetail, ValidationError
 
 from .models import Category, Material, Unit
 from .serializers import CategorySerializer, MaterialSerializer
@@ -34,6 +34,20 @@ class MaterialDuplicateError(ValidationError):
             }
         )
         self.detail["existing_id"] = existing_id
+
+
+class MaterialHasHistoryError(APIException):
+    """Kirimi bor materialning birligi yoki o'lchami o'zgartirilmaydi: 409."""
+
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = _(
+        "Materialda kirim tarixi bor: birlik va o'lchamlarni o'zgartirib bo'lmaydi."
+    )
+    default_code = "material_has_history"
+
+
+# Eski partiyalar shu qiymatlar bilan kirgan, ularni o'zgartirish tarixni buzadi.
+HISTORY_LOCKED_FIELDS = ("unit", "length_cm", "width_cm", "thickness_cm")
 
 
 def bool_param(value: str | None, name: str) -> bool | None:
@@ -112,7 +126,7 @@ class MaterialViewSet(CreatePatchViewSet):
 
     def get_queryset(self) -> QuerySet[Material]:
         params = self.request.query_params
-        queryset = Material.objects.select_related("category")
+        queryset = Material.objects.select_related("category", "stock")
         if search := params.get("search", "").strip():
             queryset = queryset.filter(
                 Q(name__icontains=search) | Q(color__icontains=search)
@@ -139,6 +153,14 @@ class MaterialViewSet(CreatePatchViewSet):
         self._save_unique(serializer)
 
     def perform_update(self, serializer: MaterialSerializer) -> None:
+        instance = serializer.instance
+        data = serializer.validated_data
+        changed = any(
+            field in data and data[field] != getattr(instance, field)
+            for field in HISTORY_LOCKED_FIELDS
+        )
+        if changed and instance.batches.exists():
+            raise MaterialHasHistoryError()
         self._save_unique(serializer)
 
     def _save_unique(self, serializer: MaterialSerializer) -> None:
