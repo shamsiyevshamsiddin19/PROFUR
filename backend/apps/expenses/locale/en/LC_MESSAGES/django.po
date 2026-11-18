@@ -83,3 +83,18 @@ msgstr "This expense type is inactive."
 
 msgid "Tugash sanasi boshlanish sanasidan oldin bo'lmasin."
 msgstr "The end date cannot be earlier than the start date."
+
+msgid "bekor qilingan yozuv"
+msgstr "reversed entry"
+
+msgid "Bu yozuvni bekor qilgan teskari yozuv (bo'lmasa null)."
+msgstr "Reverse entry that cancelled this entry (null otherwise)."
+
+msgid "Bekor qilish sababini yozing."
+msgstr "Please give a reason for the cancellation."
+
+msgid "Bu xarajat avval bekor qilingan."
+msgstr "This expense has already been cancelled."
+
+msgid "Teskari yozuvni bekor qilib bo'lmaydi."
+msgstr "A reverse entry cannot be cancelled."

@@ -83,3 +83,18 @@ msgstr "Этот тип расхода неактивен."
 
 msgid "Tugash sanasi boshlanish sanasidan oldin bo'lmasin."
 msgstr "Дата окончания не может быть раньше даты начала."
+
+msgid "bekor qilingan yozuv"
+msgstr "отменённая запись"
+
+msgid "Bu yozuvni bekor qilgan teskari yozuv (bo'lmasa null)."
+msgstr "Сторнирующая запись, отменившая эту запись (иначе null)."
+
+msgid "Bekor qilish sababini yozing."
+msgstr "Укажите причину отмены."
+
+msgid "Bu xarajat avval bekor qilingan."
+msgstr "Этот расход уже отменён."
+
+msgid "Teskari yozuvni bekor qilib bo'lmaydi."
+msgstr "Сторнирующую запись нельзя отменить."

@@ -22,7 +22,11 @@ from rest_framework.response import Response
 
 from . import services
 from .models import Batch, IdempotencyKey
-from .serializers import ReceiptCreateSerializer, ReceiptSerializer
+from .serializers import (
+    ReceiptCreateSerializer,
+    ReceiptSerializer,
+    replay_body_for_user,
+)
 
 RECEIPTS_ENDPOINT = "receipts:create"
 IDEMPOTENCY_TTL = timedelta(hours=24)
@@ -145,4 +149,7 @@ class ReceiptViewSet(
             return None
         if record.request_hash != fingerprint:
             raise IdempotencyConflictError()
-        return Response(record.response_body, status=status.HTTP_200_OK)
+        return Response(
+            replay_body_for_user(record.response_body, request.user),
+            status=status.HTTP_200_OK,
+        )

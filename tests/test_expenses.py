@@ -93,15 +93,20 @@ def test_create_expense_saves_usd_and_author(warehouse_user, tax_type):
 
 
 @pytest.mark.django_db
-def test_project_is_optional_for_general_expense(warehouse_user):
-    """Loyiha ko'rsatilmasa xarajat umumiy bo'lib saqlanadi (TZ 6.6)."""
+@pytest.mark.parametrize("project", ["missing", None])
+def test_project_is_required(warehouse_user, project):
+    """OQ-010 (PM tasdiqlagan): xarajat aniq loyihaga biriktiriladi, aks holda 400."""
     payload = valid_payload()
-    del payload["project_id"]
+    if project == "missing":
+        del payload["project_id"]
+    else:
+        payload["project_id"] = project
 
     response = client_for(warehouse_user).post(EXPENSES_URL, payload, format="json")
 
-    assert response.status_code == 201, response.data
-    assert response.data["project_id"] is None
+    assert response.status_code == 400
+    assert "project_id" in response.data
+    assert not Expense.objects.exists()
 
 
 @pytest.mark.django_db
