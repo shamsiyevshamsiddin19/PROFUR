@@ -14,7 +14,7 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-38](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-38) | Kategoriya, material va partiya modellari | Reja | — |
+| [PCRM-38](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-38) | Kategoriya va material modellari. Partiya PCRM-40 bilan | Ko‘rikda | [PR #11](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/11) |
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Katalog API qismi. UI egasi frontend | Reja | — |
 | [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40) | Kirim API’si va birlik narxi | Reja | — |
 | [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42) | Qoldiq, minimal chegara va manfiy qoldiqni bloklash | Reja | — |
@@ -24,7 +24,7 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 
 ## Oxirgi qayd
 
-Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha kiriting.
+2026-11-18 · PCRM-38 · Ko‘rikda · `catalog` ilovasi: Category, Material, Unit, 0001_initial migratsiyasi, admin, docs/05-data-model dagi taklif · PostgreSQL 16 da ruff, makemigrations --check va pytest (15 ta) o‘tdi, [PR #11](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/11) · Akbar va Jamoliddin ko‘rigi, «list/dona» bo‘yicha Team Lead javobi; keyingi ish — PCRM-49 API shartnomasi
 
 ## Navbatdagi ish
 
