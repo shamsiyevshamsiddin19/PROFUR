@@ -203,7 +203,7 @@ class UserResetPasswordView(APIView):
         if serializer.is_valid():
             new_password = serializer.validated_data["new_password"]
             target_user.set_password(new_password)
-            target_user.save()
+            target_user.save(update_fields=["password"])
             return Response(
                 {"message": _("Parol muvaffaqiyatli yangilandi.")},
                 status=status.HTTP_200_OK,

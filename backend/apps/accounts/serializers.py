@@ -4,6 +4,7 @@ from accounts.models import Role, User
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -139,6 +140,7 @@ class UserAdminCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"password": error.messages}) from error
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
         roles = validated_data.pop("roles", [])
         password = validated_data.pop("password")
@@ -190,11 +192,13 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
             "roles",
         ]
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         roles = validated_data.pop("roles", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.save()
+        if validated_data:
+            instance.save(update_fields=list(validated_data))
         if roles is not None:
             instance.roles.set(roles)
         return instance

@@ -29,6 +29,10 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     headers: { "X-CSRFToken": csrf.csrfToken },
   });
   expect(created.status()).toBe(201);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Material receipts", exact: true }),
+  ).toBeVisible();
   const material = page.getByRole("combobox", {
     name: "Material",
     exact: true,
@@ -124,7 +128,10 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await expect(
-    page.getByRole("cell").getByText("Approved", { exact: true }),
+    page
+      .getByRole("row")
+      .filter({ hasText: materialName })
+      .getByText("Approved", { exact: true }),
   ).toBeVisible();
   await page.getByRole("tab", { name: "Write-off", exact: true }).click();
   await page
@@ -198,7 +205,12 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .getByRole("button", { name: "Apply", exact: true })
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
-  await expect(page.getByText("Low stock", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: materialName })
+      .getByText("Low stock", { exact: true }),
+  ).toBeVisible();
   const minimum = await (
     await page.request.get(`/api/v1/stock/${batch.material.id}/`)
   ).json();

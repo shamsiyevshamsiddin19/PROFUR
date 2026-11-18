@@ -585,3 +585,27 @@ def test_admin_user_writes_enforce_configured_password_validators(
     assert reset.status_code == 400
     target.refresh_from_db()
     assert target.password == old_hash
+
+
+@pytest.mark.django_db
+def test_user_create_rolls_back_if_role_assignment_fails(
+    client, test_users, default_roles, monkeypatch
+):
+    """Rol yozishda xato bo‘lsa yarimta akkaunt bazada qolmaydi."""
+    client.force_login(test_users["admin"])
+
+    def failed_assignment(*args, **kwargs):
+        raise RuntimeError("role assignment failed")
+
+    monkeypatch.setattr(User.roles.related_manager_cls, "set", failed_assignment)
+    with pytest.raises(RuntimeError, match="role assignment failed"):
+        client.post(
+            "/api/auth/users/",
+            {
+                "username": "rollback_user",
+                "password": "StrongRollbackPass984!",
+                "role_ids": [default_roles["worker"].pk],
+            },
+            content_type="application/json",
+        )
+    assert not User.objects.filter(username="rollback_user").exists()
