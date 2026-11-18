@@ -1,5 +1,6 @@
 """Ombor API'si uchun so'rov va javob shakllari (shartnoma, 4- va 5-bo'lim)."""
 
+from copy import deepcopy
 from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,6 +21,21 @@ def can_view_prices(user) -> bool:
     return bool(user and user.is_authenticated) and user.has_permission_code(
         VIEW_PRICE_CODE
     )
+
+
+def replay_body_for_user(body: dict, user) -> dict:
+    """Saqlangan javob nusxasida narxni joriy ruxsat bo'yicha yashiradi.
+
+    Idempotentlikdagi asl javob va biznes amal o'zgarmaydi. Ruxsat qaytarilsa,
+    keyingi takrorda dastlab saqlangan narxlar yana ko'rinishi mumkin.
+    """
+    data = deepcopy(body)
+    if not can_view_prices(user):
+        for field in (*PRICE_FIELDS, "total_cost"):
+            data.pop(field, None)
+        for allocation in data.get("allocations", []):
+            allocation.pop("unit_price", None)
+    return data
 
 
 def material_brief(material: Material) -> dict:

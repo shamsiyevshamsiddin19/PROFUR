@@ -526,15 +526,62 @@ def test_empty_admin_role_name_does_not_grant_authority(factory):
 
 
 @pytest.mark.django_db
-def test_wildcard_prefix_permission(factory):
-    """catalog.* yoki inventory.* ruxsat kodi uning ichidagi barcha kodlarni qamrab oladi."""
+def test_unrecognized_prefix_mask_does_not_grant_permissions(factory):
+    """Shartnomada yo‘q prefiks maskasi aniq ruxsat kodlarini o‘zidan bermaydi."""
     catalog_admin_role = Role.objects.create(
         code="CATALOG_ADMIN", name="Katalogchi", permissions=["catalog.*"]
     )
     user = User.objects.create_user(username="catalog_admin")
     user.roles.add(catalog_admin_role)
 
-    assert user.has_permission_code("catalog.view_material") is True
-    assert user.has_permission_code("catalog.add_category") is True
-    assert user.has_permission_code("catalog.change_material") is True
+    assert user.has_permission_code("catalog.view_material") is False
+    assert user.has_permission_code("catalog.add_category") is False
+    assert user.has_permission_code("catalog.change_material") is False
     assert user.has_permission_code("inventory.add_receipt") is False
+
+
+@pytest.mark.django_db
+def test_me_exposes_superuser_for_frontend_without_allowing_escalation(client):
+    """Superuser rol ro'yxatisiz ham UI'ga kiradi; bayroq so'rovdan yozilmaydi."""
+    from accounts.serializers import UserSerializer
+
+    user = User.objects.create_superuser(username="root_ui", password=None)
+    client.force_login(user)
+    response = client.get("/api/auth/me/")
+    assert response.status_code == 200
+    assert response.json()["is_superuser"] is True
+    assert response.json()["roles"] == []
+    ordinary = User.objects.create_user(username="ordinary_ui")
+    serializer = UserSerializer(ordinary, data={"is_superuser": True}, partial=True)
+    assert serializer.is_valid(), serializer.errors
+    serializer.save()
+    ordinary.refresh_from_db()
+    assert ordinary.is_superuser is False
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("password", ["abcdef", "1234567890", "password"])
+def test_admin_user_writes_enforce_configured_password_validators(
+    client, test_users, password
+):
+    """Yaratish va tiklash sozlamadagi kuchli parol siyosatini chetlab o‘tmaydi."""
+    client.force_login(test_users["admin"])
+    count = User.objects.count()
+    created = client.post(
+        "/api/auth/users/",
+        {"username": "policy_user", "password": password},
+        content_type="application/json",
+    )
+    assert created.status_code == 400
+    assert "password" in created.json()
+    assert User.objects.count() == count
+    target = test_users["worker"]
+    old_hash = target.password
+    reset = client.post(
+        f"/api/auth/users/{target.pk}/reset-password/",
+        {"new_password": password},
+        content_type="application/json",
+    )
+    assert reset.status_code == 400
+    target.refresh_from_db()
+    assert target.password == old_hash

@@ -6,6 +6,7 @@ import {
   type FormEvent,
 } from "react";
 import {
+  AlertTriangle,
   ArrowDownLeft,
   Check,
   ChevronRight,
@@ -25,9 +26,16 @@ import {
   type Page,
   type Receipt,
   type ReceiptInput,
+  type StockRow,
+  type User,
+  type Category,
+  can,
 } from "../api";
 import { errorKey, localDate, money } from "../format";
 import { translate, unitLabel, type Language, type MessageKey } from "../i18n";
+
+import { useRecords } from "../hooks/useRecords";
+import { StockDetail } from "./StockDetail";
 
 function newDraft() {
   return {
@@ -45,13 +53,25 @@ export function WarehouseContent({
   screen,
   lang,
   userId,
+  user,
 }: {
   screen: "receiving" | "materials" | "stock";
   lang: Language;
   userId: number;
+  user: User;
 }) {
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
+  const [detail, setDetail] = useState<StockRow | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
+  const [stockRows, setStockRows] = useState<StockRow[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const categories = useRecords<Category>(
+    screen === "stock" && can(user, "catalog.view_material")
+      ? "/api/v1/categories/"
+      : null,
+    lang,
+  );
+  const [belowMinOnly, setBelowMinOnly] = useState(false);
   const [next, setNext] = useState<string | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,21 +115,36 @@ export function WarehouseContent({
     setLoadError(null);
     const timer = window.setTimeout(async () => {
       try {
-        const page = await request<Page<Material>>(
-          "/api/v1/materials/?is_active=true&search=" +
-            encodeURIComponent(search),
-          lang,
-          { signal: controller.signal },
-        );
-        setMaterials(page.results);
-        setNext(page.next);
-        if (screen === "receiving") {
-          const receipts = await request<Page<Receipt>>(
-            "/api/v1/receipts/",
+        if (screen === "stock") {
+          const params = new URLSearchParams();
+          if (search) params.set("search", search);
+          if (belowMinOnly) params.set("below_min", "true");
+          if (categoryFilter) params.set("category", categoryFilter);
+          const query = params.toString() ? "?" + params.toString() : "";
+          const page = await request<Page<StockRow>>(
+            "/api/v1/stock/" + query,
             lang,
             { signal: controller.signal },
           );
-          setReceipts(receipts.results);
+          setStockRows(page.results);
+          setNext(page.next);
+        } else {
+          const page = await request<Page<Material>>(
+            "/api/v1/materials/?is_active=true&search=" +
+              encodeURIComponent(search),
+            lang,
+            { signal: controller.signal },
+          );
+          setMaterials(page.results);
+          setNext(page.next);
+          if (screen === "receiving") {
+            const receipts = await request<Page<Receipt>>(
+              "/api/v1/receipts/",
+              lang,
+              { signal: controller.signal },
+            );
+            setReceipts(receipts.results);
+          }
         }
       } catch (e) {
         if (!controller.signal.aborted) setLoadError(errorKey(e));
@@ -121,21 +156,34 @@ export function WarehouseContent({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [lang, screen, search, revision]);
+  }, [lang, screen, search, belowMinOnly, categoryFilter, revision]);
 
   async function more() {
     if (!next || loading) return;
     // Sahifalash manzili API hostidan qat’i nazar o‘z originimizga o‘tkaziladi.
     const url = new URL(next, location.origin);
-    if (!url.pathname.startsWith("/api/v1/materials/")) return;
+    if (
+      !url.pathname.startsWith("/api/v1/materials/") &&
+      !url.pathname.startsWith("/api/v1/stock/")
+    )
+      return;
     setLoading(true);
     try {
-      const page = await request<Page<Material>>(
-        url.pathname + url.search,
-        lang,
-      );
-      setMaterials((items) => [...items, ...page.results]);
-      setNext(page.next);
+      if (screen === "stock") {
+        const page = await request<Page<StockRow>>(
+          url.pathname + url.search,
+          lang,
+        );
+        setStockRows((items) => [...items, ...page.results]);
+        setNext(page.next);
+      } else {
+        const page = await request<Page<Material>>(
+          url.pathname + url.search,
+          lang,
+        );
+        setMaterials((items) => [...items, ...page.results]);
+        setNext(page.next);
+      }
     } catch (e) {
       setLoadError(errorKey(e));
     } finally {
@@ -165,7 +213,7 @@ export function WarehouseContent({
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (saving) return;
+    if (saving || !can(user, "inventory.add_receipt")) return;
     if (!pending.current) {
       if (!selected || draft.received_on > localDate()) {
         setSaveError("invalid");
@@ -211,7 +259,7 @@ export function WarehouseContent({
       setSaving(false);
     }
   }
-  const locked = saving || uncertain;
+  const locked = saving || uncertain || !can(user, "inventory.add_receipt");
   const loadingNotice = loading && (
     <div className="load-line" role="status">
       <RefreshCw size={15} className="spin" />
@@ -232,50 +280,152 @@ export function WarehouseContent({
   if (screen !== "receiving")
     return (
       <>
-        <div className="toolbar">
-          <Search size={17} />
-          <input
-            aria-label={t("search")}
-            placeholder={t("search")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+        {detail && (
+          <StockDetail
+            row={detail}
+            user={user}
+            lang={lang}
+            close={() => setDetail(null)}
+            saved={() => {
+              setDetail(null);
+              setRevision((n) => n + 1);
+            }}
           />
+        )}
+        <div className="toolbar-wrap">
+          <div className="toolbar">
+            <Search size={17} />
+            <input
+              aria-label={t("search")}
+              placeholder={t("search")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {screen === "stock" && categories.data.length > 0 && (
+            <select
+              className="stock-category"
+              aria-label={t("category")}
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="">
+                {t("category")}: {t("all")}
+              </option>
+              {categories.data.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {screen === "stock" && (
+            <label className="filter-chip">
+              <input
+                type="checkbox"
+                checked={belowMinOnly}
+                onChange={(e) => setBelowMinOnly(e.target.checked)}
+              />
+              {t("belowMinFilter")}
+            </label>
+          )}
         </div>
         {loadingNotice}
         {unavailable}
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>{t("material")}</th>
-                <th>{t("category")}</th>
-                <th>{t("unit")}</th>
-                {screen === "stock" && <th>{t("stock")}</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {materials.map((m) => (
-                <tr key={m.id}>
-                  <td>
-                    <span className="material-symbol">
-                      <Package size={16} />
-                    </span>
-                    {m.display_name || m.name}
-                  </td>
-                  <td>{m.category.name}</td>
-                  <td>{unitLabel(m.unit, lang)}</td>
-                  {screen === "stock" && <td>{m.quantity_on_hand ?? "—"}</td>}
+        <div
+          className={
+            screen === "stock" ? "table-wrap stock-ledger" : "table-wrap"
+          }
+        >
+          {screen === "stock" ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("material")}</th>
+                  <th>{t("category")}</th>
+                  <th>{t("unit")}</th>
+                  <th>{t("stock")}</th>
+                  <th>{t("batches")}</th>
+                  <th>{t("minLimit")}</th>
+                  <th>{t("stockValue")}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {!loading && !loadError && materials.length === 0 && (
-            <Empty text={t("empty")} />
+              </thead>
+              <tbody>
+                {stockRows.map((row) => (
+                  <tr key={row.material.id}>
+                    <td>
+                      <span className="material-symbol">
+                        <Package size={16} />
+                      </span>
+                      <button
+                        className="text-button material-link"
+                        onClick={() => setDetail(row)}
+                      >
+                        {row.material.display_name}
+                      </button>
+                    </td>
+                    <td data-label={t("category")}>
+                      {row.material.category.name}
+                    </td>
+                    <td data-label={t("unit")}>
+                      {unitLabel(row.material.unit, lang)}
+                    </td>
+                    <td data-label={t("stock")}>
+                      <strong>{row.quantity_on_hand}</strong>
+                      {row.is_below_min && (
+                        <span className="badge-warning" title={t("lowStock")}>
+                          <AlertTriangle size={12} />
+                          {t("lowStock")}
+                        </span>
+                      )}
+                    </td>
+                    <td data-label={t("batches")}>{row.open_batches}</td>
+                    <td data-label={t("minLimit")}>
+                      {row.min_quantity ?? "—"}
+                    </td>
+                    <td data-label={t("stockValue")}>
+                      {row.value_by_currency?.[0]?.amount
+                        ? money(row.value_by_currency[0].amount, lang)
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("material")}</th>
+                  <th>{t("category")}</th>
+                  <th>{t("unit")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {materials.map((m) => (
+                  <tr key={m.id}>
+                    <td>
+                      <span className="material-symbol">
+                        <Package size={16} />
+                      </span>
+                      {m.display_name || m.name}
+                    </td>
+                    <td>{m.category.name}</td>
+                    <td>{unitLabel(m.unit, lang)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
+          {!loading &&
+            !loadError &&
+            (screen === "stock"
+              ? stockRows.length === 0
+              : materials.length === 0) && <Empty text={t("empty")} />}
         </div>
         {next && (
           <button className="secondary" onClick={more} disabled={loading}>
-            {t("materials")}
+            {t(screen === "stock" ? "stock" : "materials")}
             <ChevronRight size={15} />
           </button>
         )}
@@ -418,6 +568,7 @@ export function WarehouseContent({
             <button
               className="primary"
               disabled={
+                !can(user, "inventory.add_receipt") ||
                 saving ||
                 (!uncertain && (Boolean(loadError) || loading || !selected))
               }
@@ -497,7 +648,9 @@ export function WarehouseContent({
                     <td>
                       {r.quantity} {unitLabel(r.material.unit, lang)}
                     </td>
-                    <td>{money(r.total_amount, lang)}</td>
+                    <td>
+                      {r.total_amount ? money(r.total_amount, lang) : "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>

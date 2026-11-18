@@ -752,6 +752,53 @@ tbody tr:hover {
   background: none;
   box-shadow: none;
 }
+.toolbar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.toolbar-wrap .toolbar {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.filter-chip input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.badge-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: var(--warning-surface);
+  color: var(--warning);
+  border: 1px solid var(--warning-line);
+  margin-left: 8px;
+}
 .secondary {
   padding: 11px 14px;
   border: 1px solid var(--border-strong);
@@ -1167,5 +1214,361 @@ input:-webkit-autofill:focus {
     font-size: 12px;
     padding-inline: 8px;
     letter-spacing: -0.2px;
+  }
+}
+
+/* Ombor amallari: oq yuzalar, bir xil maydonlar va moslashuvchan jadvallar. */
+.workflow-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.workflow-toolbar > input,
+.workflow-toolbar > select {
+  flex: 1 1 170px;
+  width: auto;
+  min-width: 0;
+}
+.workflow-toolbar > label {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.workflow-toolbar .secondary {
+  margin: 0;
+  min-height: 44px;
+}
+.workflow-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--surface);
+}
+.workflow-panel h2 {
+  font-size: 17px;
+  margin-bottom: 24px;
+}
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+fieldset:disabled {
+  opacity: 0.7;
+}
+.workflow-dialog {
+  width: min(680px, calc(100% - 28px));
+  max-height: calc(100dvh - 36px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 24px;
+  box-shadow: 0 20px 80px var(--shadow-panel);
+}
+.workflow-dialog::backdrop {
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+.dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.dialog-heading h2 {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 22px;
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.dialog-actions > span {
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--muted);
+}
+.dialog-actions .secondary {
+  margin-top: 0;
+}
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+}
+.check-label input {
+  width: 18px;
+  min-height: 18px;
+}
+.tabs {
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--surface-muted);
+  overflow: auto;
+  max-width: 100%;
+}
+.tabs button {
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 7px;
+  min-height: 40px;
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+.tabs .selected {
+  background: var(--surface);
+  color: var(--accent-ink);
+  box-shadow: 0 1px 4px var(--shadow-panel);
+  font-weight: 600;
+}
+.allocation-section {
+  margin-top: 24px;
+}
+.allocation-section h3,
+.workflow-dialog h3 {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.allocation-section .table-wrap {
+  margin-top: 14px;
+}
+.quantity-input {
+  width: 115px;
+}
+.row-actions {
+  display: flex;
+  gap: 12px;
+}
+.status-tag {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface-muted);
+  color: var(--muted);
+}
+.status-tag.pending {
+  background: var(--warning-surface);
+  color: var(--warning);
+}
+.status-tag.approved {
+  background: var(--success-surface);
+  color: var(--success);
+}
+.status-tag.rejected {
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+.danger-text {
+  color: var(--danger);
+}
+.inline-summary {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 0;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.inline-summary strong {
+  overflow-wrap: anywhere;
+}
+.minimum-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin: 18px 0 26px;
+}
+.minimum-form label {
+  flex: 1;
+}
+.minimum-form p {
+  width: 100%;
+  color: var(--muted);
+  font-size: 12px;
+}
+.material-link {
+  font: inherit;
+  text-align: left;
+}
+.wrap-cell {
+  white-space: normal;
+  min-width: 150px;
+  max-width: 280px;
+  overflow-wrap: anywhere;
+}
+.sidebar nav {
+  overflow-y: auto;
+  min-height: 0;
+}
+@media (max-width: 650px) {
+  .workflow-panel,
+  .workflow-dialog {
+    padding: 18px;
+  }
+  .workflow-toolbar {
+    gap: 10px;
+  }
+  .workflow-toolbar > .primary {
+    flex: 1 1 100%;
+  }
+  .workflow-dialog .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .tabs {
+    width: 100%;
+  }
+  .tabs button {
+    flex: 1;
+    font-size: 12px;
+    padding: 10px;
+  }
+  .dialog-actions .primary {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .breadcrumbs strong {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.category-panel {
+  margin-bottom: 22px;
+}
+.category-panel h2 {
+  margin: 0;
+}
+.category-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 24px;
+}
+.category-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--line);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.field > label {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.workflow-toolbar > .field {
+  flex: 1 1 160px;
+}
+.minimum-form > .field {
+  flex: 1;
+}
+.stock-category {
+  width: auto;
+  max-width: 230px;
+}
+@media (max-width: 650px) {
+  .stock-category {
+    max-width: none;
+    flex: 1;
+  }
+  .stock-ledger {
+    overflow: visible;
+    border: 0;
+    background: none;
+  }
+  .stock-ledger table,
+  .stock-ledger tbody {
+    display: block;
+  }
+  .stock-ledger thead {
+    display: none;
+  }
+  .stock-ledger tbody {
+    display: grid;
+    gap: 14px;
+  }
+  .stock-ledger tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .stock-ledger td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .stock-ledger td:first-child {
+    grid-column: 1/-1;
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .stock-ledger td[data-label]::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .stock-ledger .material-link {
+    padding: 0;
+    line-height: 1.6;
+  }
+  .stock-ledger .material-symbol {
+    margin-right: 0;
+    flex-shrink: 0;
+  }
+  .stock-ledger .badge-warning {
+    margin-left: 0;
+  }
+}
+.filter-chip {
+  flex-direction: row;
+}
+@media (max-width: 650px) {
+  .toolbar-wrap .toolbar {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .stock-category {
+    flex: 1 1 100%;
+  }
+  .toolbar-wrap .filter-chip {
+    flex: 1;
+    min-height: 44px;
   }
 }

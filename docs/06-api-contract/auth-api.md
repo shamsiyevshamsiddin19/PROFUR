@@ -267,3 +267,8 @@ Rolga kod berish va undan kodni olib tashlash keyingi so‘rovga ta’sir qiladi
 ## API ruxsat kodlari · 2026-11-18
 
 Katalog API’si `catalog.*`, xarajatlar API’si `expenses.*` kodlarini tekshiradi. Eski `view_catalog` / `manage_catalog` kodlari bu endpointlarga ruxsat bermaydi. Mavjud rollarga kerakli aniq kodlarni admin beradi; rol nomining o‘zi ruxsat emas. Xarajat kodlari [expenses-api.md](expenses-api.md)da.
+
+
+### Integratsiya ko‘rigi · PR #44
+
+Akkaunt yaratish va parolni tiklash `AUTH_PASSWORD_VALIDATORS` dagi barcha tekshiruvlardan o‘tadi; xato `password` yoki `new_password` maydonida 400 bilan qaytadi. Ishlayotgan `ADMIN`/superuser va aniq permission kodlari shartnomasi saqlandi: yangi `accounts.manage_users` yoki prefiks maskasi o‘zidan rol boshqarish huquqini bermaydi. Oldingi ruxsatlar algoritmini yoki mavjud akkauntlarni migratsiyasiz o‘zgartirish kiritilmadi.

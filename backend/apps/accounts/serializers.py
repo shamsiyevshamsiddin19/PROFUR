@@ -2,6 +2,8 @@
 
 from accounts.models import Role, User
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -45,9 +47,16 @@ class UserSerializer(serializers.ModelSerializer):
             "primary_role",
             "phone",
             "is_active",
+            "is_superuser",
             "date_joined",
         ]
-        read_only_fields = ["id", "date_joined", "role_codes", "primary_role"]
+        read_only_fields = [
+            "id",
+            "date_joined",
+            "role_codes",
+            "primary_role",
+            "is_superuser",
+        ]
 
 
 class LoginSerializer(serializers.Serializer):
@@ -115,6 +124,20 @@ class UserAdminCreateSerializer(serializers.ModelSerializer):
             "date_joined",
         ]
         read_only_fields = ["id", "date_joined", "role_codes", "primary_role", "roles"]
+
+    def validate(self, attrs):
+        """Yangi akkaunt parolini loyiha sozlamalaridagi validatorlar bilan tekshiradi."""
+        candidate = User(
+            **{
+                key: attrs.get(key, "")
+                for key in ("username", "email", "first_name", "last_name")
+            }
+        )
+        try:
+            validate_password(attrs["password"], candidate)
+        except DjangoValidationError as error:
+            raise serializers.ValidationError({"password": error.messages}) from error
+        return attrs
 
     def create(self, validated_data):
         roles = validated_data.pop("roles", [])
@@ -187,4 +210,8 @@ class PasswordResetSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 _("Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak.")
             )
+        try:
+            validate_password(value, self.context.get("user"))
+        except DjangoValidationError as error:
+            raise serializers.ValidationError(error.messages) from error
         return value

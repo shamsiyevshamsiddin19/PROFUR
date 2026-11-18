@@ -109,62 +109,34 @@ class User(AbstractUser):
         return self.roles.filter(code=role_code).exists()
 
     def has_permission_code(self, permission_code: str) -> bool:
-        """
-        Foydalanuvchining rollari ichida berilgan ruxsat kodi borligini tekshiradi.
-        Rol nomining o'zi vakolat bermaydi; ruxsat kodi yoki '*' bo'lishi shart.
-        """
-        if self.is_superuser:
+        """Foydalanuvchining rollari ichida berilgan ruxsat kodi borligini tekshiradi."""
+        if self.is_superuser or self.has_role("ADMIN"):
             return True
         for role_obj in self.roles.all():
             perms = role_obj.permissions or []
             if "*" in perms or permission_code in perms:
                 return True
-            for perm in perms:
-                if perm.endswith(".*"):
-                    prefix = perm[:-2]
-                    if permission_code == prefix or permission_code.startswith(
-                        prefix + "."
-                    ):
-                        return True
         return False
 
     @property
     def is_admin_role(self) -> bool:
         """Administrator yoki superuser ekanligini tekshiradi."""
-        return (
-            self.is_superuser
-            or self.has_permission_code("*")
-            or self.has_permission_code("accounts.manage_users")
-            or self.has_permission_code("accounts.manage_roles")
-        )
+        return self.is_superuser or self.has_role("ADMIN")
 
     @property
     def is_warehouse_manager(self) -> bool:
         """Ombor mas'uli yoki admin ekanligini tekshiradi."""
-        return (
-            self.is_admin_role
-            or self.has_permission_code("manage_inventory")
-            or self.has_permission_code("inventory.view_stock")
-            or self.has_permission_code("inventory.add_receipt")
-        )
+        return self.is_admin_role or self.has_role("WAREHOUSE_MANAGER")
 
     @property
     def is_production_supervisor(self) -> bool:
         """Ishlab chiqarish nazoratchisi yoki admin ekanligini tekshiradi."""
-        return (
-            self.is_admin_role
-            or self.has_permission_code("manage_production")
-            or self.has_permission_code("production.*")
-        )
+        return self.is_admin_role or self.has_role("PRODUCTION_SUPERVISOR")
 
     @property
     def is_project_manager(self) -> bool:
         """Loyiha mas'uli yoki admin ekanligini tekshiradi."""
-        return (
-            self.is_admin_role
-            or self.has_permission_code("manage_projects")
-            or self.has_permission_code("projects.*")
-        )
+        return self.is_admin_role or self.has_role("PROJECT_MANAGER")
 
     @property
     def is_worker(self) -> bool:

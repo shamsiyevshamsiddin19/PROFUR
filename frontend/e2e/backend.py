@@ -34,7 +34,7 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
         username="browser_storekeeper", password="browser-test-only-password"
     )
     role = Role.objects.create(
-        code="BROWSER_STOREKEEPER",
+        code="ADMIN",
         name="Browser storekeeper",
         permissions=[
             "catalog.view_material",

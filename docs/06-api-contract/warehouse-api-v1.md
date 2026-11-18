@@ -1,11 +1,11 @@
 # Ombor API shartnomasi · v1 (katalog, kirim, qoldiq)
 
-**18-noyabr 2026 · Taklif, kelishuv kutilmoqda.** Jira: [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49), [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39), [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40), [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42). Egasi: [@ozodbek101](https://github.com/ozodbek101).
+**18-noyabr 2026 · Amaldagi kod bilan moslangan** (main: #15, #20, #21, #27, #34, #35). Javob namunalari haqiqiy API’dan olingan; frontend uchun qisqa topshiriq — [warehouse-frontend-handoff.md](warehouse-frontend-handoff.md). Jira: [PCRM-49](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-49), [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39), [PCRM-40](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-40), [PCRM-42](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-42). Egasi: [@ozodbek101](https://github.com/ozodbek101).
 Manbalar: [OQ reyestri](../01-requirements/open-questions.md) (OQ-001, 004–009, 013, 016, 034, 037–041), [muhandislik rejasi](../03-architecture/warehouse-engineering-plan.md), [katalog modeli](../05-data-model/data-model.md#katalog-modeli--pcrm-38) (PR #11).
 
-Bu hujjat birinchi oqimni qamraydi: **material yaratish → kirim → qoldiqni ko‘rish**. Chiqim, qaytarish, hisobdan chiqarish va xarajatlar Akbar (@thealiiheere) bo‘limida yoziladi. Ular bu yerdagi umumiy qoidalar va [ombor moduli chegarasi](#6-ombor-moduli-chegarasi--akbar-uchun)ga tayanadi.
+Bu hujjat birinchi oqimni qamraydi: **material yaratish → kirim → qoldiqni ko‘rish**. Chiqim — [issues-api.md](issues-api.md), qaytarish va hisobdan chiqarish — [returns-write-offs-api.md](returns-write-offs-api.md), xarajatlar — [expenses-api.md](expenses-api.md) (Akbar, @thealiiheere). Ular bu yerdagi umumiy qoidalar va [ombor moduli chegarasi](#6-ombor-moduli-chegarasi--akbar-uchun)ga tayanadi.
 
-Kelishish kerak bo‘lgan qismlar **[Kelishish]** belgisi bilan ko‘rsatilgan. PM qaroriga bog‘liq qismlar esa **[PM]** bilan belgilangan va [8-bo‘limda](#8-pmga-ochiq-savollar-team-lead-orqali) jamlangan.
+PM qaroriga bog‘liq qismlar **[PM]** bilan belgilangan va [8-bo‘limda](#8-pmga-ochiq-savollar-team-lead-orqali) jamlangan; ular hal bo‘lguncha kod taklif qilingan xatti-harakat bilan ishlaydi.
 
 **2026-11-18 · Foydalanuvchining keyingi aniqlashtirishi.** Yagona valyuta USD ($), tizim tillari uz/ru/en. Shu qaror avvalgi ko‘p valyutali taklifni almashtiradi.
 
@@ -24,36 +24,30 @@ Kelishish kerak bo‘lgan qismlar **[Kelishish]** belgisi bilan ko‘rsatilgan. 
 
 **Amaldagi ruxsat ulanishi:** endpointlar accounts.permissions.HasPermissionCode va ko‘rinishdagi required_permission orqali jadvaldagi kodni tekshiradi. Masalan, kirim uchun inventory.add_receipt.
 
-### Xato javobi **[Kelishish: Shamsiddin, Jamoliddin]**
+### Xato javobi (amaldagi)
 
-Barcha xatolar bir xil shaklda qaytadi. Shunda frontend xatoni bitta joyda ko‘rsatadi va `code` bo‘yicha tarjima qila oladi.
+Umumiy `EXCEPTION_HANDLER` qo‘shilmadi, shuning uchun xatolar DRF shaklida keladi. Matn `Accept-Language` bo‘yicha tarjima qilinadi; frontend matnni ko‘rsatadi, 409 da esa `code` bo‘yicha qaror qiladi.
+
+| HTTP | Shakl | Qachon |
+|---|---|---|
+| 400 | `{"quantity": ["…"], "currency": ["…"]}` — maydon nomi → xabarlar ro‘yxati; umumiy xato `non_field_errors` da | Maydon xatosi |
+| 400 | `{"non_field_errors": ["Bunday material allaqachon mavjud."], "existing_id": 1}` | Takror material |
+| 400 | `{"idempotency_key": ["…"]}` | `Idempotency-Key` yo‘q yoki UUID emas |
+| 403 | `{"detail": "Authentication credentials were not provided."}` | Sessiya yo‘q (SessionAuthentication 401 emas, 403 qaytaradi) |
+| 403 | `{"detail": "You do not have permission to perform this action."}` | Rolda ruxsat kodi yo‘q |
+| 404 | `{"detail": "…"}` | Yozuv yo‘q |
+| 405 | `{"detail": "…"}` | `PUT`, `DELETE` va boshqa yo‘q metodlar |
+| 409 | `{"detail": "…", "code": "<kod>", …}` | Biznes qoidasi: `idempotency_conflict`, `material_has_history`, `insufficient_stock` (+ `available`, `requested`), `batch_insufficient` (+ `batch_id`) |
+
+Haqiqiy 409 namunasi (`Accept-Language: ru`):
 
 ```json
-{
-  "error": {
-    "code": "validation_error",
-    "message": "Ma’lumotlarda xato bor.",
-    "fields": {
-      "quantity": [{"code": "min_value", "message": "0 dan katta bo‘lishi kerak."}]
-    }
-  }
-}
+{"detail": "На складе недостаточно материала.", "code": "insufficient_stock", "available": "10.00", "requested": "99.00"}
 ```
-
-| HTTP | `code` | Qachon |
-|---|---|---|
-| 400 | `validation_error` | Maydon xatosi. Tafsiloti `fields` ichida. Umumiy xato `fields.non_field_errors` da keladi. |
-| 403 | `not_authenticated` | Sessiya yo‘q yoki tugagan (SessionAuthentication). |
-| 403 | `permission_denied` | Rolda bu amalga ruxsat yo‘q. |
-| 404 | `not_found` | Manzildagi yozuv yo‘q. |
-| 405 | `method_not_allowed` | Masalan, `DELETE` qo‘llab-quvvatlanmaydi. |
-| 409 | `idempotency_conflict`, `material_has_history`, `insufficient_stock` | Biznes qoidasi bilan to‘qnashuv. Quyida batafsil yozilgan. |
-
-Bu shakl uchun `settings.py` ga umumiy `EXCEPTION_HANDLER` qo‘shiladi. Sozlama umumiy bo‘lgani uchun Jamoliddin ko‘rib chiqadi. Kelishilmasa, DRF’ning standart `{"field": ["xabar"]}` shakli qoladi. U holda frontend ikki xil shaklni o‘qishiga to‘g‘ri keladi.
 
 ## 2. Ruxsatlar
 
-OQ-037 ga ko‘ra rollar admin tomonidan erkin yaratiladi. Shuning uchun API rol nomini emas, **ruxsat kodini** tekshiradi (Django `permission`). Rol va ruxsatni bog‘lash — Jamoliddinning `accounts` ishi. **[Kelishish: Jamoliddin]**
+OQ-037 ga ko‘ra rollar admin tomonidan erkin yaratiladi. Shuning uchun API rol nomini emas, **ruxsat kodini** tekshiradi: kod `Role.permissions` ro‘yxatida bo‘lishi kerak (`accounts.permissions.HasPermissionCode`, [auth-api.md](auth-api.md)). Admin roli `*` bilan hammasini oladi.
 
 | Ruxsat kodi | Nima beradi | Admin | Ombor mas’uli | Ishlab chiqarish nazoratchisi |
 |---|---|---|---|---|
@@ -62,11 +56,12 @@ OQ-037 ga ko‘ra rollar admin tomonidan erkin yaratiladi. Shuning uchun API rol
 | `catalog.add_material`, `catalog.change_material` | Material qo‘shish va tahrirlash | ✓ | ✓ | — |
 | `inventory.view_stock` | Qoldiq miqdori va harakatlar tarixi | ✓ | ✓ | ✓ |
 | `inventory.add_receipt` | Kirim yozish | ✓ | ✓ | — |
+| `inventory.add_issue` | Chiqim yozish ([issues-api.md](issues-api.md)) | ✓ | ✓ | — |
 | `inventory.view_purchase_price` | Narx, summa va valyuta maydonlarini ko‘rish | ✓ | ✓ | — |
 | `inventory.change_min_quantity` | Minimal qoldiq chegarasini belgilash (OQ-014) | ✓ | — | — |
 
-Rollar jadvali OQ-038 va OQ-041 asosida tuzilgan boshlang‘ich taklif. Admin uni keyin o‘zgartira oladi.
-Agar foydalanuvchida `inventory.view_purchase_price` bo‘lmasa, server narx maydonlarini (`total_amount`, `unit_price`, `currency`, `value_by_currency`) javobdan **olib tashlaydi**. Ular `null` bilan to‘ldirilmaydi. Bu ruxsat frontendda emas, serverda tekshiriladi.
+Rollar jadvali OQ-038 va OQ-041 asosidagi tavsiya. `auth-api.md` dagi standart `WAREHOUSE_MANAGER` rolida hozir `catalog.view_material`, `catalog.add_material`, `catalog.change_material`, `inventory.view_stock`, `inventory.add_receipt`, `inventory.view_purchase_price` bor; `inventory.add_issue` va `inventory.change_min_quantity` ni admin beradi.
+Agar foydalanuvchida `inventory.view_purchase_price` bo‘lmasa, server narx maydonlarini (`total_amount`, `unit_price`, `currency`, `value_by_currency`, chiqimda `total_cost`) javobdan **olib tashlaydi** — kirim, qoldiq, partiyalar, chiqim, qaytarish, hisobdan chiqarish va tarixning hammasida (`tests/test_warehouse_ledger.py`). Ular `null` bilan to‘ldirilmaydi. Bu ruxsat frontendda emas, serverda tekshiriladi.
 
 ## 3. Katalog API’si · PCRM-39
 
@@ -118,9 +113,9 @@ Tekshiruvlar (PR #11 dagi baza cheklovlari bilan bir xil):
 
 - `unit`: `sheet`, `piece`, `kg`, `liter`, `meter`, `m2`. «list/dona» masalasi PR #11 da ochiq.
 - O‘lchamlar santimetrda. Berilsa, `> 0` bo‘lishi va verguldan keyin ko‘pi bilan 2 xona bo‘lishi kerak.
-- Bir xil material (kategoriya + nom + rang + o‘lchamlar + birlik) takrorlansa `400`, `code = "material_duplicate"`. Javobda `existing_id` ham keladi, shunda forma «mavjud materialni tanlash»ni taklif qila oladi.
-- Faol bo‘lmagan kategoriyaga material qo‘shib bo‘lmaydi: `400`, `fields.category_id[0].code = "category_inactive"`.
-- Kirimi bor materialning `unit` yoki o‘lchamlarini o‘zgartirish taqiqlanadi: `409`, `code = "material_has_history"`. Aks holda eski partiyalar boshqa o‘lchovga tegishli bo‘lib qoladi. Nom, rang va `is_active` o‘zgartirilishi mumkin.
+- Bir xil material (kategoriya + nom + rang + o‘lchamlar + birlik) takrorlansa `400`: `{"non_field_errors": ["…"], "existing_id": 1}`. Forma «mavjud materialni tanlash»ni taklif qila oladi.
+- Faol bo‘lmagan kategoriyaga material qo‘shib bo‘lmaydi: `400`, `{"category_id": ["…"]}`.
+- Kirimi bor materialning `unit` yoki o‘lchamlarini o‘zgartirish taqiqlanadi: `409`, `{"detail": "…", "code": "material_has_history"}`. Aks holda eski partiyalar boshqa o‘lchovga tegishli bo‘lib qoladi. Nom, rang va `is_active` o‘zgartirilishi mumkin.
 - `DELETE` qo‘llab-quvvatlanmaydi: `405`.
 
 ## 4. Kirim API’si · PCRM-40
@@ -149,7 +144,7 @@ Sarlavha: `Idempotency-Key: 6f1c2a1e-6f0b-4b3e-9d0e-4f6b8a1d2c33` (UUID, **majbu
 | `received_on` | ha | Kelajak sana bo‘lishi mumkin emas (`date_in_future`). |
 | `quantity` | ha | `> 0`, verguldan keyin ko‘pi bilan 2 xona. **[PM: P3]** |
 | `total_amount` | ha | Hujjatdagi umumiy summa. `> 0`, verguldan keyin ko‘pi bilan 2 xona. |
-| `currency` | ha | Faqat `USD`. Boshqa kod 400 validation_error bilan rad etiladi, fields.currency ichida invalid_choice qaytadi. |
+| `currency` | ha | Faqat `USD`. Boshqasi `400`: `{"currency": ["\"EUR\" is not a valid choice."]}`. |
 | `supplier` | yo‘q | 200 belgigacha (OQ-004: majburiy emas). |
 | `document_number` | yo‘q | 100 belgigacha (OQ-004: majburiy emas). |
 | `note` | yo‘q | 500 belgigacha. |
@@ -187,10 +182,10 @@ Javob `201 Created`:
 |---|---|
 | Kalit yangi | Kirim yoziladi, `201`. |
 | Kalit va tana avvalgisi bilan bir xil | Yangi yozuv yaratilmaydi. Birinchi javob `200` bilan qaytadi. |
-| Kalit bir xil, tana boshqacha | `409`, `code = "idempotency_conflict"`. |
-| Kalit yo‘q yoki UUID emas | `400`, `code = "idempotency_key_required"`. |
+| Kalit bir xil, tana boshqacha | `409`, `{"detail": "…", "code": "idempotency_conflict"}`. |
+| Kalit yo‘q yoki UUID emas | `400`, `{"idempotency_key": ["…"]}`. |
 
-Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o‘zgartirmaydi. Kalit 24 soat saqlanadi. Chiqim API’si ham shu qoidaga amal qiladi (muhandislik rejasi, PCRM-44).
+Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o‘zgartirmaydi. Kalit 24 soat saqlanadi; kalit har foydalanuvchi va manzil uchun alohida. Xato (400) bilan tugagan so‘rov kalitni band qilmaydi. Chiqim API’si ham shu qoidaga amal qiladi.
 
 ### 4.2 Kirimlarni ko‘rish
 
@@ -242,7 +237,7 @@ Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o�
 
 ## 6. Ombor moduli chegarasi · Akbar uchun
 
-**[Kelishish: Akbar (@thealiiheere), Shamsiddin]** Kirim (Ozodbek) va chiqim/qaytarish/hisobdan chiqarish (Akbar) bitta `inventory` Django ilovasida, bitta qoldiq manbaida ishlaydi.
+**Kelishilgan va kodda:** kirim (Ozodbek) va chiqim (Akbar, PR #34) bitta `inventory` ilovasida, bitta `StockBalance` qoldig‘ida ishlaydi; alohida qoldiq modeli yo‘q. Chiqim, qaytarish va hisobdan chiqarish hujjatlari — Akbarning modellari (PR #34, #35; [issues-api.md](issues-api.md), [returns-write-offs-api.md](returns-write-offs-api.md)).
 
 | Model | Asosiy maydonlar | Kim yozadi |
 |---|---|---|
@@ -256,22 +251,27 @@ Baza cheklovlari: `quantity_on_hand >= 0` va `0 <= quantity_remaining <= quantit
 **Umumiy xizmat funksiyalari** (`inventory/services.py`). Qoldiqni faqat shular o‘zgartiradi, view yoki serializer to‘g‘ridan-to‘g‘ri o‘zgartirmaydi:
 
 ```python
+def locked_balance(material) -> StockBalance: ...  # qoldiq qatorini qulflaydi
+def ensure_available(balance, quantity) -> None: ...  # yetmasa InsufficientStockError
 def receive(
     *, material, received_on, quantity, total_amount, user, currency="USD", **extra
 ) -> tuple[Batch, StockBalance]: ...
 def decrease(
-    *, material, quantity, movement_type, user, reference, reason="", allocations=None
-) -> list[StockMovement]: ...
+    *, material, quantity, movement_type, user, reference, allocations, reason=""
+) -> list[StockMovement]: ...  # Akbar, PR #34
 def increase(
     *, material, quantity, movement_type, user, reference, batch, reason=""
-) -> StockMovement: ...
+) -> StockMovement: ...  # Akbar, PR #35 (qaytarish)
 ```
 
-- Uchala funksiya `StockBalance` qatorini `select_for_update()` bilan qulflaydi. Shu sabab bir vaqtdagi ikki chiqim qoldiqni manfiyga tushira olmaydi (muhandislik rejasidagi «10 tadan 7 + 7» sinovi).
-- Qoldiq yetmasa, `decrease` umumiy `services.ensure_available(balance, quantity)` orqali `InsufficientStockError(available, requested)` ko‘taradi (PCRM-42 da tayyor). API uni `409`, `code = "insufficient_stock"` va `"available": "3.00"` bilan qaytaradi.
+- Tartib hamma joyda bir xil: avval `locked_balance()` (qoldiq qatori `select_for_update()`), keyin partiyalar `id` tartibida qulflanadi — parallel so‘rovlar navbat bilan bajariladi va bir-birini to‘sib qo‘ymaydi.
+- Qoldiq tekshiruvi bitta joyda: `decrease()` ichida `ensure_available()`. Yetmasa `InsufficientStockError(available, requested)` → API `409 insufficient_stock`; tanlangan partiyada yetmasa `BatchUnavailableError` → `409 batch_insufficient`. Ikkala holatda tranzaksiya to‘liq ortga qaytadi.
+- Harakat `reference_kind`: `receipt` (kirim id), `issue` (chiqim id), `return` (qaytarish id), `write_off` (hisobdan chiqarish id). Qaytarish va hisobdan chiqarish qoldiqni faqat tasdiqdan keyin o‘zgartiradi (OQ-003, OQ-007). Chiqim har partiya qismi uchun bitta manfiy harakat yozadi.
 - `allocations` — qaysi partiyadan qancha olinishi. Tanlash qoidasi PM qaroriga bog‘liq. **[PM: P1]** Qaror chiqquncha xizmat partiyalarni ichida tanlamaydi: chaqiruvchi taqsimotni aniq beradi yoki bitta partiyani ko‘rsatadi.
 
-## 7. Avtomatik sinovlar (PCRM-40 va PCRM-42 da yoziladi)
+## 7. Avtomatik sinovlar (hammasi yozilgan va CI’da o‘tadi)
+
+Fayllar: `tests/test_inventory_receipts.py`, `tests/test_inventory_stock.py`, `tests/test_inventory_issues.py`, `tests/test_warehouse_ledger.py`, `tests/test_pcrm50_acceptance.py`.
 
 1. Bir materialga ikki xil narxda kirim qilinadi → ikki partiya hosil bo‘ladi, `quantity_on_hand` ikkalasining yig‘indisiga teng, tarixda ikkita `receipt` harakati bor.
 2. Bir xil `Idempotency-Key` va tana bilan ikki marta POST yuboriladi → bitta partiya, ikkinchi javob `200`. Kalit bir xil, `quantity` boshqa bo‘lsa → `409`.
@@ -281,7 +281,8 @@ def increase(
 6. Faol bo‘lmagan material, kelajak sana, `quantity = 0` → `400` va to‘g‘ri `code`.
 7. Kirimi bor materialning `unit` maydonini o‘zgartirish → `409 material_has_history`.
 8. Kirim ichida xato yuzaga keladi (masalan, harakat yozilmaydi) → partiya ham, qoldiq o‘zgarishi ham saqlanmaydi.
-9. PostgreSQL’da ikki alohida ulanish bilan bir vaqtda `decrease` chaqiriladi → bittasi o‘tadi, ikkinchisi `InsufficientStock` beradi (Akbar bilan birga, PCRM-42/44).
+9. PostgreSQL’da ikki alohida ulanishdan bir vaqtda 7 tadan chiqim (qoldiq 10) → bittasi `201`, ikkinchisi `409`, qoldiq va partiya 3, chiqim hujjati bitta (`test_parallel_issues_never_make_stock_negative`).
+12. Kirim → chiqim → qoldiq: qoldiq = ochiq partiyalar yig‘indisi = harakatlar yig‘indisi; rad etilgan chiqim hech narsani o‘zgartirmaydi; qaytarish va hisobdan chiqarish tasdiqdan keyin shu hisobni yuritadi; narx ruxsatisiz foydalanuvchi 11 ta ombor endpointida birorta narx maydonini olmaydi (`test_warehouse_ledger.py`).
 
 10. USD qabul qilinadi, EUR kabi boshqa valyuta kodi rad etiladi.
 11. Interfeysdagi uz/ru/en tanlovi saqlanadi. API xabarlari so‘ralgan tilga mos qaytadi, summa har uchala tilda USD bo‘lib qoladi.
@@ -300,4 +301,4 @@ Bu savollar javobi chiqquncha shartnomadagi tegishli qism taklif sifatida qoladi
 
 ## 9. Bu versiyaga kirmaganlar
 
-Chiqim, qaytarish, hisobdan chiqarish va xarajatlar API’si (Akbar, PCRM-44–46). Login va rol boshqaruvi (Jamoliddin). Xabarnomalar. Loyiha va ishchi havolalari: ular keyingi bosqichda bo‘lgani uchun `StockMovement.reference_kind/reference_id` orqali ulanadi, to‘g‘ridan-to‘g‘ri bog‘lanmaydi. Birliklar orasidagi konvertatsiya (OQ-005).
+Login va rol boshqaruvi (Jamoliddin). Minimal chegaradan pastga tushganda xabarnoma (OQ-014) — alohida vazifa. Loyiha va ishchi havolalari: ular keyingi bosqichda bo‘lgani uchun `StockMovement.reference_kind/reference_id` orqali ulanadi, to‘g‘ridan-to‘g‘ri bog‘lanmaydi. Birliklar orasidagi konvertatsiya (OQ-005).

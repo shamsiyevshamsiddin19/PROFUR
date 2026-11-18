@@ -1,0 +1,121 @@
+# PROFUR · ombor chiqimi (PCRM-44) tarjimalari.
+# Manba tili — o'zbekcha (lotin).
+msgid ""
+msgstr ""
+"Project-Id-Version: profur-inventory\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "chiqim"
+msgstr "расход"
+
+msgid "chiqimlar"
+msgstr "расходы"
+
+msgid "chiqim sanasi"
+msgstr "дата расхода"
+
+msgid "kim oldi"
+msgstr "получатель"
+
+msgid "loyiha raqami"
+msgstr "номер проекта"
+
+msgid "chiqim partiyasi"
+msgstr "партия расхода"
+
+msgid "chiqim partiyalari"
+msgstr "партии расхода"
+
+msgid "Chiqim sanasi kelajakda bo'lishi mumkin emas."
+msgstr "Дата расхода не может быть в будущем."
+
+msgid "Bitta partiya ikki marta ko'rsatilgan."
+msgstr "Одна и та же партия указана дважды."
+
+msgid "Partiya bu materialga tegishli emas: {ids}."
+msgstr "Партия не относится к этому материалу: {ids}."
+
+msgid "Partiyada yetarli miqdor qolmagan."
+msgstr "В партии недостаточно остатка."
+
+msgid "Omborda yetarli material yo'q."
+msgstr "На складе недостаточно материала."
+
+msgid "Butun son bo'lishi kerak."
+msgstr "Должно быть целым числом."
+
+msgid "kutilmoqda"
+msgstr "ожидает"
+
+msgid "tasdiqlangan"
+msgstr "одобрено"
+
+msgid "rad etilgan"
+msgstr "отклонено"
+
+msgid "holati"
+msgstr "статус"
+
+msgid "qaror qilgan"
+msgstr "решение принял"
+
+msgid "qaror vaqti"
+msgstr "время решения"
+
+msgid "qaror izohi"
+msgstr "комментарий к решению"
+
+msgid "qaytarish"
+msgstr "возврат"
+
+msgid "qaytarishlar"
+msgstr "возвраты"
+
+msgid "asl chiqim"
+msgstr "исходный расход"
+
+msgid "qaytarilgan sana"
+msgstr "дата возврата"
+
+msgid "sabab"
+msgstr "причина"
+
+msgid "qaytarish partiyasi"
+msgstr "партия возврата"
+
+msgid "qaytarish partiyalari"
+msgstr "партии возврата"
+
+msgid "hisobdan chiqarish"
+msgstr "списание"
+
+msgid "hisobdan chiqarishlar"
+msgstr "списания"
+
+msgid "hisobdan chiqarish partiyasi"
+msgstr "партия списания"
+
+msgid "hisobdan chiqarish partiyalari"
+msgstr "партии списания"
+
+msgid "Qaytarish sanasi kelajakda bo'lishi mumkin emas."
+msgstr "Дата возврата не может быть в будущем."
+
+msgid "Partiya asl chiqimda yo'q: {ids}."
+msgstr "Партии нет в исходном расходе: {ids}."
+
+msgid "Qaytarish sanasi chiqim sanasidan oldin bo'lmasin."
+msgstr "Дата возврата не может быть раньше даты расхода."
+
+msgid "So'rov bo'yicha boshqa qaror qabul qilingan."
+msgstr "По заявке уже принято другое решение."
+
+msgid "Qaytarish asl chiqimning qaytarilmagan qismidan oshadi."
+msgstr "Возврат превышает невозвращённую часть исходного расхода."
+
+msgid "Noma'lum holat."
+msgstr "Неизвестный статус."

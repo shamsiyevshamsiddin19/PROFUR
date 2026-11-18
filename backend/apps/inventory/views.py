@@ -22,16 +22,31 @@ from rest_framework.response import Response
 
 from . import services
 from .models import Batch, IdempotencyKey
-from .serializers import ReceiptCreateSerializer, ReceiptSerializer
+from .serializers import (
+    ReceiptCreateSerializer,
+    ReceiptSerializer,
+    replay_body_for_user,
+)
 
 RECEIPTS_ENDPOINT = "receipts:create"
 IDEMPOTENCY_TTL = timedelta(hours=24)
 
 
 class IdempotencyConflictError(APIException):
+    """409: shu kalit boshqa tana bilan ishlatilgan.
+
+    Javob boshqa 409 xatolar bilan bir xil: ``{"detail": "…", "code": "…"}``.
+    """
+
     status_code = status.HTTP_409_CONFLICT
     default_detail = _("Bu kalit boshqa so'rov uchun ishlatilgan.")
     default_code = "idempotency_conflict"
+
+    def __init__(self):
+        code = self.default_code
+        super().__init__(
+            {"detail": ErrorDetail(str(self.default_detail), code), "code": code}
+        )
 
 
 def idempotency_key(request: Request) -> uuid.UUID:
@@ -145,4 +160,7 @@ class ReceiptViewSet(
             return None
         if record.request_hash != fingerprint:
             raise IdempotencyConflictError()
-        return Response(record.response_body, status=status.HTTP_200_OK)
+        return Response(
+            replay_body_for_user(record.response_body, request.user),
+            status=status.HTTP_200_OK,
+        )

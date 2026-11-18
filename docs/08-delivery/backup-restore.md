@@ -95,3 +95,8 @@ Lokal PostgreSQL serverida quyidagi mashq o'tkazildi va muvaffaqiyatli tasdiqlan
 * `pg_restore` yordamida barcha jadvallar tiklandi.
 * `catalog_category` (9 ta) va `expenses_expensetype` (3 ta) yozuvlari to'liq va o'zgarishsiz tiklanganligi tasdiqlandi.
 * Test bazasi `DROP DATABASE` bilan tozalab tashlandi.
+
+
+## Qabul va joylashtirish chegarasi
+
+OQ-046: zaxira har kuni olinishi, tiklash maqsadi 4 soat bo‘lishi kerak. Retention/RPO qiymatlari aniqlashtiriladi. Yuqoridagi buyruqlar yo‘riqnoma; production’da rejalashtirilgan backup ishlayotgani yoki ushbu ko‘rikda restore bajarilgani haqidagi dalil emas. Muallif qayd etgan lokal drill natijasi bilan production qabuli alohida tekshiriladi. Real bazada qo‘shimcha kategoriya/xarajat turlari bo‘lishi mumkin; 9/3 soni boshlang‘ich muhitga tegishli.

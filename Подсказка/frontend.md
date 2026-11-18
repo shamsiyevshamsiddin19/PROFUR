@@ -17,7 +17,7 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 | [PCRM-48](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-48) | Responsive ekran tuzilmasi, navigatsiya va UZ/RU/EN | Ko‘rikda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17) |
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Material katalogi UI | Reja | — |
 | [PCRM-41](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-41) | Kirim formasi va API integratsiyasi | Jarayonda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17), kirim backendiga bog‘liq |
-| [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Reja | — |
+| [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Jarayonda | Ozodbekning `/api/v1/stock/` API'si frontendga ulandi |
 | [PCRM-45](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-45) | Chiqim, qaytarish va tasdiqlash ekranlari | Reja | — |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Tarix va hisobot UI | Reja | — |
 
@@ -75,3 +75,34 @@ Foydalanuvchi so‘roviga ko‘ra kirish sahifasidagi oltin qutilar tasviri butu
 Foydalanuvchi oq fon saqlanishini va tizim ranglari/dizayn kamchiliklari tuzatilishini so‘radi. Safir ko‘k asosiy amallar, grafit matn va neytral status tizimi tanlandi. Mayda yozuvlar, maydon chegarasi kontrasti, takroriy bezaklar, mobil yorliq tekisligi va sana maydoni tuzatildi. Mobil menyu logout/login holati ham yopildi; yangi regressiya sinovi qo‘shildi. Rang va boshqaruv o‘lchamlari uchun Atlassian/W3C manbalari o‘rganilib, vizual uslubga kiritildi. Biznes/API o‘zgarmadi.
 
 Dalil: build va 4 frontend testi; matn/fon hamda boshqaruv/fon kontrast hisoblari; brauzerda 320/768 px va desktop, uz/ru/en, mobil menyu va maydon joylashuvi. Keyingi UI ishlarida yangi vizual uslubga tayaning.
+
+## PCRM-43 · Ozodbekning Qoldiq (Stock) API'siga frontendni ulash · 2026-11-18
+
+Frontend qoldiq ekrani (`#stock`) Ozodbek yaratgan `/api/v1/stock/` API'siga to‘liq ulandi.
+- Jadvalda har bir material qoldig‘i, ochiq partiyalar soni (`open_batches`), minimal chegara (`min_quantity`) va umumiy qiymati (`value_by_currency`) ko‘rsatiladi.
+- Agar qoldiq minimal chegaradan past bo‘lsa (`is_below_min: true`), «Kam qoldiq» (Low stock) ogohlantiruvchi badge chiqadi.
+- Qidiruv va «Faqat kam qolganlar» (`below_min=true`) filtri qo‘shildi.
+- Narx ko‘rish ruxsati bo‘lmaganda qiymat xatosiz yashiriladi (OQ-041).
+- Avtomatik sinovlar (`App.test.tsx` 6 ta test) va TypeScript build to‘liq o‘tdi.
+
+## Ombor ekranlari · 2026-11-18 · PCRM-39/43/45/47/48
+
+Holat: **Ko‘rikda**. Issue #38; `feat/PCRM-45-warehouse-workflows` branch.
+
+Material/kategoriya yaratish, tahrirlash va faolsizlantirish; qoldiqdan partiya tafsiloti va minimal chegara; chiqim, asl chiqimga qaytarish va hisobdan chiqarish so‘rovi/tasdiq/rad; loyiha xarajatlari va sababli teskari/to‘g‘ri yozuv; sana/material/amal filtrli tarix va barcha sahifalardan CSV eksporti qo‘shildi. Partiyani foydalanuvchi tanlaydi; FIFO yoki boshqa ochiq PM algoritmi tasdiqlangan deb qo‘llanmadi. Superuser belgisi auth javobida faqat o‘qiladi. Qolgan backend chegaralari buzilmadi.
+
+Barcha yangi matnlar uz/ru/en, barcha pul USD. Noma’lum chiqim/qaytarish/hisobdan chiqarish javobi ayni kalit va tana bilan qayta tiklanadi. Xarajat yaratish API’sida idempotency bo‘lmagani uchun noma’lum javobdan keyin ro‘yxatni tekshirish ko‘rsatiladi. Jadval surilishi uning konteyneri ichida.
+
+Dalil: TypeScript build va 9 frontend testi; Ruff va diff tekshiruvi. Alohida lokal bazada brauzer orqali material → 20 kirim → 7 chiqim → 2 qaytarish tasdig‘i → 1 hisobdan chiqarish tasdig‘i, $12.50 xarajat va −$12.50 teskari yozuv bajarildi. CI real Chromium ssenariysi shu amallar, tarix va CSV yuklashgacha kengaytirildi. Yakuniy PostgreSQL/Chromium CI dalili PR’da tekshiriladi. PM/buyurtmachi qabuli va ochiq algoritm qarorlari tugamaguncha 1-qism avtomatik Done qilinmaydi.
+
+
+### PR #39 · yakuniy integratsiya yangilanishi
+
+Ozodbekning #37/#40 va Akbarning #41 PR’lari ko‘rikdan o‘tib main’ga qo‘shildi. Xarajat yaratish va teskari yozuv ham frontendda Idempotency-Key, sessiyada tana/kalitni saqlash va ayni so‘rovni davom ettirishga ulandi; oldingi «xarajat API’sida idempotency yo‘q» cheklovi #41 bilan bartaraf etildi. Formadagi yorliqlar boshqaruvlarga alohida bog‘landi, tanlov variantlari yorliq matniga aralashmaydi. Build va 10 frontend testi o‘tdi; yakuniy integratsiya CI’si kutilmoqda.
+
+
+## PR #39 main’da · 2026-11-18
+
+PR #39 `36787ec` bilan main’ga birlashdi. Tekshirilgan head: `4f9df46`. CI’da 206 backend testi (PostgreSQL), 10 frontend testi va haqiqiy Chromium/Django ombor ssenariysi o‘tdi. Ozodbekning #37/#40 va Akbarning #41 ishlari ko‘rikdan o‘tib main’da. Jira PCRM-39/41/43/45/47/48 — yakuniy mezon tekshiruvi sabab Jarayonda.
+
+PCRM-43 mezonini to‘liq yopish uchun kichik ekranda qoldiq jadvali bitta DOM asosidagi kartalarga o‘tkazildi (kategoriya, birlik, miqdor, min. chegara, qiymat va partiyalar), kategoriya filtri qo‘shildi. Partiya/minimal chegara oynasi saqlanadi. Takroriy satrlar yo‘q; narx ruxsati API tomonidan boshqariladi. Browser ssenariysiga kategoriya filtri va min. chegara qo‘shildi. Build va 10 frontend testi o‘tdi; shu qo‘shimchaning CI’si kutilmoqda.

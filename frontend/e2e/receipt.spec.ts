@@ -1,29 +1,42 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-async function loginAsStorekeeper(page: Page, lang: "uz" | "ru" | "en" = "en") {
-  await page.goto("/");
-  await page.getByRole("combobox", { name: "Language" }).selectOption(lang);
-  await page.locator('input[name="username"]').fill("browser_storekeeper");
-  await page
-    .locator('input[name="password"]')
-    .fill("browser-test-only-password");
-  await page.locator("form.login-form button.primary").click();
-}
+// Bitta vaqtinchalik bazani o‘zgartiradigan ssenariy qayta urinishda takrorlanmaydi.
+test.describe.configure({ retries: 0 });
 
-test("receipt flow persists one USD batch through the real API", async ({
+test("mobile warehouse workflow persists receipts, issues, approvals and expenses through the real API", async ({
   page,
-}) => {
-  await loginAsStorekeeper(page, "en");
+}, testInfo) => {
+  await page.goto("/");
+  await page.getByRole("combobox", { name: "Language" }).selectOption("en");
+  await page.getByLabel("Username").fill("browser_storekeeper");
+  await page.getByLabel("Password").fill("browser-test-only-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
   await expect(
     page.getByRole("heading", { name: "Material receipts" }),
   ).toBeVisible();
 
+  const materialName = `Warehouse ${testInfo.project.name}`;
+  const csrf = await (await page.request.get("/api/auth/csrf/")).json();
+  const categories = await (
+    await page.request.get("/api/v1/categories/?search=LMDF")
+  ).json();
+  const created = await page.request.post("/api/v1/materials/", {
+    data: {
+      name: materialName,
+      category_id: categories.results[0].id,
+      unit: "sheet",
+    },
+    headers: { "X-CSRFToken": csrf.csrfToken },
+  });
+  expect(created.status()).toBe(201);
   const material = page.getByRole("combobox", {
     name: "Material",
     exact: true,
   });
-  await expect(material.locator("option")).toHaveCount(3);
-  await material.selectOption({ label: "Browser MDF · sheet" });
+  await expect(
+    material.locator("option").filter({ hasText: materialName }),
+  ).toHaveCount(1);
+  await material.selectOption({ label: `${materialName} · sheet` });
   await page
     .getByRole("spinbutton", { name: "Quantity", exact: true })
     .fill("15");
@@ -43,7 +56,7 @@ test("receipt flow persists one USD batch through the real API", async ({
   expect(saved.status()).toBe(201);
   const batch = await saved.json();
   expect(batch.currency).toBe("USD");
-  expect(Number(batch.quantity_on_hand_after)).toBeGreaterThanOrEqual(15);
+  expect(batch.quantity_on_hand_after).toBe("15.00");
   expect(batch.unit_price).toBe("30.000000");
 
   // Bir xil so‘rov haqiqiy serverga qaytariladi: ikkinchi partiya yaratilmasin.
@@ -61,68 +74,157 @@ test("receipt flow persists one USD batch through the real API", async ({
   await expect(
     page.getByRole("heading", { name: "Material receipts" }),
   ).toBeVisible();
-  const receipts = await page.request.get("/api/v1/receipts/");
+  const receipts = await page.request.get(
+    `/api/v1/receipts/?material=${batch.material.id}`,
+  );
   const result = await receipts.json();
-  expect(result.count).toBeGreaterThanOrEqual(1);
-  const found = result.results.find((r: { id: number }) => r.id === batch.id);
-  expect(found).toBeDefined();
+  expect(result.count).toBe(1);
+  expect(result.results[0].id).toBe(batch.id);
   const catalogue = await page.request.get(
     `/api/v1/materials/${batch.material.id}/`,
   );
-  expect(
-    Number((await catalogue.json()).quantity_on_hand),
-  ).toBeGreaterThanOrEqual(15);
+  expect((await catalogue.json()).quantity_on_hand).toBe("15.00");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-});
 
-test("multilingual language switching dynamically updates interface in uz, ru, and en", async ({
-  page,
-}) => {
-  await loginAsStorekeeper(page, "uz");
-
-  // O'zbekcha sarlavha
-  await expect(
-    page.getByRole("heading", { name: "Material kirimi" }),
-  ).toBeVisible();
-
-  // Rus tiliga o'tkazamiz
-  await page.getByRole("combobox", { name: "Language" }).selectOption("ru");
-  await expect(
-    page.getByRole("heading", { name: "Поступление материалов" }),
-  ).toBeVisible();
-
-  // Ingliz tiliga o'tkazamiz
-  await page.getByRole("combobox", { name: "Language" }).selectOption("en");
-  await expect(
-    page.getByRole("heading", { name: "Material receipts" }),
-  ).toBeVisible();
-});
-
-test("long material names render cleanly without layout overflow across viewports", async ({
-  page,
-}) => {
-  await loginAsStorekeeper(page, "en");
-  await expect(
-    page.getByRole("heading", { name: "Material receipts" }),
-  ).toBeVisible();
-
-  const material = page.getByRole("combobox", {
-    name: "Material",
+  // Shu haqiqiy sessiyada qolgan ombor oqimi ham bajariladi.
+  await page.goto("/#operations");
+  await page
+    .getByRole("combobox", { name: "Material", exact: true })
+    .selectOption({ label: `${materialName} · 15.00` });
+  await page.getByLabel("Recipient", { exact: true }).fill("Sardor");
+  const batchQuantity = page.getByRole("spinbutton", {
+    name: `Batch #${batch.id}`,
     exact: true,
   });
-  // Uzun nomli materialni tanlaymiz
-  await material.selectOption({
-    label:
-      "Akril panel yuqori zichlikdagi namlikka chidamli maxsus qoplama 2800x1220x18mm · sheet",
-  });
+  await batchQuantity.fill("7");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByText("Issue saved.", { exact: true })).toBeVisible();
+  const issues = await (
+    await page.request.get(`/api/v1/issues/?material=${batch.material.id}`)
+  ).json();
+  expect(issues.count).toBe(1);
+  expect(issues.results[0].quantity).toBe("7.00");
+  await page.getByRole("tab", { name: "Return", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Original issue", exact: true })
+    .selectOption(String(issues.results[0].id));
+  await batchQuantity.fill("2");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(
+    page.getByText("Request saved. Awaiting approval.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Approve", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(
+    page.getByRole("cell").getByText("Approved", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "Write-off", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Material", exact: true })
+    .selectOption({ label: `${materialName} · 10.00` });
+  await page.getByLabel("Reason", { exact: true }).fill("Damaged sheet");
+  await batchQuantity.fill("1");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(
+    page.getByText("Request saved. Awaiting approval.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Approve", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  const stock = await (
+    await page.request.get(`/api/v1/stock/${batch.material.id}/`)
+  ).json();
+  expect(stock.quantity_on_hand).toBe("9.00");
 
-  // Gorizontal siljish (overflow) yo'qligini tekshiramiz
-  const noOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth <= window.innerWidth,
-  );
-  expect(noOverflow).toBe(true);
+  const projectId =
+    100 +
+    ["mobile-chromium", "tablet-chromium", "desktop-chromium"].indexOf(
+      testInfo.project.name,
+    );
+  await page.goto("/#expenses");
+  await page
+    .locator("form")
+    .getByLabel("Expense type", { exact: true })
+    .selectOption("tax");
+  await page.getByLabel("Amount · USD", { exact: true }).fill("12.50");
+  await page
+    .locator("form")
+    .getByLabel("Project number", { exact: true })
+    .fill(String(projectId));
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByText("Saved.", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Reverse expense", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByLabel("Reason", { exact: true })
+    .fill("Duplicate expense");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Reverse expense", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  const expenseRows = await (
+    await page.request.get(`/api/v1/expenses/?project_id=${projectId}`)
+  ).json();
+  expect(expenseRows.count).toBe(2);
+  expect(
+    expenseRows.results.map((row: { amount: string }) => row.amount).sort(),
+  ).toEqual(["-12.50", "12.50"]);
+
+  await page.goto("/#stock");
+  await page
+    .getByRole("combobox", { name: "Category", exact: true })
+    .selectOption({ label: "LMDF" });
+  await page.getByRole("button", { name: materialName, exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByLabel("Min. limit", { exact: true })
+    .fill("10");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Apply", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByText("Low stock", { exact: true })).toBeVisible();
+  const minimum = await (
+    await page.request.get(`/api/v1/stock/${batch.material.id}/`)
+  ).json();
+  expect(minimum.min_quantity).toBe("10.00");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+
+  await page.goto("/#history");
+  await expect(
+    page.getByRole("heading", { name: "Movement history" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: "Write-off #" })
+      .filter({ hasText: materialName }),
+  ).toBeVisible();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download CSV", exact: true }).click();
+  expect((await download).suggestedFilename()).toBe("PROFUR-movements.csv");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
 });

@@ -22,7 +22,18 @@ const user = {
   username: "operator",
   first_name: "",
   last_name: "",
-  roles: [],
+  roles: [
+    {
+      code: "OPERATOR",
+      name: "Operator",
+      permissions: [
+        "catalog.view_material",
+        "inventory.view_stock",
+        "inventory.add_receipt",
+        "inventory.view_purchase_price",
+      ],
+    },
+  ],
   role_codes: [],
 };
 const material = {
@@ -31,6 +42,19 @@ const material = {
   display_name: "MDF 18 mm",
   unit: "sheet",
   category: { id: 1, name: "MDF" },
+};
+const stockRow = {
+  material: {
+    id: 41,
+    display_name: "MDF 18 mm",
+    unit: "sheet",
+    category: { id: 1, name: "MDF" },
+  },
+  quantity_on_hand: "35.00",
+  open_batches: 2,
+  min_quantity: "50.00",
+  is_below_min: true,
+  value_by_currency: [{ currency: "USD", amount: "990.00" }],
 };
 function response(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -44,6 +68,8 @@ function baseFetch(path: string) {
     return response({ csrfToken: "rotated-token" });
   if (path.startsWith("/api/v1/materials/"))
     return response({ results: [material], count: 1, next: null });
+  if (path.startsWith("/api/v1/stock/"))
+    return response({ results: [stockRow], count: 1, next: null });
   if (path === "/api/v1/receipts/")
     return response({ results: [], next: null, count: 0 });
   return response({}, 404);
@@ -222,4 +248,23 @@ test("receipt component submits one USD request with an idempotency key", async 
   expect(payload.quantity).toBe("15");
   expect(payload.total_amount).toBe("450.00");
   expect(new Headers(writes[0].headers).get("Idempotency-Key")).toBeTruthy();
+});
+
+test("stock screen queries /api/v1/stock/ and displays balances with low stock warning", async () => {
+  localStorage.setItem("profur.language", "en");
+  const calls: string[] = [];
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (path: string) => {
+      calls.push(path);
+      return baseFetch(path);
+    }),
+  );
+  location.hash = "#stock";
+  render(<App />);
+  await screen.findByRole("heading", { name: "Stock" });
+  await screen.findByText("35.00");
+  await screen.findByText("Low stock");
+  await screen.findByText("$990.00");
+  expect(calls.some((p) => p.startsWith("/api/v1/stock/"))).toBe(true);
 });

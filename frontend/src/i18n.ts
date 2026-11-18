@@ -1,7 +1,9 @@
+import { workflowMessages } from "./workflow-i18n";
 export const languages = { uz: "O‘zbekcha", ru: "Русский", en: "English" };
 export type Language = keyof typeof languages;
 
 const messages = {
+  ...workflowMessages,
   warehouse: ["Ombor", "Склад", "Warehouse"],
   receiving: ["Material kirimi", "Поступление материалов", "Material receipts"],
   materials: ["Materiallar", "Материалы", "Materials"],
@@ -113,6 +115,15 @@ const messages = {
     "Barcha hisoblar AQSH dollarida",
     "Все расчёты в долларах США",
     "All amounts in US dollars",
+  ],
+  batches: ["Partiyalar", "Партии", "Batches"],
+  minLimit: ["Min. chegara", "Мин. остаток", "Min. limit"],
+  lowStock: ["Kam qoldiq", "Мало на складе", "Low stock"],
+  stockValue: ["Umumiy qiymati", "Общая стоимость", "Stock value"],
+  belowMinFilter: [
+    "Faqat kam qolganlar",
+    "Только мало на складе",
+    "Below minimum only",
   ],
 } as const;
 

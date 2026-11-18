@@ -32,7 +32,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `${process.env.E2E_PYTHON || "../.venv/bin/python"} e2e/backend.py`,
+      command: `${process.env.E2E_PYTHON || "python3"} e2e/backend.py`,
       url: "http://127.0.0.1:18110/api/health/",
       reuseExistingServer: false,
       timeout: 60_000,

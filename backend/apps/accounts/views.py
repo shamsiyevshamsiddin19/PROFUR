@@ -197,7 +197,9 @@ class UserResetPasswordView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = PasswordResetSerializer(data=request.data)
+        serializer = PasswordResetSerializer(
+            data=request.data, context={"user": target_user}
+        )
         if serializer.is_valid():
             new_password = serializer.validated_data["new_password"]
             target_user.set_password(new_password)
