@@ -42,7 +42,7 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 
 PCRM-38, 39 (API), 40, 42 va 49 bajarildi. 1-qism ombor backendida qolganlar:
 
-1. **PM qarorlari (Team Lead orqali).** P1 — chiqimda partiya tanlash (FIFO taklif). Qaror chiqqach `allocations` ni server o‘zi FIFO bo‘yicha to‘ldiradigan qilinadi (Akbar bilan). P3 — miqdor aniqligi; P5 — xato kirimni tuzatish (`adjustment`).
+1. **PM qarorlari (Team Lead orqali).** P1 — chiqimda partiya tanlash (FIFO taklif). Qaror chiqqach faqat PM tanlagan variant asosida taqsimlash ulanadi (Akbar bilan); FIFO hali tasdiqlanmagan. P3 — miqdor aniqligi; P5 — xato kirimni tuzatish (`adjustment`).
 2. **Minimal chegara xabarnomasi (OQ-014).** Qoldiq chegaradan pastga tushganda admin va mas’ulga xabar — alohida Jira vazifasi kerak.
 3. **Ruxsat kodlari.** Jamoliddin bilan standart rollarga `inventory.add_issue` va `inventory.change_min_quantity` ni berish.
 4. **Frontendni qo‘llab-quvvatlash.** Shamsiddin [topshiriq](../docs/06-api-contract/warehouse-frontend-handoff.md) bo‘yicha savol bersa, javob shaklini o‘zgartirmasdan oldin kelishish.

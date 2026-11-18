@@ -94,3 +94,8 @@ Material/kategoriya yaratish, tahrirlash va faolsizlantirish; qoldiqdan partiya 
 Barcha yangi matnlar uz/ru/en, barcha pul USD. Noma’lum chiqim/qaytarish/hisobdan chiqarish javobi ayni kalit va tana bilan qayta tiklanadi. Xarajat yaratish API’sida idempotency bo‘lmagani uchun noma’lum javobdan keyin ro‘yxatni tekshirish ko‘rsatiladi. Jadval surilishi uning konteyneri ichida.
 
 Dalil: TypeScript build va 9 frontend testi; Ruff va diff tekshiruvi. Alohida lokal bazada brauzer orqali material → 20 kirim → 7 chiqim → 2 qaytarish tasdig‘i → 1 hisobdan chiqarish tasdig‘i, $12.50 xarajat va −$12.50 teskari yozuv bajarildi. CI real Chromium ssenariysi shu amallar, tarix va CSV yuklashgacha kengaytirildi. Yakuniy PostgreSQL/Chromium CI dalili PR’da tekshiriladi. PM/buyurtmachi qabuli va ochiq algoritm qarorlari tugamaguncha 1-qism avtomatik Done qilinmaydi.
+
+
+### PR #39 · yakuniy integratsiya yangilanishi
+
+Ozodbekning #37/#40 va Akbarning #41 PR’lari ko‘rikdan o‘tib main’ga qo‘shildi. Xarajat yaratish va teskari yozuv ham frontendda Idempotency-Key, sessiyada tana/kalitni saqlash va ayni so‘rovni davom ettirishga ulandi; oldingi «xarajat API’sida idempotency yo‘q» cheklovi #41 bilan bartaraf etildi. Formadagi yorliqlar boshqaruvlarga alohida bog‘landi, tanlov variantlari yorliq matniga aralashmaydi. Build va 10 frontend testi o‘tdi; yakuniy integratsiya CI’si kutilmoqda.
