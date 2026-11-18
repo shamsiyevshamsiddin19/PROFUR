@@ -7,6 +7,8 @@ Bu hujjat birinchi oqimni qamraydi: **material yaratish → kirim → qoldiqni k
 
 Kelishish kerak bo‘lgan qismlar **[Kelishish]** belgisi bilan ko‘rsatilgan. PM qaroriga bog‘liq qismlar esa **[PM]** bilan belgilangan va [8-bo‘limda](#8-pmga-ochiq-savollar-team-lead-orqali) jamlangan.
 
+**2026-11-18 · Foydalanuvchining keyingi aniqlashtirishi.** Yagona valyuta USD ($), tizim tillari uz/ru/en. Shu qaror avvalgi ko‘p valyutali taklifni almashtiradi.
+
 ## 1. Umumiy qoidalar
 
 | Mavzu | Qoida |
@@ -130,8 +132,8 @@ Sarlavha: `Idempotency-Key: 6f1c2a1e-6f0b-4b3e-9d0e-4f6b8a1d2c33` (UUID, **majbu
   "material_id": 41,
   "received_on": "2026-11-18",
   "quantity": "20.00",
-  "total_amount": "5400000.00",
-  "currency": "UZS",
+  "total_amount": "540.00",
+  "currency": "USD",
   "supplier": "Egger Tashkent",
   "document_number": "NK-1182",
   "note": ""
@@ -144,7 +146,7 @@ Sarlavha: `Idempotency-Key: 6f1c2a1e-6f0b-4b3e-9d0e-4f6b8a1d2c33` (UUID, **majbu
 | `received_on` | ha | Kelajak sana bo‘lishi mumkin emas (`date_in_future`). |
 | `quantity` | ha | `> 0`, verguldan keyin ko‘pi bilan 2 xona. **[PM: P3]** |
 | `total_amount` | ha | Hujjatdagi umumiy summa. `> 0`, verguldan keyin ko‘pi bilan 2 xona. |
-| `currency` | ha | `UZS` yoki `USD`. **[PM: P2]** |
+| `currency` | ha | Faqat `USD`. Boshqa kod 400 validation_error bilan rad etiladi, fields.currency ichida invalid_choice qaytadi. |
 | `supplier` | yo‘q | 200 belgigacha (OQ-004: majburiy emas). |
 | `document_number` | yo‘q | 100 belgigacha (OQ-004: majburiy emas). |
 | `note` | yo‘q | 500 belgigacha. |
@@ -160,9 +162,9 @@ Javob `201 Created`:
   "received_on": "2026-11-18",
   "quantity": "20.00",
   "quantity_remaining": "20.00",
-  "total_amount": "5400000.00",
-  "unit_price": "270000.000000",
-  "currency": "UZS",
+  "total_amount": "540.00",
+  "unit_price": "27.000000",
+  "currency": "USD",
   "supplier": "Egger Tashkent",
   "document_number": "NK-1182",
   "note": "",
@@ -189,7 +191,7 @@ Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o�
 
 ### 4.2 Kirimlarni ko‘rish
 
-`GET /api/v1/receipts/?material=41&date_from=2026-11-01&date_to=2026-11-30&currency=UZS` — eng yangisi birinchi. Har bir yozuv 4.1 dagi javob bilan bir xil shaklda, faqat `quantity_on_hand_after` maydonisiz qaytadi.
+`GET /api/v1/receipts/?material=41&date_from=2026-11-01&date_to=2026-11-30&currency=USD` — eng yangisi birinchi. Har bir yozuv 4.1 dagi javob bilan bir xil shaklda, faqat `quantity_on_hand_after` maydonisiz qaytadi.
 `GET /api/v1/receipts/{id}/` — bitta kirim.
 `PUT`, `PATCH`, `DELETE` qo‘llab-quvvatlanmaydi (`405`). Xato kirim tuzatish harakati bilan to‘g‘rilanadi. **[PM: P5]**
 
@@ -204,12 +206,12 @@ Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o�
   "open_batches": 2,
   "min_quantity": null,
   "is_below_min": null,
-  "value_by_currency": [{"currency": "UZS", "amount": "9450000.00"}]
+  "value_by_currency": [{"currency": "USD", "amount": "945.00"}]
 }
 ```
 
 - `min_quantity` va `is_below_min` PCRM-42 tayyor bo‘lguncha `null` qaytadi. Minimal chegarani admin belgilaydi (OQ-014).
-- `value_by_currency` qoldiqni har valyuta uchun alohida ko‘rsatadi. Valyutalar bir-biriga qo‘shilmaydi, chunki kurs manbai hali aniqlanmagan. **[PM: P2]**
+- `value_by_currency` faqat USD elementini qaytaradi. Qiymat USD partiya narxlari bo‘yicha hisoblanadi.
 
 `GET /api/v1/stock/{material_id}/batches/` — qoldig‘i bor partiyalar: `id`, `received_on`, `quantity`, `quantity_remaining`, `unit_price`, `currency`. Eng eskisi birinchi keladi. Chiqim formasida partiya tanlash kerak bo‘lsa, shu ro‘yxat ishlatiladi. **[PM: P1]**
 
@@ -248,9 +250,15 @@ Baza cheklovlari: `quantity_on_hand >= 0` va `0 <= quantity_remaining <= quantit
 **Umumiy xizmat funksiyalari** (`inventory/services.py`). Qoldiqni faqat shular o‘zgartiradi, view yoki serializer to‘g‘ridan-to‘g‘ri o‘zgartirmaydi:
 
 ```python
-def receive(*, material, received_on, quantity, total_amount, currency, user, **extra) -> Batch: ...
-def decrease(*, material, quantity, movement_type, user, reference, reason="", allocations=None) -> list[StockMovement]: ...
-def increase(*, material, quantity, movement_type, user, reference, batch, reason="") -> StockMovement: ...
+def receive(
+    *, material, received_on, quantity, total_amount, currency, user, **extra
+) -> Batch: ...
+def decrease(
+    *, material, quantity, movement_type, user, reference, reason="", allocations=None
+) -> list[StockMovement]: ...
+def increase(
+    *, material, quantity, movement_type, user, reference, batch, reason=""
+) -> StockMovement: ...
 ```
 
 - Uchala funksiya `StockBalance` qatorini `select_for_update()` bilan qulflaydi. Shu sabab bir vaqtdagi ikki chiqim qoldiqni manfiyga tushira olmaydi (muhandislik rejasidagi «10 tadan 7 + 7» sinovi).
@@ -269,6 +277,9 @@ def increase(*, material, quantity, movement_type, user, reference, batch, reaso
 8. Kirim ichida xato yuzaga keladi (masalan, harakat yozilmaydi) → partiya ham, qoldiq o‘zgarishi ham saqlanmaydi.
 9. PostgreSQL’da ikki alohida ulanish bilan bir vaqtda `decrease` chaqiriladi → bittasi o‘tadi, ikkinchisi `InsufficientStock` beradi (Akbar bilan birga, PCRM-42/44).
 
+10. USD qabul qilinadi, EUR kabi boshqa valyuta kodi rad etiladi.
+11. Interfeysdagi uz/ru/en tanlovi saqlanadi. API xabarlari so‘ralgan tilga mos qaytadi, summa har uchala tilda USD bo‘lib qoladi.
+
 ## 8. PMga ochiq savollar (Team Lead orqali)
 
 Bu savollar javobi chiqquncha shartnomadagi tegishli qism taklif sifatida qoladi. Qaror qabul qilingach, [qarorlar jurnaliga](../09-decisions/decision-log.md) yoziladi.
@@ -276,7 +287,7 @@ Bu savollar javobi chiqquncha shartnomadagi tegishli qism taklif sifatida qoladi
 | # | Savol | Taklif | Ta’sir |
 |---|---|---|---|
 | P1 | Chiqimda material qaysi partiyadan olinadi: eng eskisidan (FIFO), omborchi tanlaganidan yoki boshqa usulda? (OQ-001 izohi) | Standart holatda FIFO (eng eski `received_on`), omborchi kerak bo‘lsa boshqa partiyani tanlay oladi. | Akbarning chiqim API’si, loyiha tannarxi |
-| P2 | Kirimda qaysi valyutalar ishlatiladi? USD ga o‘tkazish kursi qayerdan va qaysi kunga olinadi? (OQ-004, OQ-016, OQ-034 izohi) | Hozircha `UZS` va `USD`. Kurs kirim paytida saqlanmaydi, keyinchalik hisobotda qo‘llanadi. | Kirim formasi, qoldiq qiymati |
+| P2 · hal qilingan | Yagona valyuta nima? | 2026-11-18 foydalanuvchi qarori — faqat USD ($), kirim va xarajatlar ham USD. | Kirim formasi, qoldiq qiymati |
 | P3 | Miqdor verguldan keyin necha xonagacha bo‘ladi? Masalan, 0.125 kg kley. (OQ-013 dagi «ikki xona» va «yaxlitlamaslik» ziddiyati) | 2 xona. Kerak bo‘lsa, 3 xonaga o‘tish bitta migratsiya bilan bajariladi. | Kirim/chiqim formalari, baza |
 | P4 | «List» va «dona» alohida birliklarmi? (OQ-005) | Alohida birliklar (PR #11). | Katalog |
 | P5 | Noto‘g‘ri yozilgan kirimni kim va qanday tuzatadi? | Admin sabab ko‘rsatib `adjustment` harakati yaratadi. Asl yozuv o‘zgarmaydi. | Kirim, tarix, ruxsatlar |
