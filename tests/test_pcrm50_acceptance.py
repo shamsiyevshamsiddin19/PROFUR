@@ -1,4 +1,4 @@
-"""PCRM-50: Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar.
+"""PCRM-50: API orqali kirimdan qoldiqqacha qabul sinovi va salbiy holatlar.
 
 Ushbu modul muhandislik rejasi (docs/03-architecture/warehouse-engineering-plan.md)
 va 2026-11-18 dagi qarorlar jurnali (yagona USD valyutasi va uz/ru/en tillari)

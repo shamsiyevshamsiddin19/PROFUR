@@ -86,3 +86,7 @@ Thumbs.db
 
 # Vite frontend build
 frontend/dist/
+
+# Browser acceptance test artifacts
+frontend/test-results/
+frontend/playwright-report/

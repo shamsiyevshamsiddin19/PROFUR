@@ -52,3 +52,11 @@ USD qabul qilinishi, boshqa valyuta rad etilishi va uz/ru/en til almashishi bo�
 ## Birlashtirish tekshiruvi · 2026-11-18
 
 PR #11, #12 va #13 bitta integratsiya tarmog‘ida tekshirildi. Katalogning 9 ta boshlang‘ich kategoriyasi migratsiyada qo‘shildi. Login CSRF va uch til sinovlari saqlandi, dinamik ruxsatni berish/olib tashlash regressiya sinovlari qo‘shildi. Holat — main’ga birlashtirish uchun tekshiruvda. Keyingi ish — PCRM-39/40 va frontend bilan kirimni ulash.
+
+## PR #26 · Sinov qamrovi aniqlashtirildi
+
+API qabul sinovlari tests/test_pcrm50_acceptance.py da. Narx yashirish sinovi haqiqiy kirimni ro‘yxat va tafsilot javobida tekshiradi, ruxsatli foydalanuvchi natijasi bilan solishtiradi.
+
+Haqiqiy Chromium mobil brauzer sinovi frontend/e2e/receipt.spec.ts da. U Pixel 7 o‘lchamida login, material tanlash, kirim yuborish, haqiqiy Django API javobi, qayta yuklanganda saqlangan qoldiq va takror so‘rovning bitta partiya bo‘lib qolishini tekshiradi. API almashtirilmaydi. Sinov alohida vaqtinchalik SQLite bazasi bilan ishlaydi, PostgreSQL cheklovlari backend CI’da tekshiriladi. Mahalliy yo‘l — Python bog‘liqliklarini o‘rnatib, frontend ichida npm ci, npx playwright install chromium, npm run test:e2e. Virtual muhit tashqarisida E2E_PYTHON bilan Python yo‘lini ko‘rsatish mumkin.
+
+PCRM-50’ning chiqim, qaytarish va hisobdan chiqarish kabi qolgan mezonlari tegishli funksiyalar tayyor bo‘lganda tekshiriladi. Ushbu PR kirim oqimining qabul sinovlarini beradi.

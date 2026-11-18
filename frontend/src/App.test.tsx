@@ -179,7 +179,7 @@ test("the mobile drawer closes after sign out and a new sign in", async () => {
   ).toBe("false");
 });
 
-test("mobile viewport receipt form submission saves single batch and calculates unit price", async () => {
+test("receipt component submits one USD request with an idempotency key", async () => {
   localStorage.setItem("profur.language", "uz");
   const writes: RequestInit[] = [];
   vi.stubGlobal(
