@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+// Bitta vaqtinchalik bazani o‘zgartiradigan ssenariy qayta urinishda takrorlanmaydi.
+test.describe.configure({ retries: 0 });
+
 test("mobile warehouse workflow persists receipts, issues, approvals and expenses through the real API", async ({
   page,
 }) => {
@@ -100,7 +103,9 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .getByRole("button", { name: "Approve", exact: true })
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
-  await expect(page.getByText("Approved", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("cell").getByText("Approved", { exact: true }),
+  ).toBeVisible();
   await page.getByRole("tab", { name: "Write-off", exact: true }).click();
   await page
     .getByRole("combobox", { name: "Material", exact: true })
