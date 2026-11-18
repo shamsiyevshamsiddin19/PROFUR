@@ -1,0 +1,93 @@
+# PROFUR English Translations
+msgid ""
+msgstr ""
+"Project-Id-Version: PROFUR 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-18 14:28+0500\n"
+"PO-Revision-Date: 2026-11-18 14:30+0500\n"
+"Last-Translator: Jamoliddin <jamoliddinusarov1@gmail.com>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/accounts/models.py:19
+msgid "Rol kodi"
+msgstr "Role code"
+
+#: apps/accounts/models.py:21
+msgid ""
+"Tizimda tekshirish uchun unikal identifikator (masalan: ADMIN, "
+"WAREHOUSE_MANAGER)"
+msgstr "Unique identifier for system checks (e.g., ADMIN, WAREHOUSE_MANAGER)"
+
+#: apps/accounts/models.py:26
+msgid "Rol nomi"
+msgstr "Role name"
+
+#: apps/accounts/models.py:27
+msgid "Foydalanuvchi interfeysida ko'rinadigan nom"
+msgstr "Display name in the user interface"
+
+#: apps/accounts/models.py:31
+msgid "Tavsif"
+msgstr "Description"
+
+#: apps/accounts/models.py:36
+msgid "Ruxsatlar"
+msgstr "Permissions"
+
+#: apps/accounts/models.py:38
+msgid ""
+"Ruxsatlar ro'yxati (masalan: ['view_catalog', 'add_receipt', 'manage_users'])"
+msgstr "List of permissions (e.g., ['view_catalog', 'add_receipt', 'manage_users'])"
+
+#: apps/accounts/models.py:43
+msgid "Tizimli rol"
+msgstr "System role"
+
+#: apps/accounts/models.py:44
+msgid "Tizimning asosiy rollari tasodifan o'chirib yuborilmasligi uchun belgi"
+msgstr "Flag to prevent accidental deletion of core system roles"
+
+#: apps/accounts/models.py:48
+msgid "Rol"
+msgstr "Role"
+
+#: apps/accounts/models.py:49 apps/accounts/models.py:67
+msgid "Rollar"
+msgstr "Roles"
+
+#: apps/accounts/models.py:68
+msgid "Foydalanuvchiga biriktirilgan rollar"
+msgstr "Assigned user roles"
+
+#: apps/accounts/models.py:73
+msgid "Telefon raqami"
+msgstr "Phone number"
+
+#: apps/accounts/models.py:77
+msgid "Foydalanuvchi"
+msgstr "User"
+
+#: apps/accounts/models.py:78
+msgid "Foydalanuvchilar"
+msgstr "Users"
+
+#: apps/accounts/serializers.py:68
+msgid "Login yoki parol noto'g'ri kiritildi."
+msgstr "Invalid username or password."
+
+#: apps/accounts/serializers.py:72
+msgid "Ushbu hisob faolsizlantirilgan."
+msgstr "This account has been deactivated."
+
+#: apps/accounts/views.py:49
+msgid "Tizimga muvaffaqiyatli kirildi."
+msgstr "Successfully logged in."
+
+#: apps/accounts/views.py:65
+msgid "Tizimdan muvaffaqiyatli chiqildi."
+msgstr "Successfully logged out."

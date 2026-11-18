@@ -1,0 +1,95 @@
+# PROFUR Russian Translations
+msgid ""
+msgstr ""
+"Project-Id-Version: PROFUR 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-18 14:28+0500\n"
+"PO-Revision-Date: 2026-11-18 14:30+0500\n"
+"Last-Translator: Jamoliddin <jamoliddinusarov1@gmail.com>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: apps/accounts/models.py:19
+msgid "Rol kodi"
+msgstr "Код роли"
+
+#: apps/accounts/models.py:21
+msgid ""
+"Tizimda tekshirish uchun unikal identifikator (masalan: ADMIN, "
+"WAREHOUSE_MANAGER)"
+msgstr "Уникальный идентификатор роли для проверки в системе (например: ADMIN, WAREHOUSE_MANAGER)"
+
+#: apps/accounts/models.py:26
+msgid "Rol nomi"
+msgstr "Название роли"
+
+#: apps/accounts/models.py:27
+msgid "Foydalanuvchi interfeysida ko'rinadigan nom"
+msgstr "Отображаемое имя в пользовательском интерфейсе"
+
+#: apps/accounts/models.py:31
+msgid "Tavsif"
+msgstr "Описание"
+
+#: apps/accounts/models.py:36
+msgid "Ruxsatlar"
+msgstr "Разрешения"
+
+#: apps/accounts/models.py:38
+msgid ""
+"Ruxsatlar ro'yxati (masalan: ['view_catalog', 'add_receipt', 'manage_users'])"
+msgstr "Список разрешений (например: ['view_catalog', 'add_receipt', 'manage_users'])"
+
+#: apps/accounts/models.py:43
+msgid "Tizimli rol"
+msgstr "Системная роль"
+
+#: apps/accounts/models.py:44
+msgid "Tizimning asosiy rollari tasodifan o'chirib yuborilmasligi uchun belgi"
+msgstr "Отметка для защиты основных системных ролей от случайного удаления"
+
+#: apps/accounts/models.py:48
+msgid "Rol"
+msgstr "Роль"
+
+#: apps/accounts/models.py:49 apps/accounts/models.py:67
+msgid "Rollar"
+msgstr "Роли"
+
+#: apps/accounts/models.py:68
+msgid "Foydalanuvchiga biriktirilgan rollar"
+msgstr "Назначенные роли пользователя"
+
+#: apps/accounts/models.py:73
+msgid "Telefon raqami"
+msgstr "Номер телефона"
+
+#: apps/accounts/models.py:77
+msgid "Foydalanuvchi"
+msgstr "Пользователь"
+
+#: apps/accounts/models.py:78
+msgid "Foydalanuvchilar"
+msgstr "Пользователи"
+
+#: apps/accounts/serializers.py:68
+msgid "Login yoki parol noto'g'ri kiritildi."
+msgstr "Неверный логин или пароль."
+
+#: apps/accounts/serializers.py:72
+msgid "Ushbu hisob faolsizlantirilgan."
+msgstr "Данная учетная запись отключена."
+
+#: apps/accounts/views.py:49
+msgid "Tizimga muvaffaqiyatli kirildi."
+msgstr "Успешный вход в систему."
+
+#: apps/accounts/views.py:65
+msgid "Tizimdan muvaffaqiyatli chiqildi."
+msgstr "Успешный выход из системы."

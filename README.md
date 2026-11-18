@@ -75,3 +75,19 @@ Har bir ochilgan Pull Request (PR) GitHub Actions orqali avtomatik tarzda quyida
 - Ruff lint va formatlash tekshiruvi
 - Ma’lumotlar bazasi migratsiyalari to‘liqligi (`makemigrations --check`)
 - Avtomatlashtirilgan testlar
+
+
+## Foydalanuvchi modeli bilan yangilash
+
+Accounts ilovasi accounts.User modelini qo‘llaydi. Yangi muhitda migratsiyalar
+toza PostgreSQL bazaga bajariladi. Oldin standart auth.User bilan migratsiya
+qilingan bazada admin migratsiyasi tarixi yangi modelga mos kelmasligi mumkin.
+Bunday bazada avval zaxira nusxa va mavjud ma’lumotlar tekshiriladi, ko‘chirish
+rejasi Jamoliddin bilan kelishiladi. Lokal ishlab chiqish uchun yangi bo‘sh
+baza tanlash mumkin. Eski baza ma’lumotlarini saqlang.
+
+## Biznes endpointlari uchun ruxsat
+
+Accounts ichidagi HasPermissionCode tekshiruvi ko‘rinishdagi required_permission
+kodini Role.permissions ro‘yxati bilan solishtiradi. Ombor uchun aniq kodlar
+docs/06-api-contract/warehouse-api-v1.md shartnomasida berilgan.

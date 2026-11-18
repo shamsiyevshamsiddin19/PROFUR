@@ -2,6 +2,8 @@
 
 Bu yerda API guruhlari taklif qilinmoqda. Yakuniy manzillar va javob shakllari hali tasdiqlanmagan.
 
+**Ombor (1-qism):** katalog, kirim va qoldiq bo‘yicha batafsil taklif — [warehouse-api-v1.md](warehouse-api-v1.md) (PCRM-49).
+
 ## Asosiy API yo‘nalishlari
 
 - Tizimga kirish va foydalanuvchi ruxsatlarini tekshirish.

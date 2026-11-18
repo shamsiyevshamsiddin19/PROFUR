@@ -47,13 +47,18 @@ INSTALLED_APPS = [
     # Third-party apps
     "rest_framework",
     "corsheaders",
-    # Local apps bo'lsa backend/apps papkasiga qo'shiladi
+    # Local apps
+    "accounts",
+    "apps.catalog",
 ]
+
+AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",  # CORS birinchi o'rinlarda bo'lishi kerak
+    "django.middleware.locale.LocaleMiddleware",  # Ko'p tillilik (UZ/RU/EN) uchun
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -131,6 +136,16 @@ LANGUAGE_CODE = "uz"
 TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
 USE_TZ = True
+
+LANGUAGES = [
+    ("uz", "O'zbekcha"),
+    ("ru", "Русский"),
+    ("en", "English"),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]
 
 
 # Static and Media files
