@@ -24,7 +24,7 @@
 | `POST /api/v1/receipts/` | `inventory.add_receipt` | `material_id`, `received_on`, `quantity`, `total_amount`, `currency: "USD"`, `supplier?`, `document_number?`, `note?` |
 | `GET /api/v1/stock/` · `/{material_id}/` | `inventory.view_stock` | `search`, `category`, `below_min=true` |
 | `PATCH /api/v1/stock/{material_id}/` | `inventory.change_min_quantity` | `{"min_quantity": "15.00"}` yoki `null` |
-| `GET /api/v1/stock/{material_id}/batches/` | `inventory.view_stock` | qoldig‘i bor partiyalar, eng eskisi birinchi — chiqim formasida FIFO bo‘yicha oldindan to‘ldirish uchun |
+| `GET /api/v1/stock/{material_id}/batches/` | `inventory.view_stock` | qoldig‘i bor partiyalar, eng eskisi birinchi. Avtomatik FIFO taqsimoti OQ-001/P1 bo‘yicha PM tasdig‘igacha qo‘llanmaydi; mijoz tanlangan partiya qismlarini yuboradi |
 | `GET /api/v1/movements/` | `inventory.view_stock` | `material`, `type` (`receipt`, `issue`, `return`, `write_off`), `date_from`, `date_to` |
 | `POST /api/v1/issues/` | `inventory.add_issue` | [issues-api.md](issues-api.md) |
 | `/api/v1/returns/`, `/api/v1/write-offs/` | `inventory.add_return`, `inventory.approve_return`, `inventory.add_write_off`, `inventory.approve_write_off` | [returns-write-offs-api.md](returns-write-offs-api.md) |
@@ -103,7 +103,7 @@ Narx ruxsatisiz o‘sha qator — `value_by_currency` yo‘q, qolgani bir xil. K
 | `400 {"non_field_errors": ["Bunday material allaqachon mavjud."], "existing_id": 1}` | «Mavjud materialni tanlash» tugmasi `existing_id` bilan. |
 | `403 {"detail": "Authentication credentials were not provided."}` | Login sahifasiga. |
 | `403 {"detail": "You do not have permission to perform this action."}` | «Ruxsat yo‘q» xabari; tugmani yashirish yetarli emas, server baribir rad etadi. |
-| `409 {"detail": "…", "code": "idempotency_conflict"}` | Yangi kalit yarating va qayta yuborishni so‘rang. |
+| `409 {"detail": "…", "code": "idempotency_conflict"}` | Avval shu kalitning asl tanasi va natijasini tekshiring. Noma’lum natijada avtomatik yangi kalit bilan yubormang; tuzatilgan tana alohida yangi amal bo‘lishi kerak. |
 | `409 {"detail": "…", "code": "material_has_history"}` | Birlik va o‘lcham maydonlarini kirimi bor materialda bloklang. |
 | `409 {"detail": "…", "code": "insufficient_stock", "available": "10.00", "requested": "99.00"}` | `available` ni ko‘rsating; hech narsa saqlanmagan. |
 
