@@ -19,9 +19,9 @@ OQ-037 qaroriga ko‘ra:
 * Administrator istalgan nom va kod bilan yangi rollar yarata oladi va ularning ruxsatlarini (`permissions`) belgilaydi.
 * Foydalanuvchiga bir vaqtning o‘zida **bir nechta rol** biriktirilishi mumkin (masalan: bir vaqtda ombor mas’uli va ishlab chiqarish nazoratchisi).
 
-Standart tizim rollari:
+Tavsiya etilgan rollar (avtomatik yaratilmaydi; admin ruxsatlarni beradi):
 * `ADMIN` — Tizim administratori (`permissions: ["*"]`).
-* `WAREHOUSE_MANAGER` — Ombor mas'uli (`permissions: ["view_catalog", "manage_catalog", "view_inventory", "manage_inventory"]`).
+* `WAREHOUSE_MANAGER` — Ombor mas'uli (`permissions: ["catalog.view_material", "catalog.add_material", "catalog.change_material", "inventory.view_stock", "inventory.add_receipt", "inventory.view_purchase_price"]`).
 * `PRODUCTION_SUPERVISOR` — Ishlab chiqarish nazoratchisi.
 * `PROJECT_MANAGER` — Loyiha mas'uli.
 * `WORKER` — Ishchi.
@@ -69,7 +69,7 @@ Standart tizim rollari:
         "code": "WAREHOUSE_MANAGER",
         "name": "Ombor mas'uli",
         "description": "Ombor kirim-chiqimini boshqaradi",
-        "permissions": ["view_catalog", "manage_catalog", "view_inventory", "manage_inventory"],
+        "permissions": ["catalog.view_material", "catalog.add_material", "catalog.change_material", "inventory.view_stock", "inventory.add_receipt", "inventory.view_purchase_price"],
         "is_system": true
       }
     ],
@@ -107,7 +107,7 @@ Standart tizim rollari:
       "code": "WAREHOUSE_MANAGER",
       "name": "Ombor mas'uli",
       "description": "Ombor kirim-chiqimini boshqaradi",
-      "permissions": ["view_catalog", "manage_catalog", "view_inventory", "manage_inventory"],
+      "permissions": ["catalog.view_material", "catalog.add_material", "catalog.change_material", "inventory.view_stock", "inventory.add_receipt", "inventory.view_purchase_price"],
       "is_system": true
     }
   ],
@@ -172,3 +172,7 @@ inventory.add_receipt. Kod Role.permissions ro‘yxatidagi qiymat bilan aynan
 mos kelishi kerak. Administrator rollarni shu kodlar bilan sozlaydi.
 IsWarehouseManager umumiy manage_inventory kodini tekshiradi.
 Rolga kod berish va undan kodni olib tashlash keyingi so‘rovga ta’sir qiladi.
+
+## API ruxsat kodlari · 2026-11-18
+
+Katalog API’si `catalog.*`, xarajatlar API’si `expenses.*` kodlarini tekshiradi. Eski `view_catalog` / `manage_catalog` kodlari bu endpointlarga ruxsat bermaydi. Mavjud rollarga kerakli aniq kodlarni admin beradi; rol nomining o‘zi ruxsat emas. Xarajat kodlari [expenses-api.md](expenses-api.md)da.

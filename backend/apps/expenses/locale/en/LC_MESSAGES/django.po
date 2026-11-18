@@ -1,0 +1,85 @@
+# PROFUR · qo'shimcha xarajatlar (PCRM-46) tarjimalari.
+# Manba tili — o'zbekcha (lotin).
+msgid ""
+msgstr ""
+"Project-Id-Version: profur-expenses\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "AQSH dollari"
+msgstr "US dollar"
+
+msgid "kod"
+msgstr "code"
+
+msgid "nomi (o'zbekcha)"
+msgstr "name (Uzbek)"
+
+msgid "nomi (ruscha)"
+msgstr "name (Russian)"
+
+msgid "nomi (inglizcha)"
+msgstr "name (English)"
+
+msgid "faol"
+msgstr "active"
+
+msgid "xarajat turi"
+msgstr "expense type"
+
+msgid "xarajat turlari"
+msgstr "expense types"
+
+msgid "summa"
+msgstr "amount"
+
+msgid "valyuta"
+msgstr "currency"
+
+msgid "xarajat sanasi"
+msgstr "expense date"
+
+msgid "loyiha raqami"
+msgstr "project number"
+
+msgid "izoh"
+msgstr "note"
+
+msgid "kim kiritdi"
+msgstr "created by"
+
+msgid "kiritilgan vaqt"
+msgstr "created at"
+
+msgid "qo'shimcha xarajat"
+msgstr "additional expense"
+
+msgid "qo'shimcha xarajatlar"
+msgstr "additional expenses"
+
+msgid "Qo'shimcha xarajatlar"
+msgstr "Additional expenses"
+
+msgid "Foydalanuvchi tilidagi nom."
+msgstr "Name in the user's language."
+
+msgid "Xarajat turining kodini o'zgartirib bo'lmaydi."
+msgstr "The expense type code cannot be changed."
+
+msgid "Summa 0 dan katta bo'lishi kerak."
+msgstr "The amount must be greater than 0."
+
+msgid "Summada verguldan keyin ko'pi bilan 2 ta raqam bo'lsin."
+msgstr "The amount can have at most 2 decimal places."
+
+msgid "Faqat USD valyutasi qabul qilinadi."
+msgstr "Only USD currency is accepted."
+
+msgid "Bu xarajat turi faol emas."
+msgstr "This expense type is inactive."
+
+msgid "Tugash sanasi boshlanish sanasidan oldin bo'lmasin."
+msgstr "The end date cannot be earlier than the start date."

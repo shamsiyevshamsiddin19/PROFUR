@@ -91,3 +91,27 @@ baza tanlash mumkin. Eski baza ma’lumotlarini saqlang.
 Accounts ichidagi HasPermissionCode tekshiruvi ko‘rinishdagi required_permission
 kodini Role.permissions ro‘yxati bilan solishtiradi. Ombor uchun aniq kodlar
 docs/06-api-contract/warehouse-api-v1.md shartnomasida berilgan.
+
+## Frontend — PCRM-48 va PCRM-41
+
+Frontend uchun React, TypeScript va Vite tanlandi. Node.js 22.12+ kerak.
+Frontend papkasida npm ci, keyin npm run dev orqali ishga tushiring.
+Brauzer manzili http://127.0.0.1:5173. Django alohida 127.0.0.1:8000 da
+ishlashi kerak. Vite /api so‘rovlarini Django’ga yo‘naltiradi, asl Host
+sarlavhasini saqlaydi. Ishlab chiqarishda frontend va /api bir origin ostida
+HTTPS orqali xizmat qilishi kerak.
+
+Login uchun administrator bergan hisobdan foydalaning. Kod ichida tayyor
+login yoki parol yo‘q. Tarjima tillari uz, ru va en, tanlov brauzerda saqlanadi.
+Qayta yuboriladigan kirim faqat USD. Natijasi noma’lum qolgan so‘rov kaliti
+va tanasi shu tab sessiyasida saqlanadi, sahifa qayta ochilsa ayni so‘rov takrorlanadi.
+
+npm run build — TypeScript va ishlab chiqarish yig‘masi.
+npm test — login CSRF/til, kirimni qayta yuborish hamda mavjud bo‘lmagan
+katalog holati uchun avtomatik sinovlar.
+
+Joriy bog‘liqlik — main’da katalog va kirim endpointlari hali mavjud emas.
+Login haqiqiy accounts API’siga ulanadi. Material ro‘yxati va kirim API’si
+tayyor bo‘lgach frontend shartnomadagi /api/v1 manzillaridan foydalanadi.
+Bu API’lar 404 bersa, frontend xizmat mavjud emasligini ko‘rsatadi,
+saqlash muvaffaqiyatini esa faqat server javobidan keyin ko‘rsatadi.
