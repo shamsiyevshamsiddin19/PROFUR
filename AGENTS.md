@@ -14,3 +14,7 @@ Ish tugaganda yoki topshirilganda, tegishli rol faylidagi vazifa holati va dalil
 Chat yoki qo‘lda ish boshlash uchun [AI boshlash matnlari](Подсказка/START.md)dan foydalaning.
 
 Yangi qaror yoki jamoadoshga ta’sir qiladigan o‘zgarishda [birgalikda ishlash tartibiga](Подсказка/COLLABORATION.md) amal qiling. AI variantlar va tavsiya beradi, kelishuv va qaror dalilga tayangan holda yoziladi.
+
+## AI bilan amaliy bajarish
+
+Jamoa a’zolari dastlabki tajribaga ega. Vazifa berilganda [bajarish qo‘llanmasi](Подсказка/EXECUTION.md) va o‘z rol faylidagi “Navbatdagi ish” bo‘limiga tayanib o‘qish → kodlash → tekshirish → PR → topshirish yo‘lini bajaring. Faqat reja yoki maslahat bilan to‘xtamang. Oddiy texnik tanlovlarda o‘zingiz qaror qilib sababini tushuntiring. Umumiy API, moliyaviy hisob va biznes qoidasiga tegadigan ochiq masalani tegishli egasi yoki PM bilan kelishish uchun qayd eting.

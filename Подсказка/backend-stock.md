@@ -25,3 +25,12 @@ Avval frontend bilan kirim so‘rovi, javobi va xatolarini kelishing. Material v
 ## Oxirgi qayd
 
 Boshlang‘ich taqsimot. Keyingi ish qaydini [AI ish tartibi](AI.md) bo‘yicha kiriting.
+
+## Navbatdagi ish
+
+1. **PCRM-38** bilan boshlang. Main’dagi Django asosini oling. requirements.txt, settings.py, OQ-005 va OQ-008 hamda ma’lumotlar modelini tekshiring. Katalog va kirim partiyasini ajratish, birliklar, o‘lchamlar va majburiy maydonlar bo‘yicha kichik model taklifini docs/05-data-model ichidagi mavjud hujjatda yozing. Birinchi ishlaydigan kategoriya/material modeli, migratsiya va haqiqiy saqlash sinovini PR qiling.
+2. **PCRM-39 / PCRM-49** doirasida kategoriya/material qidiruvi va kirim so‘rovining API manzili, maydonlari, majburiyligi, xato va javob namunalarini docs/06-api-contract ichidagi hujjatda aniqlang. Shamsiddin va Akbar uchun tayyor qismini yozing.
+3. **PCRM-40** bilan kirimni bazaga saqlash, asl narx/valyuta, birlik narxi, qoldiq va tarixni bitta tranzaksiyada yozishni quring. Har xil narxdagi ikki partiya va takror so‘rov sinovini bajaring. Yaxlitlash yoki partiya tanlashdagi ochiq qarorni PMga qayd eting.
+4. **PCRM-42** uchun mavjud qoldiq, minimal chegara va chiqim bilan umumiy qoldiq tekshiruvini Akbar bilan kelishing.
+
+Boshlashda har bir band allaqachon kod yoki PR’da bajarilganini tekshiring. Akbarga model nomi, identifikator, migratsiya va qoldiq amalining kirish/chiqishini aniq topshiring.

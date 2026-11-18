@@ -23,3 +23,5 @@ Jadval vazifa taqsimoti rejasini ko‘rsatadi. Amaldagi ijrochi, vazifa va sprin
 Biznes talablari va tasdiqlar [OQ reyestrida](../docs/01-requirements/open-questions.md), arxitektura va kod standarti [muhandislik rejasida](../docs/03-architecture/warehouse-engineering-plan.md). AI yordamchilari [AI ish tartibi](AI.md) bo‘yicha holatni yuritadi.
 
 [Birgalikda ishlash tartibi](COLLABORATION.md) — kim bilan kelishish, AI qanday maslahat berishi va holatni qachon yangilash.
+
+[AI bajarish qo‘llanmasi](EXECUTION.md) — har bir vazifani kod, sinov va PR’gacha yetkazish. Har bir rol faylida navbatdagi ishlarning ketma-ketligi bor.
