@@ -1,6 +1,5 @@
 """DRF uchun maxsus ruxsatlar (permissions)."""
 
-from accounts.models import UserRole
 from rest_framework.permissions import BasePermission
 
 
@@ -11,7 +10,7 @@ class IsAdminRole(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and (request.user.role == UserRole.ADMIN or request.user.is_superuser)
+            and request.user.is_admin_role
         )
 
 
@@ -22,10 +21,7 @@ class IsWarehouseManager(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and (
-                request.user.role in (UserRole.ADMIN, UserRole.WAREHOUSE_MANAGER)
-                or request.user.is_superuser
-            )
+            and request.user.is_warehouse_manager
         )
 
 
@@ -36,10 +32,7 @@ class IsProductionSupervisor(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and (
-                request.user.role in (UserRole.ADMIN, UserRole.PRODUCTION_SUPERVISOR)
-                or request.user.is_superuser
-            )
+            and request.user.is_production_supervisor
         )
 
 
@@ -50,8 +43,5 @@ class IsProjectManager(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and (
-                request.user.role in (UserRole.ADMIN, UserRole.PROJECT_MANAGER)
-                or request.user.is_superuser
-            )
+            and request.user.is_project_manager
         )

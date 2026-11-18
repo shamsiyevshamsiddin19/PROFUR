@@ -23,13 +23,13 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 ## Jamoadoshlarga topshirish (Handoff)
 
 - **PCRM-37 (Umumiy asos):** PR #8 orqali main’ga birlashtirildi. Django + DRF, Ruff, docker-compose va CI to‘liq ishlamoqda.
-- **PCRM-32 (Accounts va Ruxsatlar):** `accounts` ilovasi, kengaytirilgan `User` modeli (`role` tanlovi bilan), login/logout/me/csrf API nuqtalari va DRF ruxsatlari (`IsAdminRole`, `IsWarehouseManager`, `IsProductionSupervisor`, `IsProjectManager`) tayyorlandi.
+- **PCRM-32 (Accounts va Ruxsatlar):** `accounts` ilovasi, kengaytirilgan `User` modeli (`Role` ko‘pdan-ko‘p bog‘lanishi bilan, OQ-037), login/logout/me/csrf hamda rollar API nuqtalari (`/api/auth/roles/`) va DRF ruxsatlari (`IsAdminRole`, `IsWarehouseManager`, `IsProductionSupervisor`, `IsProjectManager`) tayyorlandi. Login CSRF himoyasi bilan ta'minlandi, xabarlar 3 tilda (UZ/RU/EN) tarjima qilindi.
 - **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [Akbar (@thealiiheere)](https://github.com/thealiiheere)):** Katalog, ombor va xarajatlar modullarida foydalanuvchi tekshiruvi uchun `request.user` va `accounts.permissions` ruxsatnomalaridan foydalanishingiz mumkin.
-- **Frontend va Team Leadga (Shamsiddin):** Kirish, chiqish, joriy foydalanuvchi ma'lumoti va CSRF token API shartnomasi [docs/06-api-contract/auth-api.md](../docs/06-api-contract/auth-api.md) hujjatiga kiritildi.
+- **Frontend va Team Leadga (Shamsiddin):** Kirish, chiqish, joriy foydalanuvchi ma'lumoti, CSRF token hamda rol boshqaruvi (OQ-037) API shartnomasi [docs/06-api-contract/auth-api.md](../docs/06-api-contract/auth-api.md) hujjatiga kiritildi.
 
 ## Oxirgi qayd
 
-2026-11-18 · PCRM-32 · Ko‘rikda · User modeli, login/logout/me/csrf API va ruxsatlar tayyorlandi, 8 ta avtomatik testdan o‘tdi · PR [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) (CI: success) · PR ko‘rikdan o‘tgach birlashtirish
+2026-11-18 · PCRM-32 · Ko‘rikda · Review asosida login CSRF himoyasi, 3 tildagi xabarlar (UZ/RU/EN) va OQ-037 dinamik rollar qo‘shildi · 12 ta test muvaffaqiyatli (pytest, ruff pass), PR [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12) · Team Lead va jamoadoshlar ko‘rigidan so‘ng main'ga birlashtirish
 
 
 

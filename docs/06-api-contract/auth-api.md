@@ -1,25 +1,39 @@
-# Autentifikatsiya va Ruxsatlar API Kelishuvi (PCRM-32)
+# Autentifikatsiya, Rollar va Ruxsatlar API Kelishuvi (PCRM-32)
 
-Ushbu hujjat frontend va backend o‘rtasidagi foydalanuvchi autentifikatsiyasi, sessiya va ruxsatlar shartnomasini belgilaydi.
-
----
-
-## Foydalanuvchi rollari (Roles)
-
-Tizimda 5 ta asosiy rol mavjud:
-1. `ADMIN` — Tizim administratori (barcha amallarga to‘liq huquq).
-2. `WAREHOUSE_MANAGER` — Ombor mas'uli (materiallar katalogi, kirim, chiqim, hisobdan chiqarish so‘rovlari).
-3. `PRODUCTION_SUPERVISOR` — Ishlab chiqarish nazoratchisi.
-4. `PROJECT_MANAGER` — Loyiha mas'uli.
-5. `WORKER` — Ishchi (vazifalar va shaxsiy ishbay hisobi).
+Ushbu hujjat frontend va backend o‘rtasidagi foydalanuvchi autentifikatsiyasi, sessiya xavfsizligi (CSRF), ko‘p tillilik (UZ/RU/EN) va dinamik rollar (OQ-037) shartnomasini belgilaydi.
 
 ---
 
-## API Nuqtalari (Endpoints)
+## 1. Ko‘p tillilik (i18n)
 
-### 1. CSRF Token olish
+Barcha API so‘rovlarida javob xabarlarining tilini belgilash uchun HTTP sarlavhasida `Accept-Language` yuboriladi:
+* `Accept-Language: uz` — O‘zbekcha (standart)
+* `Accept-Language: ru` — Ruscha
+* `Accept-Language: en` — Inglizcha
+
+---
+
+## 2. Foydalanuvchi rollari (OQ-037)
+
+OQ-037 qaroriga ko‘ra:
+* Administrator istalgan nom va kod bilan yangi rollar yarata oladi va ularning ruxsatlarini (`permissions`) belgilaydi.
+* Foydalanuvchiga bir vaqtning o‘zida **bir nechta rol** biriktirilishi mumkin (masalan: bir vaqtda ombor mas’uli va ishlab chiqarish nazoratchisi).
+
+Standart tizim rollari:
+* `ADMIN` — Tizim administratori (`permissions: ["*"]`).
+* `WAREHOUSE_MANAGER` — Ombor mas'uli (`permissions: ["view_catalog", "manage_catalog", "view_inventory", "manage_inventory"]`).
+* `PRODUCTION_SUPERVISOR` — Ishlab chiqarish nazoratchisi.
+* `PROJECT_MANAGER` — Loyiha mas'uli.
+* `WORKER` — Ishchi.
+
+---
+
+## 3. API Nuqtalari (Endpoints)
+
+### 3.1. CSRF Token olish
 * **Manzil:** `GET /api/auth/csrf/`
 * **Ruxsat:** Barcha uchun ochiq (`AllowAny`)
+* **Izoh:** Ushbu so‘rov brauzerda `csrftoken` cookie'sini o‘rnatadi va JSON shaklida tokenni qaytaradi.
 * **Muvaffaqiyatli javob (`200 OK`):**
 ```json
 {
@@ -27,12 +41,10 @@ Tizimda 5 ta asosiy rol mavjud:
 }
 ```
 
-### 2. Tizimga kirish (Login)
+### 3.2. Tizimga kirish (Login)
 * **Manzil:** `POST /api/auth/login/`
 * **Ruxsat:** Barcha uchun ochiq (`AllowAny`)
-* **Sarlavhalar (Headers):**
-  * `Content-Type: application/json`
-  * `X-CSRFToken: <csrf_token>`
+* **Xavfsizlik talabi:** CSRF himoyasi yoqilgan. So‘rovda `X-CSRFToken` sarlavhasi bo‘lishi **shart**. Tokensiz so‘rov `403 Forbidden` bilan rad etiladi.
 * **So‘rov tanasi (Request Body):**
 ```json
 {
@@ -51,8 +63,18 @@ Tizimda 5 ta asosiy rol mavjud:
     "email": "vali@profur.uz",
     "first_name": "Vali",
     "last_name": "Aliyev",
-    "role": "WAREHOUSE_MANAGER",
-    "role_display": "Ombor mas'uli",
+    "roles": [
+      {
+        "id": 2,
+        "code": "WAREHOUSE_MANAGER",
+        "name": "Ombor mas'uli",
+        "description": "Ombor kirim-chiqimini boshqaradi",
+        "permissions": ["view_catalog", "manage_catalog", "view_inventory", "manage_inventory"],
+        "is_system": true
+      }
+    ],
+    "role_codes": ["WAREHOUSE_MANAGER"],
+    "primary_role": "WAREHOUSE_MANAGER",
     "phone": "+998901234567",
     "is_active": true,
     "date_joined": "2026-11-18T10:00:00Z"
@@ -68,7 +90,7 @@ Tizimda 5 ta asosiy rol mavjud:
 }
 ```
 
-### 3. Joriy foydalanuvchi ma'lumotlari (Me)
+### 3.3. Joriy foydalanuvchi profili (Me)
 * **Manzil:** `GET /api/auth/me/`
 * **Ruxsat:** Faqat tizimga kirganlar (`IsAuthenticated`)
 * **Muvaffaqiyatli javob (`200 OK`):**
@@ -79,21 +101,25 @@ Tizimda 5 ta asosiy rol mavjud:
   "email": "vali@profur.uz",
   "first_name": "Vali",
   "last_name": "Aliyev",
-  "role": "WAREHOUSE_MANAGER",
-  "role_display": "Ombor mas'uli",
+  "roles": [
+    {
+      "id": 2,
+      "code": "WAREHOUSE_MANAGER",
+      "name": "Ombor mas'uli",
+      "description": "Ombor kirim-chiqimini boshqaradi",
+      "permissions": ["view_catalog", "manage_catalog", "view_inventory", "manage_inventory"],
+      "is_system": true
+    }
+  ],
+  "role_codes": ["WAREHOUSE_MANAGER"],
+  "primary_role": "WAREHOUSE_MANAGER",
   "phone": "+998901234567",
   "is_active": true,
   "date_joined": "2026-11-18T10:00:00Z"
 }
 ```
-* **Ruxsatsiz kirilganda (`403 Forbidden` / `401 Unauthorized`):**
-```json
-{
-  "detail": "Autentifikatsiyadan o'tilmagan."
-}
-```
 
-### 4. Tizimdan chiqish (Logout)
+### 3.4. Tizimdan chiqish (Logout)
 * **Manzil:** `POST /api/auth/logout/`
 * **Ruxsat:** Faqat tizimga kirganlar (`IsAuthenticated`)
 * **Muvaffaqiyatli javob (`200 OK`):**
@@ -103,12 +129,36 @@ Tizimda 5 ta asosiy rol mavjud:
 }
 ```
 
+### 3.5. Rollar ro‘yxati va yangi rol yaratish (OQ-037)
+* **Ro‘yxat:** `GET /api/auth/roles/` (barcha xodimlar ko‘ra oladi)
+* **Yaratish:** `POST /api/auth/roles/` (faqat Administrator yaratishi mumkin)
+* **So‘rov tanasi (yaratish uchun):**
+```json
+{
+  "code": "QUALITY_CONTROLLER",
+  "name": "Sifat nazoratchisi",
+  "description": "Mahsulotlar sifatini tekshiruvchi mutaxassis",
+  "permissions": ["view_quality", "approve_batch"]
+}
+```
+* **Muvaffaqiyatli javob (`201 Created`):**
+```json
+{
+  "id": 6,
+  "code": "QUALITY_CONTROLLER",
+  "name": "Sifat nazoratchisi",
+  "description": "Mahsulotlar sifatini tekshiruvchi mutaxassis",
+  "permissions": ["view_quality", "approve_batch"],
+  "is_system": false
+}
+```
+
 ---
 
-## DRF Ruxsatnomalari (Permissions) boshqa modullar uchun
+## 4. DRF Ruxsatnomalari (Permissions) boshqa modullar uchun
 
-Boshqa ilovalar (`catalog`, `inventory`, `operations`) quyidagi ruxsatnomalarni ishlatishi mumkin:
-* `IsAdminRole` — Faqat admin amallari uchun (foydalanuvchi boshqaruvi, audit).
-* `IsWarehouseManager` — Ombor amallari (materiallar yaratish, kirim kiritish, chiqim qilish).
-* `IsProductionSupervisor` — Ishlab chiqarish nazorati.
-* `IsProjectManager` — Loyiha mas'uli amallari.
+Backend dasturchilari o‘z modullarida (`catalog`, `inventory`, `operations`):
+* `IsAdminRole` — Faqat admin amallari uchun.
+* `IsWarehouseManager` — Ombor mas'uli yoki administrator uchun.
+* `IsProductionSupervisor` — Ishlab chiqarish nazoratchisi yoki admin uchun.
+* `IsProjectManager` — Loyiha mas'uli yoki admin uchun.
