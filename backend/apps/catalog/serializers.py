@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -65,9 +66,12 @@ class MaterialSerializer(serializers.ModelSerializer):
     def get_display_name(self, obj: Material) -> str:
         return str(obj)
 
-    def get_quantity_on_hand(self, obj: Material) -> str | None:
-        """Qoldiq PCRM-40 dagi ``inventory`` moduli bilan to'ldiriladi."""
-        return None
+    def get_quantity_on_hand(self, obj: Material) -> str:
+        """``inventory.StockBalance`` dagi qoldiq; hali kirim bo'lmasa ``"0.00"``."""
+        try:
+            return str(obj.stock.quantity_on_hand)
+        except ObjectDoesNotExist:
+            return "0.00"
 
     def validate_category_id(self, category: Category) -> Category:
         changed = self.instance is None or self.instance.category_id != category.pk
