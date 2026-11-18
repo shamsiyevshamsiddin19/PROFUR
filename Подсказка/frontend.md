@@ -14,9 +14,9 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-48](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-48) | Responsive ekran tuzilmasi, navigatsiya va UZ/RU/EN | Ko‘rikda | [Frontend branch](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-41-receipt-frontend) |
+| [PCRM-48](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-48) | Responsive ekran tuzilmasi, navigatsiya va UZ/RU/EN | Ko‘rikda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17) |
 | [PCRM-39](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-39) | Material katalogi UI | Reja | — |
-| [PCRM-41](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-41) | Kirim formasi va API integratsiyasi | Jarayonda | [Frontend branch](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-41-receipt-frontend), kirim backendiga bog‘liq |
+| [PCRM-41](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-41) | Kirim formasi va API integratsiyasi | Jarayonda | [PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17), kirim backendiga bog‘liq |
 | [PCRM-43](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-43) | Qoldiq, filtrlar va partiya tafsiloti | Reja | — |
 | [PCRM-45](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-45) | Chiqim, qaytarish va tasdiqlash ekranlari | Reja | — |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Tarix va hisobot UI | Reja | — |
@@ -29,7 +29,7 @@ API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quri
 
 ## Navbatdagi ish
 
-PCRM-48/PCRM-41 uchun Ozodbekning API taklifi va joriy main’ni tekshiring. Frontend texnologiyasi bo‘yicha tasdiqlangan tanlovni aniqlang. Kirim materialini tanlash, miqdor/birlik, sana, summa va valyuta maydonlari, server xato javobi va birlik narxi ko‘rinishini kelishing. Telefon, planshet, kompyuter va UZ/RU/EN holatlarida quring. Shartnoma kelishilsa API javob namunalari bilan davom etish mumkin. Yakunda haqiqiy kirim API’siga ulab, qoldiq va partiyani qayta yuklash orqali tekshiring.
+[PR #17](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/17)dagi React/TypeScript/Vite frontendni davom ettiring. Yangi frontend yoki parallel maket boshlamang. Ozodbekning katalog PR #16 va PCRM-40 kirim API’si tayyor bo‘lgach, haqiqiy material tanlash va kirim saqlashni ulang. API maydonlari va ruxsatlarni shartnoma bilan solishtiring. Kirimdan keyin qoldiq/partiya yangilanishi hamda bir xil Idempotency-Key bilan takroriy so‘rov yangi kirim yaratmasligini haqiqiy backendda tekshiring. Backend integratsiyasi tugamaguncha PCRM-41 ni Done qilmang.
 
 ## 2026-11-18 · Valyuta va til qarori
 
