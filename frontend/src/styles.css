@@ -1556,3 +1556,19 @@ fieldset:disabled {
     margin-left: 0;
   }
 }
+.filter-chip {
+  flex-direction: row;
+}
+@media (max-width: 650px) {
+  .toolbar-wrap .toolbar {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .stock-category {
+    flex: 1 1 100%;
+  }
+  .toolbar-wrap .filter-chip {
+    flex: 1;
+    min-height: 44px;
+  }
+}
