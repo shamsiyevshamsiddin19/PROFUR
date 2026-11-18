@@ -9,6 +9,7 @@ Manbalar: TZ 6.6 va 6.8, [OQ-010](../01-requirements/open-questions.md), [valyut
 - **Summa** satr ko‘rinishida: `"150.25"`. 0 dan katta, verguldan keyin ko‘pi bilan 2 xona. Server yaxlitlamaydi, ortiqcha xonani rad etadi.
 - **Xarajat o‘chirilmaydi va tahrirlanmaydi** (TZ 6.8). `PUT`, `PATCH`, `DELETE` → `405`. Xato yozuv teskari yozuv bilan bekor qilinadi — pastdagi «Bekor qilish va tuzatish» bo‘limi.
 - **Til.** Xato matni `Accept-Language: uz | ru | en` bo‘yicha. Tur nomi `expense_type_name` va `name` maydonlarida shu tilda keladi. Tarjima bo‘lmasa o‘zbekcha nom qaytadi.
+- **Takroriy yuborish.** `POST /expenses/` va `POST /expenses/{id}/reverse/` `Idempotency-Key: <UUID>` sarlavhasini qabul qiladi (ombor API’si bilan bir xil qoida): bir xil kalit va tana — yangi yozuv yo‘q, birinchi javob `200`; bir xil kalit, boshqa tana — `409 idempotency_conflict`; UUID emas — `400 idempotency_key_required`; kalit 24 soat saqlanadi. Sarlavha hozircha ixtiyoriy, lekin frontend uni forma ochilganda yaratib, muvaffaqiyatli javobgacha o‘zgartirmasdan yuborishi kerak — aks holda uzilgan so‘rov ikkinchi xarajat yozishi mumkin.
 - **Loyiha majburiy** (OQ-010, PM tasdiqlagan: har bir qo‘shimcha xarajat aniq loyihaga biriktiriladi). `project_id` yuborilmasa yoki `null` bo‘lsa — `400`. Loyihalar moduli 1-qismdan keyin keladi, shuning uchun raqam hozircha mavjud loyihalar ro‘yxati bilan tekshirilmaydi; modul kelganda maydon loyihaga havola (FK) bo‘ladi. Bazadagi ustun eski yozuvlar uchun `null` ga ruxsat beradi.
 
 ## Ruxsatlar
