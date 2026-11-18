@@ -7,6 +7,7 @@ export type User = {
   last_name: string;
   roles: { code: string; name: string; permissions: string[] }[];
   role_codes: string[];
+  is_superuser?: boolean;
 };
 export type Material = {
   id: number;
@@ -119,13 +120,14 @@ export async function write<T>(
   language: Language,
   body: unknown,
   key?: string,
+  method: "POST" | "PATCH" = "POST",
 ) {
   const { csrfToken } = await request<{ csrfToken: string }>(
     "/api/auth/csrf/",
     language,
   );
   return request<T>(path, language, {
-    method: "POST",
+    method,
     body: JSON.stringify(body),
     headers: {
       "X-CSRFToken": csrfToken,
@@ -154,4 +156,82 @@ export function fieldErrors(error: unknown): Record<string, string> {
       return [key, text];
     }),
   );
+}
+
+export function can(user: User, code: string) {
+  return Boolean(
+    user.is_superuser ||
+    user.role_codes.includes("ADMIN") ||
+    user.roles.some(
+      (role) =>
+        role.permissions.includes("*") || role.permissions.includes(code),
+    ),
+  );
+}
+export type Category = { id: number; name: string; is_active: boolean };
+export type Allocation = {
+  batch_id: number;
+  quantity: string;
+  unit_price?: string;
+  received_on: string;
+};
+export type Operation = {
+  id: number;
+  material: { id: number; display_name: string; unit: string };
+  quantity: string;
+  allocations: Allocation[];
+  total_cost?: string;
+  issued_on?: string;
+  returned_on?: string;
+  recipient_name?: string;
+  project_id?: number | null;
+  issue?: { id: number; recipient_name: string; quantity: string };
+  reason?: string;
+  note?: string;
+  status?: "pending" | "approved" | "rejected";
+  decision_note?: string;
+  created_by: { id: number; name: string };
+  created_at: string;
+};
+export type ExpenseType = {
+  id: number;
+  code: string;
+  name: string;
+  is_active: boolean;
+};
+export type Expense = {
+  id: number;
+  expense_type: string;
+  expense_type_name: string;
+  amount: string;
+  spent_on: string;
+  project_id: number | null;
+  note: string;
+  created_by: number;
+  reverses: number | null;
+  reversal: { id: number; reason: string } | null;
+};
+export async function allPages<T>(
+  path: string,
+  lang: Language,
+  signal?: AbortSignal,
+): Promise<T[]> {
+  const rows: T[] = [];
+  let next: string | null = path;
+  const seen = new Set<string>();
+  const prefix = new URL(path, location.origin).pathname;
+  while (next) {
+    const url = new URL(next, location.origin);
+    if (url.pathname !== prefix || seen.has(url.pathname + url.search))
+      throw new ApiError(502, null);
+    seen.add(url.pathname + url.search);
+    const page: Page<T> = await request<Page<T>>(
+      url.pathname + url.search,
+      lang,
+      { signal },
+    );
+    rows.push(...page.results);
+    next = page.next;
+  }
+  return rows;
 }

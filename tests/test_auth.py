@@ -362,3 +362,22 @@ def test_view_permission_code_is_checked(factory):
     assert gate.has_permission(request, ReceiptView()) is True
     assert gate.has_permission(request, IssueView()) is False
     assert gate.has_permission(request, None) is False
+
+
+@pytest.mark.django_db
+def test_me_exposes_superuser_for_frontend_without_allowing_escalation(client):
+    """Superuser rol ro'yxatisiz ham UI'ga kiradi; bayroq so'rovdan yozilmaydi."""
+    from accounts.serializers import UserSerializer
+
+    user = User.objects.create_superuser(username="root_ui", password=None)
+    client.force_login(user)
+    response = client.get("/api/auth/me/")
+    assert response.status_code == 200
+    assert response.json()["is_superuser"] is True
+    assert response.json()["roles"] == []
+    ordinary = User.objects.create_user(username="ordinary_ui")
+    serializer = UserSerializer(ordinary, data={"is_superuser": True}, partial=True)
+    assert serializer.is_valid(), serializer.errors
+    serializer.save()
+    ordinary.refresh_from_db()
+    assert ordinary.is_superuser is False

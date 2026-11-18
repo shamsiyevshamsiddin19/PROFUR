@@ -109,8 +109,6 @@ Narx ruxsatisiz o‘sha qator — `value_by_currency` yo‘q, qolgani bir xil. K
 
 `api.ts` dagi `fieldErrors()` bu shaklni allaqachon o‘qiydi; 409 uchun `error.data.code` ni tekshiring.
 
-## Frontendda qolgan ishlar (ombor backendi tayyor)
+## Frontend ulanishi · PR #39
 
-- Qoldiq ekranida minimal chegarani o‘rnatish (`PATCH /stock/{id}/`). `below_min` filtri va ustunlari allaqachon ulangan.
-- Partiyalar ro‘yxati va harakatlar tarixi ekrani (`/batches/`, `/movements/`).
-- Kirimi bor materialda birlik/o‘lchamni tahrirlashni bloklash (`409 material_has_history`).
+Minimal chegara, partiyalar, chiqim/qaytarish/hisobdan chiqarish va tasdiqlar, material/kategoriya formasi, xarajat/teskari yozuv, filtrli tarix va barcha sahifalarni qamrovchi CSV PR #39 da ulandi. Ruxsatlar UI va serverda tekshiriladi; uzilgan ombor POST so‘rovi ayni tana/kalit bilan tiklanadi. PM’ning P1/P3/P5 qarorlari va PM/buyurtmachi yakuniy qabuli ochiq qoladi.
