@@ -14,21 +14,23 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Reja | — |
-| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Ko‘rikda | [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) |
+| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session va omborga tegishli ruxsatlar | Ko‘rikda | [feat/PCRM-32-auth-and-permissions](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-32-auth-and-permissions) |
+| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, lint, test va migratsiya tekshiruvi | Bajarildi | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8) |
 | [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Brauzerda kirimdan qoldiqqacha qabul sinovi va salbiy holatlar | Reja | — |
 
 **Qabul mezoni** — To‘rt jamoadosh loyihani mahalliy ishga tushira oladi. Ruxsatsiz amal rad etiladi. birinchi brauzer sinovida kirim bir marta saqlanib, qoldiq yangilanadi.
 
 ## Jamoadoshlarga topshirish (Handoff)
 
-- **Tayyorlangan poydevor:** `backend/` ichida Django + DRF loyihasi, modulli `apps/` arxitekturasi, `requirements.txt`, `tests/test_health.py` (pytest), `pyproject.toml` (Ruff sozlamalari), `docker-compose.yml` (PostgreSQL 16) va GitHub Actions CI to‘liq tayyorlandi.
-- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [Akbar (@thealiiheere)](https://github.com/thealiiheere)):** Django muhiti tayyor. O‘z ilovalaringizni `backend/apps/` papkasiga qo‘shishingiz, PostgreSQL bazani `docker compose up -d` orqali ko‘tarishingiz va testlarni `pytest` bilan ishlatishingiz mumkin.
-- **Frontend va Team Leadga (Shamsiddin):** Django backend asosiy sozlamalari, CORS, `/api/health/` API tekshiruvi va CI ko‘rikka taqdim etildi.
+- **PCRM-37 (Umumiy asos):** PR #8 orqali main’ga birlashtirildi. Django + DRF, Ruff, docker-compose va CI to‘liq ishlamoqda.
+- **PCRM-32 (Accounts va Ruxsatlar):** `accounts` ilovasi, kengaytirilgan `User` modeli (`role` tanlovi bilan), login/logout/me/csrf API nuqtalari va DRF ruxsatlari (`IsAdminRole`, `IsWarehouseManager`, `IsProductionSupervisor`, `IsProjectManager`) tayyorlandi.
+- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [Akbar (@thealiiheere)](https://github.com/thealiiheere)):** Katalog, ombor va xarajatlar modullarida foydalanuvchi tekshiruvi uchun `request.user` va `accounts.permissions` ruxsatnomalaridan foydalanishingiz mumkin.
+- **Frontend va Team Leadga (Shamsiddin):** Kirish, chiqish, joriy foydalanuvchi ma'lumoti va CSRF token API shartnomasi [docs/06-api-contract/auth-api.md](../docs/06-api-contract/auth-api.md) hujjatiga kiritildi.
 
 ## Oxirgi qayd
 
-2026-11-17 · PCRM-37 · Ko‘rikda · Django backend loyihasi, DRF, CORS, requirements.txt, health API va pytest sinovlari to‘liq sozlandi · [feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci) · PR ko‘rikdan o‘tgach birlashtirish va PCRM-32 (Login/ruxsatlar)ga o‘tish
+2026-11-18 · PCRM-32 · Ko‘rikda · User modeli, login/logout/me/csrf API va ruxsatlar tayyorlandi, 8 ta avtomatik testdan o‘tdi · feat/PCRM-32-auth-and-permissions · PR ochish va ko‘rikka taqdim etish
+
 
 
 

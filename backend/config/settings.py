@@ -47,8 +47,11 @@ INSTALLED_APPS = [
     # Third-party apps
     "rest_framework",
     "corsheaders",
-    # Local apps bo'lsa backend/apps papkasiga qo'shiladi
+    # Local apps
+    "accounts",
 ]
+
+AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
