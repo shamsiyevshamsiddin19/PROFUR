@@ -23,7 +23,7 @@ Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyr
 ## Jamoadoshlarga topshirish (Handoff)
 
 - **Tayyorlangan poydevor:** `backend/` ichida Django + DRF loyihasi, modulli `apps/` arxitekturasi, `requirements.txt`, `tests/test_health.py` (pytest), `pyproject.toml` (Ruff sozlamalari), `docker-compose.yml` (PostgreSQL 16) va GitHub Actions CI to‘liq tayyorlandi.
-- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [@thealiiheere](https://github.com/thealiiheere)):** Django muhiti tayyor. O‘z ilovalaringizni `backend/apps/` papkasiga qo‘shishingiz, PostgreSQL bazani `docker compose up -d` orqali ko‘tarishingiz va testlarni `pytest` bilan ishlatishingiz mumkin.
+- **Backendchilarga ([@ozodbek101](https://github.com/ozodbek101), [Akbar (@thealiiheere)](https://github.com/thealiiheere)):** Django muhiti tayyor. O‘z ilovalaringizni `backend/apps/` papkasiga qo‘shishingiz, PostgreSQL bazani `docker compose up -d` orqali ko‘tarishingiz va testlarni `pytest` bilan ishlatishingiz mumkin.
 - **Frontend va Team Leadga (Shamsiddin):** Django backend asosiy sozlamalari, CORS, `/api/health/` API tekshiruvi va CI ko‘rikka taqdim etildi.
 
 ## Oxirgi qayd
