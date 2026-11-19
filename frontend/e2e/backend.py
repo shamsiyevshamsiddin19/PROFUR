@@ -46,6 +46,8 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
     user.roles.add(role)
     # These accounts exist only in this temporary test database.
     for code, permissions in {
+        "warehouse": ["catalog.view_material", "inventory.view_stock", "inventory.view_purchase_price", "inventory.add_receipt", "inventory.add_issue", "inventory.add_return", "inventory.approve_return", "inventory.add_write_off", "inventory.approve_write_off"],
+        "procurement": ["catalog.view_material", "catalog.add_material", "inventory.view_stock", "inventory.add_receipt"],
         "production": ["catalog.view_material", "inventory.view_stock", "inventory.add_issue", "inventory.add_return"],
         "accountant": ["expenses.view_expense", "expenses.view_expensetype", "expenses.add_expense"],
         "worker": [],

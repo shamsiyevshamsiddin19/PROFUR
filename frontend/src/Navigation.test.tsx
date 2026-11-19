@@ -46,6 +46,18 @@ test.each([
     false,
   ],
   ["ACCOUNTANT", ["expenses.view_expense"], false, false, true],
+  [
+    "PROCUREMENT",
+    [
+      view,
+      "catalog.view_material",
+      "catalog.add_material",
+      "inventory.add_receipt",
+    ],
+    true,
+    false,
+    false,
+  ],
   ["WORKER", [], false, false, false],
   ["ADMIN", [], true, true, true],
 ] as const)(

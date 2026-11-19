@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-for (const role of ["production", "accountant", "worker"] as const) {
+for (const role of [
+  "warehouse",
+  "procurement",
+  "production",
+  "accountant",
+  "worker",
+] as const) {
   test(
     role + " sees only permitted menus and actions",
     async ({ page }, info) => {
@@ -22,9 +28,10 @@ for (const role of ["production", "accountant", "worker"] as const) {
       const mobile = await toggle.isVisible();
       if (mobile) await toggle.click();
       const nav = page.getByRole("navigation");
+      const receives = role === "warehouse" || role === "procurement";
       await expect(
         nav.getByRole("link", { name: "Material receipts", exact: true }),
-      ).toHaveCount(0);
+      ).toHaveCount(receives ? 1 : 0);
       await expect(
         nav.getByRole("link", { name: "Administration", exact: true }),
       ).toHaveCount(0);
@@ -33,7 +40,9 @@ for (const role of ["production", "accountant", "worker"] as const) {
       ).toHaveCount(role === "accountant" ? 1 : 0);
       await expect(
         nav.getByRole("link", { name: "Stock", exact: true }),
-      ).toHaveCount(role === "production" ? 1 : 0);
+      ).toHaveCount(
+        ["warehouse", "procurement", "production"].includes(role) ? 1 : 0,
+      );
       if (mobile) {
         // Keyboard focus stays inside the drawer, Escape restores the opener.
         await page
@@ -61,14 +70,23 @@ for (const role of ["production", "accountant", "worker"] as const) {
         headers: { "X-CSRFToken": csrf.csrfToken },
         data: {},
       });
-      expect(writeDenied.status()).toBe(403);
+      expect(writeDenied.status()).toBe(receives ? 400 : 403);
       await page.goto("/#receiving");
-      await expect(
-        page.getByRole("link", { name: "Back to home", exact: true }),
-      ).toBeVisible();
-      await expect(
-        page.getByRole("button", { name: "Save receipt", exact: true }),
-      ).toHaveCount(0);
+      if (receives) {
+        await expect(
+          page.getByRole("heading", { name: "Material receipts", exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Save receipt", exact: true }),
+        ).toHaveCount(1);
+      } else {
+        await expect(
+          page.getByRole("link", { name: "Back to home", exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Save receipt", exact: true }),
+        ).toHaveCount(0);
+      }
       if (role === "production") {
         await page.goto("/#operations");
         await expect(
