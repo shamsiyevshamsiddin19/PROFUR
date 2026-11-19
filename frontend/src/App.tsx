@@ -299,35 +299,17 @@ export function App() {
       )}
       <aside className={drawer ? "sidebar open" : "sidebar"}>
         <div className="brand-row">
-          <a
-            className="brand"
-            href="#receiving"
-            onClick={(e) => {
-              if (collapsed) {
-                e.preventDefault();
-                setCollapsed(false);
-              } else {
-                setDrawer(false);
-              }
-            }}
-          >
-            <span className="brand-icon">
-              {collapsed ? (
-                <PanelLeftOpen size={20} />
-              ) : (
-                <Warehouse size={22} />
-              )}
-            </span>
-            <span className="brand-text">PROFUR</span>
-          </a>
           <button
-            className="icon-button collapse-toggle"
+            className="brand-icon collapse-toggle"
             onClick={() => setCollapsed((c) => !c)}
             aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
             title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
           >
-            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+            {collapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
           </button>
+          <a className="brand" href="#receiving" onClick={() => setDrawer(false)}>
+            <span className="brand-text">PROFUR</span>
+          </a>
         </div>
         <button
           className="icon-button drawer-close"
@@ -340,7 +322,7 @@ export function App() {
           {(
             [
               ["warehouseOps", ["receiving", "operations", "stock"]],
-              ["recordsNav", ["expenses", "history", "notifications"]],
+              ["recordsNav", ["expenses", "history"]],
               [
                 "managementNav",
                 ["materials", "expenseTypes", "administration", "settings"],
@@ -408,13 +390,7 @@ export function App() {
           <div className="breadcrumbs">
             <button
               className="icon-button mobile-menu"
-              onClick={() => {
-                if (collapsed && window.innerWidth > 850) {
-                  setCollapsed(false);
-                } else {
-                  setDrawer(true);
-                }
-              }}
+              onClick={() => setDrawer(true)}
               aria-label={t("menu")}
               aria-expanded={drawer}
             >

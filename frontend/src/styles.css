@@ -176,7 +176,6 @@ label small {
   margin: 0 0 8px -5px;
 }
 .sidebar .brand {
-  padding-left: 8px;
   color: var(--sidebar-on);
 }
 .sidebar .brand-icon {
@@ -691,10 +690,13 @@ footer > span:first-child {
 .brand-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
+  padding-left: 8px;
 }
 .collapse-toggle {
   display: none;
+  border: none;
+  cursor: pointer;
 }
 .topbar-notifications {
   position: relative;
@@ -764,9 +766,6 @@ footer > span:first-child {
   .sidebar-collapsed .brand-row {
     justify-content: center;
     padding-bottom: 10px;
-  }
-  .sidebar-collapsed .collapse-toggle {
-    display: none;
   }
   .sidebar-collapsed .nav-item {
     justify-content: center;
@@ -1328,9 +1327,6 @@ input:-webkit-autofill:focus {
 @media (min-width: 851px) {
   .scrim {
     display: none;
-  }
-  .sidebar-collapsed .mobile-menu {
-    display: grid;
   }
 }
 
