@@ -30,3 +30,7 @@ Jamoa a’zolari dastlabki tajribaga ega. Vazifa berilganda [bajarish qo‘llanm
 ## Frontend uslubi · 2026-11-18
 
 Foydalanuvchi oq fonni saqlash va tizim ranglari hamda dizayn kamchiliklarini yaxshilashni so‘radi. Joriy [vizual uslub](docs/07-ux-ui/visual-style.md): oq ish maydoni, safir ko‘k asosiy amallar, grafit matn va to‘q neytral navigatsiya. Avvalgi oltin palitra va rad etilgan login bezagi qaytarilmasin. UZ/RU/EN va USD saqlanadi.
+
+## Vizual yangilanish · 2026-11-19
+
+Foydalanuvchi avvalgi palitra/chap panelni oddiy deb topdi. Joriy standart: oq ish maydoni, zumrad aksent, to‘q yashil-grafit guruhlangan navigatsiya; sozlamalarda indigo/binafsha ham tanlanadi. Bu oldingi safir rangni majburiy standart sifatida qo‘llashni almashtiradi. Login dekorini qaytarmang. Tafsilotlar docs/07-ux-ui/visual-style.md da.

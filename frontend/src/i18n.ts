@@ -1,3 +1,4 @@
+import { appearanceMessages } from "./appearance-i18n";
 import { adminMessages } from "./admin-i18n";
 import { workflowMessages } from "./workflow-i18n";
 export const languages = { uz: "O‘zbekcha", ru: "Русский", en: "English" };
@@ -5,6 +6,7 @@ export type Language = keyof typeof languages;
 
 const messages = {
   ...workflowMessages,
+  ...appearanceMessages,
   ...adminMessages,
   warehouse: ["Ombor", "Склад", "Warehouse"],
   receiving: ["Material kirimi", "Поступление материалов", "Material receipts"],

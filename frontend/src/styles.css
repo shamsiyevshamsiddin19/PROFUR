@@ -142,7 +142,7 @@ label small {
 .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
-  width: 228px;
+  width: 244px;
   display: flex;
   flex-direction: column;
   padding: 27px 15px 15px;
@@ -306,8 +306,8 @@ label small {
   color: var(--sidebar-on);
 }
 .workspace {
-  width: calc(100% - 228px);
-  margin-left: 228px;
+  width: calc(100% - 244px);
+  margin-left: 244px;
   min-width: 0;
 }
 .topbar {

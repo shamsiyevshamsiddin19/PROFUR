@@ -1,0 +1,63 @@
+export const appearanceMessages = {
+  settings: ["Sozlamalar", "Настройки", "Settings"],
+  settingsHint: [
+    "Ish maydonini o‘zingizga moslang.",
+    "Настройте рабочее пространство под себя.",
+    "Make the workspace your own.",
+  ],
+  appearance: ["Ko‘rinish", "Внешний вид", "Appearance"],
+  appearanceHint: [
+    "Oq ish maydoni, siz tanlagan urg‘u rangi.",
+    "Белое рабочее поле и выбранный вами акцент.",
+    "A white workspace with your preferred accent.",
+  ],
+  preferenceScope: [
+    "Tanlovlar ushbu brauzerda avtomatik saqlanadi.",
+    "Настройки автоматически сохраняются в этом браузере.",
+    "Preferences are saved automatically in this browser.",
+  ],
+  preferenceUnavailable: [
+    "Brauzer saqlashni cheklagan. Tanlov faqat ushbu sessiyada amal qiladi.",
+    "Браузер запретил сохранение. Настройки действуют только в этой сессии.",
+    "Browser storage is unavailable. Preferences apply for this session only.",
+  ],
+  accentColor: ["Asosiy rang", "Акцентный цвет", "Accent colour"],
+  teal: ["Zumrad", "Изумруд", "Emerald"],
+  indigo: ["Indigo", "Индиго", "Indigo"],
+  violet: ["Binafsha", "Фиолетовый", "Violet"],
+  densityHint: [
+    "Jadvaldagi ma’lumotlarni qulay o‘qing.",
+    "Выберите удобный интервал в таблицах.",
+    "Choose comfortable spacing for your tables.",
+  ],
+  density: ["Qatorlar oralig‘i", "Плотность строк", "Row spacing"],
+  comfortable: ["Keng", "Комфортная", "Comfortable"],
+  compact: ["Ixcham", "Компактная", "Compact"],
+  motion: ["Harakatni kamaytirish", "Уменьшить анимацию", "Reduce motion"],
+  motionHint: [
+    "O‘tish animatsiyalarini o‘chiradi. Qurilma sozlamasi ham hisobga olinadi.",
+    "Отключает переходы. Также учитывает настройки устройства.",
+    "Disables transitions and respects your device preferences.",
+  ],
+  interfaceLanguage: [
+    "Interfeys tili",
+    "Язык интерфейса",
+    "Interface language",
+  ],
+  workspaceRules: ["Ish maydoni", "Рабочее пространство", "Workspace"],
+  mainWarehouse: ["Asosiy ombor", "Основной склад", "Main warehouse"],
+  warehouseNav: ["OMBOR BOSHQARUVI", "УПРАВЛЕНИЕ СКЛАДОМ", "WAREHOUSE"],
+  activityNav: ["NAZORAT", "КОНТРОЛЬ", "ACTIVITY"],
+  managementNav: ["BOSHQARUV", "УПРАВЛЕНИЕ", "MANAGEMENT"],
+  profileSettings: ["Hisobingiz", "Ваша учётная запись", "Your account"],
+  resetAppearance: [
+    "Ko‘rinishni tiklash",
+    "Сбросить оформление",
+    "Reset appearance",
+  ],
+  warehouseWorkspace: [
+    "Ombor boshqaruvi",
+    "Управление складом",
+    "Warehouse management",
+  ],
+};

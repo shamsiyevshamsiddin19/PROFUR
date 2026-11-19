@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { initialAppearance } from "./appearance";
+import { Settings } from "./pages/Settings";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Settings2,
   Tags,
   Users,
   Bell,
@@ -10,7 +13,6 @@ import {
   Layers3,
   LogOut,
   Menu,
-  ShieldCheck,
   Warehouse,
   ArrowUpRight,
   History as HistoryIcon,
@@ -37,6 +39,7 @@ import { Operations } from "./pages/Operations";
 import { Expenses } from "./pages/Expenses";
 import { History } from "./pages/History";
 type Screen =
+  | "settings"
   | "receiving"
   | "materials"
   | "stock"
@@ -47,6 +50,7 @@ type Screen =
   | "administration"
   | "notifications";
 const screens = {
+  settings: Settings2,
   expenseTypes: Tags,
   administration: Users,
   notifications: Bell,
@@ -62,12 +66,36 @@ function currentScreen(): Screen {
   return Object.hasOwn(screens, hash) ? (hash as Screen) : "receiving";
 }
 export function App() {
+  const [appearance, setAppearance] = useState(initialAppearance);
+  const [storageAvailable, setStorageAvailable] = useState(true);
+  useEffect(() => {
+    document.documentElement.dataset.accent = appearance.accent;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute(
+        "content",
+        { teal: "#087d68", indigo: "#4855bd", violet: "#7851a9" }[
+          appearance.accent
+        ],
+      );
+    document.documentElement.dataset.density = appearance.density;
+    document.documentElement.dataset.motion = appearance.reducedMotion
+      ? "reduced"
+      : "full";
+    try {
+      localStorage.setItem("profur.appearance", JSON.stringify(appearance));
+      setStorageAvailable(true);
+    } catch {
+      setStorageAvailable(false);
+    }
+  }, [appearance]);
   const [lang, setLang] = useState<Language>(initialLanguage);
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [authError, setAuthError] = useState<MessageKey | null>(null);
   const [screen, setScreen] = useState<Screen>(currentScreen);
   const [unreadCount, setUnreadCount] = useState(0);
+  const navRef = useRef<HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
 
@@ -138,6 +166,19 @@ export function App() {
     };
   }, [user, lang, screen]);
 
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !active) return;
+    if (active.offsetTop < nav.scrollTop) nav.scrollTop = active.offsetTop;
+    else if (
+      active.offsetTop + active.offsetHeight >
+      nav.scrollTop + nav.clientHeight
+    )
+      nav.scrollTop =
+        active.offsetTop + active.offsetHeight - nav.clientHeight + 8;
+  }, [screen, lang, user, drawer]);
+
   const languagePicker = (
     <select
       className="language"
@@ -174,18 +215,20 @@ export function App() {
     );
 
   const allowed = (key: Screen) =>
-    key === "administration"
-      ? user.is_superuser || user.role_codes.includes("ADMIN")
-      : can(
-          user,
-          key === "expenseTypes"
-            ? "expenses.view_expensetype"
-            : key === "materials"
-              ? "catalog.view_material"
-              : key === "expenses"
-                ? "expenses.view_expense"
-                : "inventory.view_stock",
-        );
+    key === "settings"
+      ? true
+      : key === "administration"
+        ? user.is_superuser || user.role_codes.includes("ADMIN")
+        : can(
+            user,
+            key === "expenseTypes"
+              ? "expenses.view_expensetype"
+              : key === "materials"
+                ? "catalog.view_material"
+                : key === "expenses"
+                  ? "expenses.view_expense"
+                  : "inventory.view_stock",
+          );
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
@@ -226,43 +269,71 @@ export function App() {
         >
           <X size={20} />
         </button>
-        <div className="sidebar-label">{t("workspace")}</div>
-        <nav>
-          {(Object.entries(screens) as [Screen, typeof Box][]).map(
-            ([key, Icon]) =>
-              allowed(key) && (
-                <a
-                  href={"#" + key}
-                  className={key === screen ? "nav-item active" : "nav-item"}
-                  key={key}
-                  onClick={() => {
-                    setScreen(key);
-                    setDrawer(false);
-                  }}
-                  aria-current={key === screen ? "page" : undefined}
-                >
-                  <Icon size={19} />
-                  {t(key)}
-                  {key === "notifications" && unreadCount > 0 && (
-                    <span className="notification-count">{unreadCount}</span>
-                  )}
-                  {key === screen && <span className="nav-dot" />}
-                </a>
+        <div className="sidebar-workspace">
+          <span className="workspace-monogram">
+            <Warehouse size={18} />
+          </span>
+          <span>
+            <strong>{t("mainWarehouse")}</strong>
+            <small>{t("warehouseWorkspace")}</small>
+          </span>
+        </div>
+        <nav ref={navRef} aria-label={t("workspace")}>
+          {(
+            [
+              [
+                "warehouseNav",
+                ["receiving", "materials", "stock", "operations"],
+              ],
+              ["activityNav", ["expenses", "history", "notifications"]],
+              ["managementNav", ["expenseTypes", "administration", "settings"]],
+            ] as [MessageKey, Screen[]][]
+          ).map(
+            ([label, keys]) =>
+              keys.some(allowed) && (
+                <div className="nav-group" key={label}>
+                  <div className="sidebar-label">{t(label)}</div>
+                  {keys.filter(allowed).map((key) => {
+                    const Icon = screens[key];
+                    return (
+                      <a
+                        href={"#" + key}
+                        className={
+                          key === screen ? "nav-item active" : "nav-item"
+                        }
+                        key={key}
+                        onClick={() => {
+                          setScreen(key);
+                          setDrawer(false);
+                        }}
+                        aria-current={key === screen ? "page" : undefined}
+                      >
+                        <span className="nav-icon">
+                          <Icon size={18} />
+                        </span>
+                        <span className="nav-text">{t(key)}</span>
+                        {key === "notifications" && unreadCount > 0 && (
+                          <span className="notification-count">
+                            {unreadCount}
+                          </span>
+                        )}
+                        {key === screen && (
+                          <ChevronRight size={14} className="nav-arrow" />
+                        )}
+                      </a>
+                    );
+                  })}
+                </div>
               ),
           )}
         </nav>
         <div className="sidebar-bottom">
-          <div className="warehouse-label">
-            <Warehouse size={18} />
-            <div>
-              <strong>PROFUR</strong>
-              <span>{t("warehouse")}</span>
-            </div>
-            <ShieldCheck size={17} />
-          </div>
           <div className="profile">
             <span className="avatar">{name.slice(0, 1).toUpperCase()}</span>
-            <span className="profile-name">{name}</span>
+            <span className="profile-name">
+              {name}
+              <small>{user.roles[0]?.name || user.username}</small>
+            </span>
             <button
               className="icon-button"
               onClick={logout}
@@ -299,21 +370,23 @@ export function App() {
                 {screen === "receiving"
                   ? t("intro")
                   : t(
-                      screen === "expenseTypes"
-                        ? "expenseTypesHint"
-                        : screen === "administration"
-                          ? "administrationHint"
-                          : screen === "notifications"
-                            ? "notificationsHint"
-                            : screen === "materials"
-                              ? "catalogueHint"
-                              : screen === "operations"
-                                ? "operationsHint"
-                                : screen === "expenses"
-                                  ? "expenseHint"
-                                  : screen === "history"
-                                    ? "historyHint"
-                                    : "stockHint",
+                      screen === "settings"
+                        ? "settingsHint"
+                        : screen === "expenseTypes"
+                          ? "expenseTypesHint"
+                          : screen === "administration"
+                            ? "administrationHint"
+                            : screen === "notifications"
+                              ? "notificationsHint"
+                              : screen === "materials"
+                                ? "catalogueHint"
+                                : screen === "operations"
+                                  ? "operationsHint"
+                                  : screen === "expenses"
+                                    ? "expenseHint"
+                                    : screen === "history"
+                                      ? "historyHint"
+                                      : "stockHint",
                     )}
               </p>
             </div>
@@ -335,6 +408,15 @@ export function App() {
           )}
           {!allowed(screen) ? (
             <div className="notice">{t("noPermission")}</div>
+          ) : screen === "settings" ? (
+            <Settings
+              lang={lang}
+              setLanguage={setLang}
+              value={appearance}
+              onChange={setAppearance}
+              user={user}
+              storageAvailable={storageAvailable}
+            />
           ) : screen === "administration" ? (
             <Administration
               lang={lang}
