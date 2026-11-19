@@ -1,3 +1,4 @@
+import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { can, write, type StockRow, type StockBatch, type User } from "../api";
 import { translate, type Language } from "../i18n";
@@ -74,7 +75,7 @@ export function StockDetail({
       )}
       <Feedback error={error} lang={lang} />
       <h3>{t("batches")}</h3>
-      <div className="table-wrap">
+      <TableViewport lang={lang} className="">
         <table>
           <thead>
             <tr>
@@ -99,7 +100,7 @@ export function StockDetail({
             ))}
           </tbody>
         </table>
-      </div>
+      </TableViewport>
       <RecordsState
         {...records}
         empty={!records.data.length}

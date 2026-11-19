@@ -1,3 +1,5 @@
+import { receiptKeyboard } from "../keyboard";
+import { TableViewport } from "../components/TableViewport";
 import {
   useCallback,
   useEffect,
@@ -296,6 +298,8 @@ export function WarehouseContent({
           <div className="toolbar">
             <Search size={17} />
             <input
+              data-search-field
+              aria-keyshortcuts="/ Control+k Meta+k"
               aria-label={t("search")}
               placeholder={t("search")}
               value={search}
@@ -332,10 +336,9 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {unavailable}
-        <div
-          className={
-            screen === "stock" ? "table-wrap stock-ledger" : "table-wrap"
-          }
+        <TableViewport
+          lang={lang}
+          className={screen === "stock" ? "stock-ledger" : ""}
         >
           {screen === "stock" ? (
             <table>
@@ -421,8 +424,33 @@ export function WarehouseContent({
             !loadError &&
             (screen === "stock"
               ? stockRows.length === 0
-              : materials.length === 0) && <Empty text={t("empty")} />}
-        </div>
+              : materials.length === 0) && (
+              <Empty
+                text={t("empty")}
+                action={
+                  <>
+                    {(search || categoryFilter || belowMinOnly) && (
+                      <button
+                        className="secondary"
+                        onClick={() => {
+                          setSearch("");
+                          setCategoryFilter("");
+                          setBelowMinOnly(false);
+                        }}
+                      >
+                        {t("resetFilters")}
+                      </button>
+                    )}
+                    {can(user, "catalog.view_material") && (
+                      <a className="secondary" href="#materials">
+                        {t("openMaterials")}
+                      </a>
+                    )}
+                  </>
+                }
+              />
+            )}
+        </TableViewport>
         {next && (
           <button className="secondary" onClick={more} disabled={loading}>
             {t(screen === "stock" ? "stock" : "materials")}
@@ -488,7 +516,11 @@ export function WarehouseContent({
         </div>
       )}
       <div className="receipt-layout">
-        <form className="receipt-form panel" onSubmit={submit}>
+        <form
+          className="receipt-form panel"
+          onSubmit={submit}
+          onKeyDown={(event) => receiptKeyboard(event, locked)}
+        >
           <div className="panel-heading">
             <span className="section-icon">
               <ArrowDownLeft size={22} />
@@ -558,14 +590,23 @@ export function WarehouseContent({
             </div>
           )}
           {!loading && !loadError && materials.length === 0 && (
-            <p className="form-hint">{t("noMaterials")}</p>
+            <div className="form-hint">
+              {t("noMaterials")}
+              {can(user, "catalog.view_material") && (
+                <a className="text-button" href="#materials">
+                  {t("openMaterials")}
+                </a>
+              )}
+            </div>
           )}
+          <p className="form-hint keyboard-hint">{t("receiptKeyboard")}</p>
           <div className="form-actions">
             <span>
               <ShieldCheck size={15} />
               USD · $
             </span>
             <button
+              type="submit"
               className="primary"
               disabled={
                 !can(user, "inventory.add_receipt") ||
@@ -630,7 +671,7 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {receipts.length ? (
-          <div className="table-wrap">
+          <TableViewport lang={lang} className="">
             <table>
               <thead>
                 <tr>
@@ -655,7 +696,7 @@ export function WarehouseContent({
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableViewport>
         ) : (
           !loading && <Empty text={loadError ? t(loadError) : t("empty")} />
         )}
@@ -664,11 +705,18 @@ export function WarehouseContent({
   );
 }
 
-function Empty({ text }: { text: string }) {
+function Empty({
+  text,
+  action,
+}: {
+  text: string;
+  action?: import("react").ReactNode;
+}) {
   return (
     <div className="empty">
       <Package size={26} strokeWidth={1.2} />
       <p>{text}</p>
+      {action && <div className="empty-actions">{action}</div>}
     </div>
   );
 }

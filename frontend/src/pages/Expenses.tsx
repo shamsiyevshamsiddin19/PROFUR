@@ -1,3 +1,4 @@
+import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { can, type Expense, type ExpenseType, type User } from "../api";
 import { translate, type Language } from "../i18n";
@@ -136,7 +137,7 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
           />
         </Field>
       </div>
-      <div className="table-wrap">
+      <TableViewport lang={lang} className="">
         <table>
           <thead>
             <tr>
@@ -182,10 +183,28 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableViewport>
       <RecordsState
         {...records}
         empty={!records.data.length}
+        emptyAction={
+          <button
+            className="secondary"
+            onClick={() => {
+              setFilters({
+                project_id: "",
+                expense_type: "",
+                date_from: "",
+                date_to: "",
+              });
+              records.reload();
+            }}
+          >
+            {t(
+              Object.values(filters).some(Boolean) ? "resetFilters" : "refresh",
+            )}
+          </button>
+        }
         more={records.next ? records.more : undefined}
         lang={lang}
       />

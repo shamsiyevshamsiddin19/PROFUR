@@ -1,3 +1,4 @@
+import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { Plus, Pencil } from "lucide-react";
 import { can, write, type User, type Material, type Category } from "../api";
@@ -35,6 +36,8 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
     <>
       <div className="workflow-toolbar">
         <input
+          data-search-field
+          aria-keyshortcuts="/ Control+k Meta+k"
           aria-label={t("search")}
           placeholder={t("search")}
           value={search}
@@ -109,12 +112,22 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
           <RecordsState
             {...categories}
             empty={!categories.data.length}
+            emptyAction={
+              can(user, "catalog.add_category") ? (
+                <button
+                  className="secondary"
+                  onClick={() => setCategoryEdit("new")}
+                >
+                  {t("newCategory")}
+                </button>
+              ) : undefined
+            }
             more={categories.next ? categories.more : undefined}
             lang={lang}
           />
         </section>
       )}
-      <div className="table-wrap">
+      <TableViewport lang={lang} className="">
         <table>
           <thead>
             <tr>
@@ -147,10 +160,31 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableViewport>
       <RecordsState
         {...records}
         empty={!records.data.length}
+        emptyAction={
+          <>
+            {(search || category || active) && (
+              <button
+                className="secondary"
+                onClick={() => {
+                  setSearch("");
+                  setCategory("");
+                  setActive("");
+                }}
+              >
+                {t("resetFilters")}
+              </button>
+            )}
+            {can(user, "catalog.add_material") && (
+              <button className="primary" onClick={() => setEditing("new")}>
+                {t("newMaterial")}
+              </button>
+            )}
+          </>
+        }
         more={records.next ? records.more : undefined}
         lang={lang}
       />
