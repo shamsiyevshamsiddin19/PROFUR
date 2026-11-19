@@ -612,3 +612,72 @@ input[type="number"],
     max-height: none;
   }
 }
+
+/* Data entry and browsing share a native table layout at every screen size. */
+.visually-hidden,
+.entry-table .field > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.tabular-receipt.receipt-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tabular-receipt .summary {
+  max-width: none;
+}
+.entry-viewport {
+  max-height: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.entry-table {
+  width: 100%;
+  min-width: max-content;
+}
+.entry-table th {
+  text-transform: none;
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  padding: 12px;
+}
+.entry-table td {
+  min-width: 165px;
+  vertical-align: top;
+  padding: 8px;
+}
+.entry-table td:first-child {
+  min-width: 240px;
+}
+.entry-table .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+.entry-table input,
+.entry-table select,
+.entry-table .readonly {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+}
+.entry-table input:focus,
+.entry-table select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.entry-table td:focus-within {
+  background: var(--accent-muted);
+}
+.workflow-dialog:has(.entry-table) {
+  width: min(1160px, calc(100% - 28px));
+}

@@ -1,3 +1,4 @@
+import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { Plus, Pencil } from "lucide-react";
@@ -274,7 +275,7 @@ function MaterialForm({
       <form onSubmit={submit}>
         <Feedback error={error} lang={lang} />
         <fieldset disabled={busy}>
-          <div className="form-grid">
+          <EntryTable lang={lang}>
             <Field label={t("name")} wide>
               <input
                 name="name"
@@ -326,15 +327,15 @@ function MaterialForm({
                 />
               </Field>
             ))}
-            <label className="check-label">
-              <input
-                type="checkbox"
-                name="is_active"
-                defaultChecked={material?.is_active ?? true}
-              />
-              {t("active")}
-            </label>
-          </div>
+          </EntryTable>
+          <label className="check-label">
+            <input
+              type="checkbox"
+              name="is_active"
+              defaultChecked={material?.is_active ?? true}
+            />
+            {t("active")}
+          </label>
         </fieldset>
         <div className="dialog-actions">
           <button

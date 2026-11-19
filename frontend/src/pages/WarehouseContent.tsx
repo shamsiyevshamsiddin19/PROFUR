@@ -1,3 +1,5 @@
+import { EntryTable } from "../components/EntryTable";
+import { Field } from "../components/WorkflowUI";
 import { receiptKeyboard } from "../keyboard";
 import { TableViewport } from "../components/TableViewport";
 import {
@@ -336,10 +338,7 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {unavailable}
-        <TableViewport
-          lang={lang}
-          className={screen === "stock" ? "stock-ledger" : ""}
-        >
+        <TableViewport lang={lang} className="">
           {screen === "stock" ? (
             <table>
               <thead>
@@ -467,13 +466,7 @@ export function WarehouseContent({
     type = "text",
   ) {
     return (
-      <label className={field === "note" ? "wide" : ""}>
-        <span
-          className={optional ? "field-label optional-label" : "field-label"}
-        >
-          {t(key)}
-          {optional && <small>{t("optional")}</small>}
-        </span>
+      <Field label={t(key) + (optional ? " · " + t("optional") : "")}>
         <input
           type={type}
           value={draft[field]}
@@ -500,7 +493,7 @@ export function WarehouseContent({
             {fields[field]}
           </span>
         )}
-      </label>
+      </Field>
     );
   }
   return (
@@ -515,7 +508,7 @@ export function WarehouseContent({
           </span>
         </div>
       )}
-      <div className="receipt-layout">
+      <div className="receipt-layout tabular-receipt">
         <form
           className="receipt-form panel"
           onSubmit={submit}
@@ -530,9 +523,8 @@ export function WarehouseContent({
               <p>{t("detailsHint")}</p>
             </div>
           </div>
-          <div className="form-grid">
-            <label className="wide">
-              {t("material")}
+          <EntryTable lang={lang}>
+            <Field label={t("material")}>
               <select
                 required
                 aria-invalid={Boolean(fields.material_id)}
@@ -555,34 +547,32 @@ export function WarehouseContent({
                   {fields.material_id}
                 </span>
               )}
-            </label>
-            {next && (
-              <button
-                type="button"
-                className="text-button wide"
-                onClick={more}
-                disabled={locked}
-              >
-                {t("materials")}
-                <ChevronRight size={14} />
-              </button>
-            )}
+            </Field>
             {input("received_on", "date", false, "date")}
-            <label>
-              {t("unit")}
+            <Field label={t("unit")}>
               <div className="readonly">
                 {selected ? unitLabel(selected.unit, lang) : "—"}
               </div>
-            </label>
+            </Field>
             {input("quantity", "quantity", false, "number")}
             {input("total_amount", "total", false, "number")}
-          </div>
-          <div className="form-divider" />
-          <div className="form-grid">
+
             {input("supplier", "supplier", true)}
             {input("document_number", "document", true)}
             {input("note", "note", true)}
-          </div>
+          </EntryTable>
+          {next && (
+            <button
+              type="button"
+              className="text-button wide"
+              onClick={more}
+              disabled={locked}
+            >
+              {t("materials")}
+              <ChevronRight size={14} />
+            </button>
+          )}
+
           {saveError && (
             <div className="notice error" role="alert">
               {t(saveError)}

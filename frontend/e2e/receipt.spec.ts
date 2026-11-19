@@ -96,6 +96,11 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
 
   // Shu haqiqiy sessiyada qolgan ombor oqimi ham bajariladi.
   await page.goto("/#operations");
+  await expect(
+    page
+      .getByRole("table", { name: "New record entry", exact: true })
+      .getByLabel("Recipient", { exact: true }),
+  ).toBeEditable();
   await page
     .getByRole("combobox", { name: "Material", exact: true })
     .selectOption({ label: `${materialName} · 15.00` });
@@ -160,6 +165,11 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
       testInfo.project.name,
     );
   await page.goto("/#expenses");
+  await expect(
+    page
+      .getByRole("table", { name: "New record entry", exact: true })
+      .getByRole("columnheader"),
+  ).toHaveCount(5);
   await page
     .locator("form")
     .getByLabel("Expense type", { exact: true })
