@@ -127,3 +127,7 @@ PCRM-43 mezonini to‘liq yopish uchun kichik ekranda qoldiq jadvali bitta DOM a
 **PCRM-39/41/43/45/47/48 — Bajarildi.** PR #39 (`36787ec`) va #42 (`28ef64e`) main’da. Jira holatlari tekshirilgan natija va PR/CI havolali izoh bilan Done ga o‘tkazildi. Yakuniy kod head’i `f4ec008` uchun CI: 206 backend testi, 10 frontend testi va haqiqiy Chromium/Django ombor ssenariysi o‘tdi (kategoriya filtri, minimal chegara, chiqim, qaytarish/tasdiq, hisobdan chiqarish/tasdiq, xarajat/teskari yozuv, tarix/CSV). Oq fon, uz/ru/en va USD saqlangan.
 
 **Keyingi qadam — PCRM-50:** Jamoliddinning yakuniy qabul matritsasi va qolgan integratsiya ishlari, PM/buyurtmachi qabuli. P1 (partiya tanlash), P3 (aniqlik), P5 (kirimni tuzatish) bo‘yicha ochiq qarorlar frontend ticketlari Done bo‘lishi bilan tasdiqlangan hisoblanmaydi. Yangi ishda avval main, ochiq PR va [API topshirig‘i](../docs/06-api-contract/warehouse-frontend-handoff.md)ni o‘qing; mavjud ekranlarni qayta yaratmang.
+
+## 2026-11-19 · PCRM-48 — vizual yaxshilash
+
+Team Lead topshirig‘i: palitra, chap panel va sozlamalar. Standart zumrad rang, guruhlangan navigatsiya va `#settings` qo‘shildi. Aksent/ixchamlik/animatsiya tanlovi brauzerda saqlanadi; USD va server ruxsatlari o‘zgarmaydi. Build va mavjud testlar, uch ekranda sozlamalar saqlanishi, rus/ingliz til almashtirish va 320px overflow tekshiruvi bajariladi. Ranglar tokens.css da, yangi vizual qoidalar refinements.css da.

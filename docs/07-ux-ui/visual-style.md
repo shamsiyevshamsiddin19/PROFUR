@@ -54,3 +54,9 @@ Manba — `frontend/src/tokens.css`. Komponentda yangi tarqoq hex rang yozmang. 
 [W3C bosish maydoni](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) — kamida 24×24 px yoki tegishli masofa; PROFUR asosiy boshqaruvlari buning ustida tanlandi.
 
 Bu to‘liq WCAG muvofiqligi auditi emas. Brauzerda 320/768 px va desktop, uch til, mobil menyu va maydon joylashuvi tekshirildi. Build hamda 4 frontend sinovi bajariladi.
+
+## 2026-11-19 · Rang, navigatsiya va sozlamalar yangilanishi
+
+Foydalanuvchi oldingi ranglar/chap panelni oddiy deb baholadi. Asosiy oq ish maydoni saqlandi; standart aksent zumrad (#087d68), navigatsiya to‘q yashil-grafit. Sidebar ombor, nazorat va boshqaruv guruhlariga ajratildi. Faol sahifa ikonka, chegara va fon bilan belgilanadi; rangning o‘zi yagona belgi emas. Asosiy ombor bloki va profil pastda aniq ajratilgan. Past ekranlarda menyu o‘z ichida aylanadi.
+
+`#settings`: zumrad/indigo/binafsha aksent, keng/ixcham qatorlar, kamaytirilgan animatsiya, uz/ru/en til tanlovi va qayta tiklash. Ko‘rinish sozlamalari ushbu brauzerda `profur.appearance` bilan saqlanadi; server yoki boshqa xodim sozlamasini o‘zgartirmaydi. Brauzer saqlashni taqiqlasa sessiyadagi tanlov ishlaydi va holat tushuntiriladi. USD va ombor ma’lumotlari axborot sifatida ko‘rsatiladi. Ruxsatlar serverdagi shartnoma bo‘yicha qoladi.
