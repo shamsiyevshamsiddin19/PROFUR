@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
 # Ruxsat etilgan domenlar
-allowed_hosts_raw = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
+allowed_hosts_raw = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,*")
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_raw.split(",") if host.strip()]
 
 
@@ -178,9 +178,26 @@ REST_FRAMEWORK = {
 # CORS sozlamalari (Frontend React integratsiyasi uchun)
 cors_origins_raw = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173",
 )
 CORS_ALLOWED_ORIGINS = [
     origin.strip() for origin in cors_origins_raw.split(",") if origin.strip()
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF sozlamalari (Mahalliy Wi-Fi va boshqa qurilmalardan kirish uchun)
+csrf_trusted_raw = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",
+)
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in csrf_trusted_raw.split(",") if origin.strip()
+]
+if DEBUG:
+    # Dinamik IP va Wi-Fi subneti uchun CSRF ruxsati
+    for port in ("5173", "8000", "3000"):
+        origin = f"http://10.10.2.225:{port}"
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)

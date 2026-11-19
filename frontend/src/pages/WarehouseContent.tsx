@@ -544,11 +544,23 @@ export function WarehouseContent({
                 onChange={(e) => change("material_id", e.target.value)}
               >
                 <option value="">{t("select")}</option>
-                {materials.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.display_name || m.name} · {unitLabel(m.unit, lang)}
-                  </option>
-                ))}
+                {materials.map((m) => {
+                  const dims = [m.length_cm, m.width_cm, m.thickness_cm]
+                    .filter(Boolean)
+                    .join("×");
+                  const extra = [
+                    unitLabel(m.unit, lang),
+                    m.color,
+                    dims && dims + " sm",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ");
+                  return (
+                    <option key={m.id} value={m.id}>
+                      {m.display_name || m.name} · {extra}
+                    </option>
+                  );
+                })}
               </select>
               {fields.material_id && (
                 <span className="field-error" id="error-material">
@@ -566,6 +578,31 @@ export function WarehouseContent({
                 {t("materials")}
                 <ChevronRight size={14} />
               </button>
+            )}
+            {selected && (selected.color || selected.length_cm || selected.width_cm || selected.thickness_cm) && (
+              <div className="material-info-card wide">
+                <span className="material-info-label">{t("materialInfo")}</span>
+                <div className="material-info-grid">
+                  {selected.color && (
+                    <span>{t("color")}: <strong>{selected.color}</strong></span>
+                  )}
+                  {(selected.length_cm || selected.width_cm || selected.thickness_cm) && (
+                    <span>
+                      {t("dimensions")}:{" "}
+                      <strong>
+                        {[
+                          selected.length_cm && `${selected.length_cm}`,
+                          selected.width_cm && `${selected.width_cm}`,
+                          selected.thickness_cm && `${selected.thickness_cm}`,
+                        ]
+                          .filter(Boolean)
+                          .join(" × ")}{" "}
+                        sm
+                      </strong>
+                    </span>
+                  )}
+                </div>
+              </div>
             )}
             {input("received_on", "date", false, "date")}
             <label>

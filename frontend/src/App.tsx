@@ -18,6 +18,8 @@ import {
   Warehouse,
   ArrowUpRight,
   History as HistoryIcon,
+  PanelLeftClose,
+  PanelLeftOpen,
   ReceiptText,
   X,
 } from "lucide-react";
@@ -99,7 +101,22 @@ export function App() {
   const [unreadCount, setUnreadCount] = useState(0);
   const navRef = useRef<HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("profur.sidebar.collapsed") === "true";
+    } catch {
+      return false;
+    }
+  });
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("profur.sidebar.collapsed", String(collapsed));
+    } catch {
+      /* Saqlash yopiq bo'lsa sessiyada saqlanadi. */
+    }
+  }, [collapsed]);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -275,7 +292,7 @@ export function App() {
     }
   }
   return (
-    <div className="app">
+    <div className={collapsed ? "app sidebar-collapsed" : "app"}>
       {drawer && (
         <button
           className="scrim"
@@ -288,8 +305,7 @@ export function App() {
           <span className="brand-icon">
             <Warehouse size={22} />
           </span>
-          PROFUR
-          <span className="brand-dot" />
+          <span className="brand-text">PROFUR</span>
         </a>
         <button
           className="icon-button drawer-close"
@@ -301,12 +317,12 @@ export function App() {
         <nav ref={navRef} aria-label={t("workspace")}>
           {(
             [
+              ["warehouseOps", ["receiving", "operations", "stock"]],
+              ["recordsNav", ["expenses", "history", "notifications"]],
               [
-                "warehouseNav",
-                ["receiving", "materials", "stock", "operations"],
+                "managementNav",
+                ["materials", "expenseTypes", "administration", "settings"],
               ],
-              ["activityNav", ["expenses", "history", "notifications"]],
-              ["managementNav", ["expenseTypes", "administration", "settings"]],
             ] as [MessageKey, Screen[]][]
           ).map(
             ([label, keys]) =>
@@ -327,6 +343,7 @@ export function App() {
                           setDrawer(false);
                         }}
                         aria-current={key === screen ? "page" : undefined}
+                        title={collapsed ? t(key) : undefined}
                       >
                         <span className="nav-icon">
                           <Icon size={18} />
@@ -348,6 +365,14 @@ export function App() {
           )}
         </nav>
         <div className="sidebar-bottom">
+          <button
+            className="icon-button collapse-toggle"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
+            title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
+          >
+            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
           <div className="profile">
             <span className="avatar">{name.slice(0, 1).toUpperCase()}</span>
             <span className="profile-name">
@@ -369,7 +394,13 @@ export function App() {
           <div className="breadcrumbs">
             <button
               className="icon-button mobile-menu"
-              onClick={() => setDrawer(true)}
+              onClick={() => {
+                if (collapsed && window.innerWidth > 850) {
+                  setCollapsed(false);
+                } else {
+                  setDrawer(true);
+                }
+              }}
               aria-label={t("menu")}
               aria-expanded={drawer}
             >

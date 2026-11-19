@@ -134,6 +134,7 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
               <th>{t("material")}</th>
               <th>{t("category")}</th>
               <th>{t("unit")}</th>
+              <th>{t("dimensions")}</th>
               <th>{t("status")}</th>
               <th>{t("actions")}</th>
             </tr>
@@ -144,6 +145,13 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
                 <td>{m.display_name}</td>
                 <td>{m.category.name}</td>
                 <td>{unitLabel(m.unit, lang)}</td>
+                <td>
+                  {m.length_cm || m.width_cm || m.thickness_cm
+                    ? [m.length_cm, m.width_cm, m.thickness_cm]
+                        .filter(Boolean)
+                        .join(" × ") + " sm"
+                    : "—"}
+                </td>
                 <td>{t(m.is_active ? "active" : "inactive")}</td>
                 <td>
                   {can(user, "catalog.change_material") && (
@@ -300,7 +308,10 @@ function MaterialForm({
               </select>
             </Field>
             <Field label={t("unit")}>
-              <select name="unit" defaultValue={material?.unit || "sheet"}>
+              <select
+                name="unit"
+                defaultValue={material?.unit || "sheet"}
+              >
                 {["sheet", "piece", "kg", "liter", "meter", "m2"].map((u) => (
                   <option key={u} value={u}>
                     {unitLabel(u, lang)}
@@ -316,16 +327,16 @@ function MaterialForm({
               />
             </Field>
             {(["length", "width", "thickness"] as const).map((key) => (
-              <Field key={key} label={t(key)}>
-                <input
-                  name={key + "_cm"}
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  defaultValue={material?.[`${key}_cm`] || ""}
-                />
-              </Field>
-            ))}
+                <Field key={key} label={t(key)}>
+                  <input
+                    name={key + "_cm"}
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    defaultValue={material?.[`${key}_cm`] || ""}
+                  />
+                </Field>
+              ))}
             <label className="check-label">
               <input
                 type="checkbox"

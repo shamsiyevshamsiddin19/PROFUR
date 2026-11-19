@@ -48,7 +48,6 @@ export const appearanceMessages = {
   mainWarehouse: ["Asosiy ombor", "Основной склад", "Main warehouse"],
   warehouseNav: ["OMBOR BOSHQARUVI", "УПРАВЛЕНИЕ СКЛАДОМ", "WAREHOUSE"],
   activityNav: ["NAZORAT", "КОНТРОЛЬ", "ACTIVITY"],
-  managementNav: ["BOSHQARUV", "УПРАВЛЕНИЕ", "MANAGEMENT"],
   profileSettings: ["Hisobingiz", "Ваша учётная запись", "Your account"],
   resetAppearance: [
     "Ko‘rinishni tiklash",
