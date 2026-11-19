@@ -30,7 +30,7 @@ const messages = {
   material: ["Material", "Материал", "Material"],
   select: ["Materialni tanlang", "Выберите материал", "Select a material"],
   quantity: ["Miqdor", "Количество", "Quantity"],
-  date: ["Kirim sanasi", "Дата поступления", "Receipt date"],
+  date: ["Sana", "Дата", "Date"],
   total: ["Jami summa", "Общая сумма", "Total amount"],
   currency: ["Valyuta", "Валюта", "Currency"],
   supplier: ["Yetkazib beruvchi", "Поставщик", "Supplier"],

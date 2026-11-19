@@ -712,29 +712,15 @@ input[type="number"],
 }
 .entry-table th {
   text-transform: none;
-  font-size: 11.5px;
-  letter-spacing: 0;
-  color: var(--text-secondary);
-  background: var(--surface-muted);
-  padding: 8px 6px;
-  vertical-align: bottom;
-  border-bottom: 1px solid var(--line);
-  line-height: 1.25;
-  white-space: normal;
-}
-.entry-table th .th-title {
-  display: block;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.entry-table th .th-sub {
-  display: block;
-  font-size: 10px;
-  font-weight: normal;
-  color: var(--text-muted);
-  opacity: 0.85;
+  background: var(--surface-muted);
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.3;
   white-space: nowrap;
 }
 .entry-table td {
@@ -842,10 +828,17 @@ input[type="number"],
     table-layout: fixed;
     width: 100%;
   }
-  .recent-receipts-table th,
-  .recent-receipts-table td {
-    padding: 8px 6px;
+  .recent-receipts-table th {
     font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    padding: 10px 8px;
+    vertical-align: middle;
+  }
+  .recent-receipts-table td {
+    padding: 8px;
+    font-size: 13px;
+    vertical-align: middle;
   }
   .recent-receipts-table th:first-child,
   .recent-receipts-table td:first-child {

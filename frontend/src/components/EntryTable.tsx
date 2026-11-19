@@ -39,22 +39,17 @@ export function EntryTable({
         </caption>
         <thead>
           <tr>
-            {columns.map((column, index) => {
-              const label = isValidElement<{ label: string }>(column)
-                ? column.props.label
-                : "";
-              const [title, subtitle] = label.split(" · ");
-              return (
-                <th
-                  scope="col"
-                  key={index}
-                  className={`entry-col-${index}`}
-                >
-                  <span className="th-title">{title}</span>
-                  {subtitle && <span className="th-sub">{subtitle}</span>}
-                </th>
-              );
-            })}
+            {columns.map((column, index) => (
+              <th
+                scope="col"
+                key={index}
+                className={`entry-col-${index}`}
+              >
+                {isValidElement<{ label: string }>(column)
+                  ? column.props.label
+                  : ""}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>

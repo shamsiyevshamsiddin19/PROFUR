@@ -465,13 +465,14 @@ export function WarehouseContent({
     type = "text",
   ) {
     return (
-      <Field label={t(key) + (optional ? " · " + t("optional") : "")}>
+      <Field label={t(key)}>
         <input
           type={type}
           value={draft[field]}
           disabled={locked}
           required={!optional}
           onChange={(e) => change(field, e.target.value)}
+          placeholder={optional ? t("optional") : undefined}
           step={type === "number" ? "0.01" : undefined}
           min={type === "number" ? "0.01" : undefined}
           max={type === "date" ? localDate() : undefined}
