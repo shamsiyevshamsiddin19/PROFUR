@@ -154,11 +154,13 @@ export function App() {
         });
     };
     window.addEventListener("focus", refresh);
+    window.addEventListener("hashchange", refresh);
     const interval = window.setInterval(refresh, 60000);
     return () => {
       stopped = true;
       controller.abort();
       window.removeEventListener("focus", refresh);
+      window.removeEventListener("hashchange", refresh);
       window.clearInterval(interval);
     };
   }, [user?.id, lang]);

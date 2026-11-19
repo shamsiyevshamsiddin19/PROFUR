@@ -67,6 +67,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
     kind === "returns"
       ? "inventory.approve_return"
       : "inventory.approve_write_off";
+  const showDecisions = kind !== "issues" && can(user, approvalCode);
   return (
     <>
       <div className="workflow-toolbar">
@@ -128,7 +129,9 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 <th>{t("recipient")}</th>
                 <th>{t("status")}</th>
                 <th>{t("createdBy")}</th>
-                <th>{t("actions")}</th>
+                {showDecisions && (
+                  <th className="sticky-actions">{t("actions")}</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -150,26 +153,30 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                     {!row.status && "—"}
                   </td>
                   <td>{row.created_by.name}</td>
-                  <td>
-                    {row.status === "pending" && can(user, approvalCode) && (
-                      <div className="row-actions">
-                        <button
-                          className="text-button"
-                          onClick={() =>
-                            setDecision({ row, action: "approve" })
-                          }
-                        >
-                          {t("approve")}
-                        </button>
-                        <button
-                          className="text-button danger-text"
-                          onClick={() => setDecision({ row, action: "reject" })}
-                        >
-                          {t("reject")}
-                        </button>
-                      </div>
-                    )}
-                  </td>
+                  {showDecisions && (
+                    <td className="sticky-actions">
+                      {row.status === "pending" && (
+                        <div className="row-actions">
+                          <button
+                            className="text-button"
+                            onClick={() =>
+                              setDecision({ row, action: "approve" })
+                            }
+                          >
+                            {t("approve")}
+                          </button>
+                          <button
+                            className="text-button danger-text"
+                            onClick={() =>
+                              setDecision({ row, action: "reject" })
+                            }
+                          >
+                            {t("reject")}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

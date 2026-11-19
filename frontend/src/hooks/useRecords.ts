@@ -75,7 +75,10 @@ export function useRecords<T>(
       ? state
       : { data: [], next: null, error: null, loading: Boolean(path) };
   return {
-    ...current,
+    data: current.data,
+    next: current.next,
+    error: current.error,
+    loading: current.loading,
     more: () => {
       if (!current.loading && current.next)
         setPagination({ key, cursor: current.next });
