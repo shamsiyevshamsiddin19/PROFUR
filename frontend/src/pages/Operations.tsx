@@ -5,6 +5,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import Decimal from "decimal.js";
 import {
   allPages,
+  request,
   can,
   write,
   type User,
@@ -229,12 +230,33 @@ function OperationForm({
     setPartError(null);
     setParts([]);
     setIssueParts([]);
+    const controller = new AbortController();
     if (kind === "returns") {
-      setIssueParts(selectedIssue?.allocations || []);
+      if (!selectedIssue) {
+        setPartLoading(false);
+        return;
+      }
+      setPartLoading(true);
+      request<{ allocations: Allocation[] }>(
+        `/api/v1/issues/${selectedIssue.id}/returnable/`,
+        lang,
+        { signal: controller.signal },
+      )
+        .then((result) => {
+          if (!controller.signal.aborted) setIssueParts(result.allocations);
+        })
+        .catch((error) => {
+          if (!controller.signal.aborted) setPartError(error);
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setPartLoading(false);
+        });
+      return () => controller.abort();
+    }
+    if (!material) {
+      setPartLoading(false);
       return;
     }
-    if (!material) return;
-    const controller = new AbortController();
     setPartLoading(true);
     allPages<StockBatch>(
       `/api/v1/stock/${material}/batches/`,
@@ -256,7 +278,7 @@ function OperationForm({
     kind === "returns"
       ? issueParts.map((p) => ({
           id: p.batch_id,
-          available: p.quantity,
+          available: p.returnable_quantity || "0.00",
           date: p.received_on,
           price: p.unit_price,
         }))

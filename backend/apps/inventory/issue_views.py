@@ -13,6 +13,7 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, ErrorDetail, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -202,6 +203,16 @@ class StockIssueViewSet(
         if date_to := query_param_date(self.request, "date_to"):
             queryset = queryset.filter(issued_on__lte=date_to)
         return queryset
+
+    @action(detail=True, methods=["get"])
+    def returnable(self, request: Request, *args, **kwargs) -> Response:
+        """Asl chiqimdan tasdiqlangan va kutilayotgan qaytarishlarni ayiradi."""
+        issue = self.get_object()
+        available = services.returnable_by_batch(issue, include_pending=True)
+        data = self.get_serializer(issue).data
+        for part in data["allocations"]:
+            part["returnable_quantity"] = str(available[part["batch_id"]])
+        return Response({"allocations": data["allocations"]})
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         """Chiqim yozadi. Qoldiq yoki partiya yetmasa 409, hech narsa saqlanmaydi."""

@@ -112,3 +112,7 @@ Narx ruxsatisiz o‘sha qator — `value_by_currency` yo‘q, qolgani bir xil. K
 ## Frontend ulanishi · PR #39
 
 Minimal chegara, partiyalar, chiqim/qaytarish/hisobdan chiqarish va tasdiqlar, material/kategoriya formasi, xarajat/teskari yozuv, filtrli tarix va barcha sahifalarni qamrovchi CSV PR #39 da ulandi. Ruxsatlar UI va serverda tekshiriladi; uzilgan ombor POST so‘rovi ayni tana/kalit bilan tiklanadi. PM’ning P1/P3/P5 qarorlari va PM/buyurtmachi yakuniy qabuli ochiq qoladi.
+
+### Qaytarishning joriy chegarasi · 2026-11-19
+
+`GET /api/v1/issues/{id}/returnable/` — `inventory.view_stock` ruxsati bilan `{allocations: [...]}`. Har qismda avvalgi `batch_id`, `quantity`, `received_on` va yangi `returnable_quantity` bor. Narxlar faqat `inventory.view_purchase_price` bilan. Chegara mavjud `returnable_by_batch(include_pending=True)` servisi orqali hisoblanadi: tasdiqlangan va kutilayotgan qaytarishlar ayiriladi, rad etilganlar ayirilmaydi. GET qoldiqni o‘zgartirmaydi. Frontend shu qiymatni miqdor chegarasida ko‘rsatadi; yakuniy yozishda server yana tekshiradi.

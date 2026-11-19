@@ -33,3 +33,5 @@ Tekshiruvlar: frontend rol matritsasi, taqiqlangan URL’da yopiq sahifa so‘ro
 P1/P3/P5 ochiq biznes qarorlari va buyurtmachi qabuli bu texnik tekshiruv bilan yopilmaydi.
 
 Qo‘shimcha aniqlangan holatlar: 20 tadan ko‘p material bo‘lsa kirim tanlovida keyingi sahifalar yo‘qolgan; endi faol materiallar barcha sahifalardan olinadi va 25+ materialli brauzer ssenariysi bilan tekshiriladi. Namuna to‘ldirish buyrug‘i mavjud loginlarning paroli/rolini almashtirmaydi; mavjud ombor ustiga takroriy qoldiq qo‘shish va amalga oshirilmagan --clear amali oldindan rad etiladi. Ushbu buyruq tekshiruvlari alohida test bazasida; jonli bazada ishga tushirilmaydi.
+
+Qaytarish tanlovidagi limit ham tekshirildi: oldingi qaytarishlar bo‘lsa ham UI asl chiqim miqdorini ko‘rsatgan. Endi mavjud server hisobi orqali qaytarilishi mumkin bo‘lgan joriy miqdor olinadi (kutilayotgan so‘rovlar ham ayiriladi). GET narx ruxsatini saqlaydi; yozishdagi yakuniy tekshiruv o‘zgarmaydi. Tasdiqlash/rad etish va narxni yashirish regressiyasi qo‘shildi.

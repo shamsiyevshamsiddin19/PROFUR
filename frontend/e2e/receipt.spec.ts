@@ -126,6 +126,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await expect(
     page.getByText("Request saved. Awaiting approval.", { exact: true }),
   ).toBeVisible();
+  await expect(batchQuantity).toHaveAttribute("max", "5.00");
   await page
     .getByRole("row")
     .filter({ hasText: materialName })
