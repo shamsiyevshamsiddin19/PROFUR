@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { request, type Page } from "../api";
+import { allPages, request, type Page } from "../api";
 import type { Language } from "../i18n";
 
 export function useRecords<T>(
   path: string | null,
   lang: Language,
   revision = 0,
+  loadAll = false,
 ) {
-  const key = JSON.stringify([path, lang, revision]);
+  const key = JSON.stringify([path, lang, revision, loadAll]);
   const [pagination, setPagination] = useState({
     key,
     cursor: null as string | null,
@@ -48,9 +49,14 @@ export function useRecords<T>(
       });
       return () => controller.abort();
     }
-    request<Page<T>>(url.pathname + url.search, lang, {
-      signal: controller.signal,
-    })
+    const result = loadAll
+      ? allPages<T>(url.pathname + url.search, lang, controller.signal).then(
+          (results) => ({ results, next: null, count: results.length }),
+        )
+      : request<Page<T>>(url.pathname + url.search, lang, {
+          signal: controller.signal,
+        });
+    result
       .then((page) => {
         if (!controller.signal.aborted)
           setState((old) => ({
@@ -69,7 +75,7 @@ export function useRecords<T>(
           setState((old) => ({ ...old, error, loading: false }));
       });
     return () => controller.abort();
-  }, [key, path, lang, cursor, nonce]);
+  }, [key, path, lang, cursor, nonce, loadAll]);
   const current =
     state.key === key && path
       ? state

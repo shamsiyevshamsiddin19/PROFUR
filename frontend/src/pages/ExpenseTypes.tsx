@@ -97,7 +97,7 @@ export function ExpenseTypes({ lang, user }: { lang: Language; user: User }) {
                   <input
                     name="code"
                     required
-                    pattern="[-a-zA-Z0-9_]+"
+                    pattern={"[a-zA-Z0-9_\\-]+"}
                     maxLength={50}
                     readOnly={editor !== "new"}
                     defaultValue={editor === "new" ? "" : editor.code}

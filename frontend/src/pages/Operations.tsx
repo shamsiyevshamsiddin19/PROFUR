@@ -216,7 +216,12 @@ function OperationForm({
   saved: () => void;
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
-  const stocks = useRecords<StockRow>("/api/v1/stock/", lang);
+  const stocks = useRecords<StockRow>(
+    kind === "returns" ? null : "/api/v1/stock/",
+    lang,
+    0,
+    true,
+  );
   const issues = useRecords<Operation>(
     kind === "returns" ? "/api/v1/issues/" : null,
     lang,
@@ -351,6 +356,16 @@ function OperationForm({
         error={operation.error || partError || stocks.error || issues.error}
         lang={lang}
       />
+      {stocks.loading && (
+        <div className="load-line" role="status">
+          {t("loading")}
+        </div>
+      )}
+      {Boolean(stocks.error) && (
+        <button className="secondary" onClick={stocks.reload}>
+          {t("retry")}
+        </button>
+      )}
       {operation.pending && !operation.busy && (
         <div className="notice" role="alert">
           {t("locked")}
@@ -388,15 +403,19 @@ function OperationForm({
               <Field label={t("material")} wide>
                 <select
                   required
+                  disabled={stocks.loading}
+                  aria-busy={stocks.loading}
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
                 >
                   <option value="">{t("choose")}</option>
-                  {stocks.data.map((s) => (
-                    <option key={s.material.id} value={s.material.id}>
-                      {s.material.display_name} · {s.quantity_on_hand}
-                    </option>
-                  ))}
+                  {stocks.data
+                    .filter((s) => new Decimal(s.quantity_on_hand).gt(0))
+                    .map((s) => (
+                      <option key={s.material.id} value={s.material.id}>
+                        {s.material.display_name} · {s.quantity_on_hand}
+                      </option>
+                    ))}
                 </select>
                 {stocks.next && (
                   <button
