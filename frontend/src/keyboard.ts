@@ -23,7 +23,12 @@ export function receiptKeyboard(
   const advances =
     target instanceof HTMLInputElement &&
     ["text", "number", "email", "tel", "url", "search"].includes(target.type);
-  if (event.repeat && (advances || event.ctrlKey || event.metaKey)) {
+  const saveButton =
+    target instanceof HTMLButtonElement && target.type === "submit";
+  if (
+    event.repeat &&
+    (advances || saveButton || event.ctrlKey || event.metaKey)
+  ) {
     event.preventDefault();
     return;
   }

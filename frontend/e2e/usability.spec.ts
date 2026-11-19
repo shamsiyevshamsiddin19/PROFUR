@@ -79,6 +79,16 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   await page.keyboard.up("Enter");
   await total.press("Enter");
   await expect(page.getByRole("textbox", { name: /Supplier/ })).toBeFocused();
+  // Advancing from the last field must not activate Save on a held key.
+  const note = page.getByRole("textbox", { name: /Notes/ });
+  await note.fill("Keyboard verification");
+  await note.focus();
+  await page.keyboard.down("Enter");
+  await expect(
+    page.getByRole("button", { name: "Save receipt", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.down("Enter");
+  await page.keyboard.up("Enter");
   // Enter has advanced the form without creating a financial record.
   const before = await (
     await page.request.get("/api/v1/receipts/?material=" + material.id)
