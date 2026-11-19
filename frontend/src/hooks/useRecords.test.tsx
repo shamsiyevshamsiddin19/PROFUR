@@ -19,7 +19,7 @@ test("changing a filter after loading more never appends an old page to new resu
           late = resolve;
         });
       return path.includes("filter=A")
-        ? page(1, "/items/?filter=A&page=2")
+        ? page(1, "http://backend.internal/items/?filter=A&page=2")
         : page(9);
     }),
   );

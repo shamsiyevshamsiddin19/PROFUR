@@ -31,3 +31,5 @@ Bir necha rol biriktirilsa mavjud server qoidasi bo‘yicha ruxsatlar birlashadi
 Tekshiruvlar: frontend rol matritsasi, taqiqlangan URL’da yopiq sahifa so‘rovlari yo‘qligi, filtr/cursor regressiyasi; haqiqiy API bilan production/accountant/worker login, taqiqlangan POST va admin GET uchun 403; uch ekranli navigatsiya va ombor oqimi. Yakuniy PR/CI dalili topshirishda yoziladi.
 
 P1/P3/P5 ochiq biznes qarorlari va buyurtmachi qabuli bu texnik tekshiruv bilan yopilmaydi.
+
+Qo‘shimcha aniqlangan holatlar: 20 tadan ko‘p material bo‘lsa kirim tanlovida keyingi sahifalar yo‘qolgan; endi faol materiallar barcha sahifalardan olinadi va 25+ materialli brauzer ssenariysi bilan tekshiriladi. Namuna to‘ldirish buyrug‘i mavjud loginlarning paroli/rolini almashtirmaydi; mavjud ombor ustiga takroriy qoldiq qo‘shish va amalga oshirilmagan --clear amali oldindan rad etiladi. Ushbu buyruq tekshiruvlari alohida test bazasida; jonli bazada ishga tushirilmaydi.

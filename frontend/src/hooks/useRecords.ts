@@ -33,7 +33,7 @@ export function useRecords<T>(
     }));
     const url = new URL(cursor || path, location.origin);
     const expected = new URL(path, location.origin).pathname;
-    if (url.origin !== location.origin || url.pathname !== expected) {
+    if (url.pathname !== expected) {
       setState({
         key,
         data: [],

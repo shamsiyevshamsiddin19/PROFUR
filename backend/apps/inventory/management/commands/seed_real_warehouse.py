@@ -16,7 +16,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from accounts.models import Role, User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from apps.catalog.models import Category, Material, Unit
@@ -56,6 +56,18 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        if options.get("clear"):
+            raise CommandError(
+                "--clear qo‘llab-quvvatlanmaydi; mavjud ombor o‘chirilmaydi."
+            )
+        if (
+            Batch.objects.exists()
+            or Expense.objects.exists()
+            or StockIssue.objects.exists()
+        ):
+            raise CommandError(
+                "Omborda yozuvlar mavjud. Namuna ma’lumotlarini faqat bo‘sh bazaga kiriting."
+            )
         self.stdout.write(
             self.style.NOTICE("Ombor ma'lumotlarini yaratish boshlandi...")
         )
@@ -155,12 +167,13 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        admin_user.set_password("admin123")
-        admin_user.save()
-        admin_user.roles.set([role_admin])
+        if created:
+            admin_user.set_password("admin123")
+            admin_user.save()
+            admin_user.roles.set([role_admin])
 
         # Omborchi
-        omborchi_user, _ = User.objects.get_or_create(
+        omborchi_user, created = User.objects.get_or_create(
             username="omborchi",
             defaults={
                 "first_name": "Davronbek",
@@ -170,12 +183,13 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        omborchi_user.set_password("ombor123")
-        omborchi_user.save()
-        omborchi_user.roles.set([role_wh])
+        if created:
+            omborchi_user.set_password("ombor123")
+            omborchi_user.save()
+            omborchi_user.roles.set([role_wh])
 
         # Ishlab chiqarish ustasi
-        usta_user, _ = User.objects.get_or_create(
+        usta_user, created = User.objects.get_or_create(
             username="usta",
             defaults={
                 "first_name": "Rustam",
@@ -185,12 +199,13 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        usta_user.set_password("usta123")
-        usta_user.save()
-        usta_user.roles.set([role_prod])
+        if created:
+            usta_user.set_password("usta123")
+            usta_user.save()
+            usta_user.roles.set([role_prod])
 
         # Hisobchi
-        hisobchi_user, _ = User.objects.get_or_create(
+        hisobchi_user, created = User.objects.get_or_create(
             username="hisobchi",
             defaults={
                 "first_name": "Nodira",
@@ -200,12 +215,13 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        hisobchi_user.set_password("hisobchi123")
-        hisobchi_user.save()
-        hisobchi_user.roles.set([role_acc])
+        if created:
+            hisobchi_user.set_password("hisobchi123")
+            hisobchi_user.save()
+            hisobchi_user.roles.set([role_acc])
 
         # Ta'minotchi
-        taminot_user, _ = User.objects.get_or_create(
+        taminot_user, created = User.objects.get_or_create(
             username="taminotchi",
             defaults={
                 "first_name": "Bobur",
@@ -215,9 +231,10 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        taminot_user.set_password("taminot123")
-        taminot_user.save()
-        taminot_user.roles.set([role_proc])
+        if created:
+            taminot_user.set_password("taminot123")
+            taminot_user.save()
+            taminot_user.roles.set([role_proc])
 
         # ---------------------------------------------------------
         # 2. XARAJAT TURLARI

@@ -90,4 +90,12 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
         category=category,
         unit=Unit.SHEET,
     )
+    Material.objects.bulk_create(
+        [
+            Material(
+                name=f"A paged material {i:02}", category=category, unit=Unit.SHEET
+            )
+            for i in range(25)
+        ]
+    )
     call_command("runserver", "127.0.0.1:18110", use_reloader=False)

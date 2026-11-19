@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import {
+  allPages,
   ApiError,
   fieldErrors,
   request,
@@ -130,17 +131,26 @@ export function WarehouseContent({
           setStockRows(page.results);
           setNext(page.next);
         } else {
-          const pageSize = screen === "receiving" ? "&page_size=250" : "";
-          const page = await request<Page<Material>>(
-            "/api/v1/materials/?is_active=true" +
-              pageSize +
-              "&search=" +
-              encodeURIComponent(search),
-            lang,
-            { signal: controller.signal },
-          );
-          setMaterials(page.results);
-          setNext(page.next);
+          const materialPath =
+            "/api/v1/materials/?is_active=true&search=" +
+            encodeURIComponent(search);
+          if (screen === "receiving") {
+            const rows = await allPages<Material>(
+              materialPath,
+              lang,
+              controller.signal,
+            );
+            if (controller.signal.aborted) return;
+            setMaterials(rows);
+            setNext(null);
+          } else {
+            const page = await request<Page<Material>>(materialPath, lang, {
+              signal: controller.signal,
+            });
+            if (controller.signal.aborted) return;
+            setMaterials(page.results);
+            setNext(page.next);
+          }
           if (screen === "receiving") {
             const receipts = await request<Page<Receipt>>(
               "/api/v1/receipts/",
@@ -610,7 +620,9 @@ export function WarehouseContent({
               <tbody>
                 {receipts.map((r) => (
                   <tr key={r.id}>
-                    <td title={r.material.display_name}>{r.material.display_name}</td>
+                    <td title={r.material.display_name}>
+                      {r.material.display_name}
+                    </td>
                     <td>{r.received_on}</td>
                     <td>
                       {r.quantity} {unitLabel(r.material.unit, lang)}
@@ -631,8 +643,12 @@ export function WarehouseContent({
                       {r.total_amount ? money(r.total_amount, lang) : "—"}
                     </td>
                     <td title={r.supplier || undefined}>{r.supplier || "—"}</td>
-                    <td title={r.document_number || undefined}>{r.document_number || "—"}</td>
-                    <td className="wrap-cell" title={r.note || undefined}>{r.note || "—"}</td>
+                    <td title={r.document_number || undefined}>
+                      {r.document_number || "—"}
+                    </td>
+                    <td className="wrap-cell" title={r.note || undefined}>
+                      {r.note || "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
