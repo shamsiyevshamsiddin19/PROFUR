@@ -166,7 +166,7 @@ test("expense form labels select their controls and an uncertain write reuses it
     { target: { value: "tax" } },
   );
   fireEvent.change(
-    within(form).getByLabelText("Amount · USD", { exact: true }),
+    within(form).getByLabelText("Amount", { exact: true }),
     { target: { value: "12.50" } },
   );
   fireEvent.change(

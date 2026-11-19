@@ -300,12 +300,12 @@ export function App() {
       <aside className={drawer ? "sidebar open" : "sidebar"}>
         <div className="brand-row">
           <button
-            className="brand-icon collapse-toggle"
+            className="collapse-toggle"
             onClick={() => setCollapsed((c) => !c)}
             aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
             title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
           >
-            {collapsed ? <PanelLeftOpen size={22} /> : <PanelLeftClose size={22} />}
+            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
           </button>
           <a className="brand" href="#receiving" onClick={() => setDrawer(false)}>
             <span className="brand-text">PROFUR</span>

@@ -167,13 +167,7 @@ label small {
   width: 34px;
   height: 36px;
 }
-.sidebar .brand-icon.collapse-toggle {
-  background: none;
-  border-radius: 0;
-  width: auto;
-  height: auto;
-  color: var(--sidebar-on);
-}
+
 .brand-dot {
   width: 5px;
   height: 5px;
@@ -697,14 +691,30 @@ footer > span:first-child {
 .brand-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 14px;
+  gap: 10px;
+  padding: 0 12px;
+  margin-bottom: 20px;
+  min-height: 28px;
 }
 .collapse-toggle {
   display: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: transparent;
   border: none;
+  box-shadow: none;
+  color: var(--sidebar-on);
   cursor: pointer;
-  padding: 4px;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.18s, color 0.18s;
+}
+.collapse-toggle:hover {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-active-text);
 }
 .topbar-notifications {
   position: relative;
@@ -748,16 +758,39 @@ footer > span:first-child {
 @media (min-width: 851px) {
   .collapse-toggle {
     display: flex;
-    align-items: center;
-    color: var(--sidebar-on);
   }
   .collapse-toggle:hover {
+    background: var(--sidebar-hover);
     color: var(--sidebar-active-text);
   }
   .sidebar-collapsed .sidebar {
     width: 68px;
     padding: 26px 10px 14px;
     align-items: center;
+  }
+  .sidebar-collapsed .brand {
+    display: none !important;
+  }
+  .sidebar-collapsed .brand-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin-bottom: 16px;
+    width: 100%;
+    gap: 0;
+  }
+  .sidebar-collapsed .collapse-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 9px;
+    margin: 0 auto;
+    box-shadow: none;
+    border: none;
+    background: transparent;
   }
   .sidebar-collapsed .brand-text,
   .sidebar-collapsed .nav-text,
@@ -767,18 +800,28 @@ footer > span:first-child {
   .sidebar-collapsed .profile .icon-button {
     display: none;
   }
-  .sidebar-collapsed .brand {
-    justify-content: center;
-    padding: 0;
+  .sidebar-collapsed nav {
+    width: 100%;
+    scrollbar-width: none;
   }
-  .sidebar-collapsed .brand-row {
-    justify-content: center;
-    padding: 0;
-    padding-bottom: 10px;
+  .sidebar-collapsed nav::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar-collapsed .nav-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .sidebar-collapsed .nav-item {
+    width: 100%;
+    max-width: 44px;
+    height: 44px;
+    padding: 4px;
+    margin: 0 auto 3px;
+    display: flex;
     justify-content: center;
-    padding: 6px;
+    align-items: center;
     gap: 0;
   }
   .sidebar-collapsed .nav-icon {

@@ -94,16 +94,25 @@ export function Field({
   wide?: boolean;
 }) {
   const id = useId();
-  const controls = Children.map(children, (child) => {
+  function injectId(child: ReactNode): ReactNode {
+    if (!isValidElement(child)) return child;
     if (
-      isValidElement(child) &&
       typeof child.type === "string" &&
       ["input", "select", "textarea"].includes(child.type)
     ) {
       return cloneElement(child as ReactElement<{ id?: string }>, { id });
     }
+    const props = child.props as { children?: ReactNode };
+    if (props && props.children) {
+      return cloneElement(
+        child as ReactElement<any>,
+        {},
+        Children.map(props.children, injectId),
+      );
+    }
     return child;
-  });
+  }
+  const controls = Children.map(children, injectId);
   return (
     <div className={wide ? "field wide" : "field"}>
       <label htmlFor={id}>{label}</label>
