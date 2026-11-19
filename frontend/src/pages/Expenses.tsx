@@ -22,7 +22,11 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
     lang,
     revision,
   );
-  const types = useRecords<ExpenseType>("/api/v1/expense-types/", lang);
+  const types = useRecords<ExpenseType>(
+    "/api/v1/expense-types/",
+    lang,
+    revision,
+  );
   const operation = useIdempotentWrite<Expense>("expenses", user.id, lang);
   const { busy, error, pending } = operation;
   const [success, setSuccess] = useState(false);

@@ -100,3 +100,20 @@ Lokal PostgreSQL serverida quyidagi mashq o'tkazildi va muvaffaqiyatli tasdiqlan
 ## Qabul va joylashtirish chegarasi
 
 OQ-046: zaxira har kuni olinishi, tiklash maqsadi 4 soat bo‘lishi kerak. Retention/RPO qiymatlari aniqlashtiriladi. Yuqoridagi buyruqlar yo‘riqnoma; production’da rejalashtirilgan backup ishlayotgani yoki ushbu ko‘rikda restore bajarilgani haqidagi dalil emas. Muallif qayd etgan lokal drill natijasi bilan production qabuli alohida tekshiriladi. Real bazada qo‘shimcha kategoriya/xarajat turlari bo‘lishi mumkin; 9/3 soni boshlang‘ich muhitga tegishli.
+
+## Avtomatik vosita va kundalik timer
+
+Repo ichidagi vositalar `DB_NAME/USER/PASSWORD/HOST/PORT` yoki PostgreSQL `PG*` muhit parametrlarini oladi. Parol buyruq satriga yozilmaydi. PostgreSQL client vositalari va Python 3.11+ kerak.
+
+```bash
+python3 ops/backup.py --directory /var/backups/profur
+python3 ops/restore_drill.py /var/backups/profur/profur-TIMESTAMP.dump
+```
+
+Restore mashqi original bazaga yozmaydi. Undan olingan arxivni tasodifiy `profur_drill_*` bazaga tiklaydi va o‘z bazasini tozalaydi. Bu mashq akkauntiga vaqtinchalik baza yaratish huquqi kerak; oddiy kundalik backup akkauntiga bu huquq shart emas. Arxiv yonidagi JSON manifest SHA-256 bilan birga saqlansin. Rejalashtirilgan sinov/CI dalili [topshirish reyestrida](phase-one-acceptance.md).
+
+VPS o‘rnatish: repo `/opt/profur`, `profur` xizmat foydalanuvchisi, PostgreSQL client, `/var/backups/profur` jildi shu foydalanuvchiga tegishli (0700), `/etc/profur/backup.env` faqat xizmat/root o‘qiydigan (0600) bo‘lishi kerak. `ops/systemd/profur-backup.service` va `.timer` fayllarini `/etc/systemd/system/` ga o‘rnating, `systemctl daemon-reload`, avval `systemctl start profur-backup.service` bilan natijani tekshiring, keyin `systemctl enable --now profur-backup.timer`. Jadval har kuni 02:00 UTC (07:00 Toshkent), o‘tkazib yuborilgan ish keyingi ishga tushishda bajariladi. Holat `systemctl list-timers profur-backup.timer` va `journalctl -u profur-backup.service` orqali tekshiriladi. Nosozlik xabarini server monitoringiga ulang.
+
+Retention qiymati kelishilmagani sababli vosita eski zaxiralarni o‘chirmaydi. Serverdan tashqari nusxa, disk sig‘imi nazorati va real ma’lumot hajmidagi 4 soatlik RTO mashqi production qabulida tekshiriladi. Ushbu fayllar tayyorligi timer jonli serverda o‘rnatilganiga dalil emas.
+
+PostgreSQL client va server asosiy versiyalari mos bo‘lsin. `PG_BIN=/usr/lib/postgresql/16/bin` kabi parametr barcha `pg_dump`, `pg_restore`, `psql`, `createdb`, `dropdb` yo‘lini belgilaydi. CI PostgreSQL 16 uchun aynan `postgres:16-alpine` client konteynerini ishlatadi; yangi client chiqargan `transaction_timeout` buyrug‘ini eski serverda e’tiborsiz qoldirish ishlatilmaydi.

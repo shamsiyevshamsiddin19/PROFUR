@@ -11,9 +11,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
-"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: apps/accounts/models.py:19
 msgid "Rol kodi"
@@ -23,7 +21,9 @@ msgstr "Код роли"
 msgid ""
 "Tizimda tekshirish uchun unikal identifikator (masalan: ADMIN, "
 "WAREHOUSE_MANAGER)"
-msgstr "Уникальный идентификатор роли для проверки в системе (например: ADMIN, WAREHOUSE_MANAGER)"
+msgstr ""
+"Уникальный идентификатор роли для проверки в системе (например: ADMIN, "
+"WAREHOUSE_MANAGER)"
 
 #: apps/accounts/models.py:26
 msgid "Rol nomi"
@@ -43,8 +43,11 @@ msgstr "Разрешения"
 
 #: apps/accounts/models.py:38
 msgid ""
-"Ruxsatlar ro'yxati (masalan: ['view_catalog', 'add_receipt', 'manage_users'])"
-msgstr "Список разрешений (например: ['view_catalog', 'add_receipt', 'manage_users'])"
+"Ruxsatlar ro'yxati (masalan: ['view_catalog', 'add_receipt', "
+"'manage_users'])"
+msgstr ""
+"Список разрешений (например: ['view_catalog', 'add_receipt', "
+"'manage_users'])"
 
 #: apps/accounts/models.py:43
 msgid "Tizimli rol"
@@ -109,3 +112,15 @@ msgstr "Пароль успешно обновлен."
 #: apps/accounts/serializers.py
 msgid "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak."
 msgstr "Новый пароль должен содержать не менее 6 символов."
+
+msgid "Tizimli rol kodini o'zgartirib bo'lmaydi."
+msgstr "Код системной роли нельзя изменить."
+
+msgid "O'z hisobingizni faolsizlantira olmaysiz."
+msgstr "Нельзя деактивировать свою учётную запись."
+
+msgid "O'zingizdan ADMIN rolini olib tashlay olmaysiz."
+msgstr "Нельзя снять с себя роль ADMIN."
+
+msgid "Tizimli yoki foydalanuvchiga biriktirilgan rol o'chirilmaydi."
+msgstr "Нельзя удалить системную роль или роль, назначенную пользователям."

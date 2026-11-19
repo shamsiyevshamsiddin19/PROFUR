@@ -114,6 +114,7 @@ def set_min_quantity(material: Material, min_quantity: Decimal | None) -> StockB
     balance = locked_balance(material)
     balance.min_quantity = min_quantity
     balance.save(update_fields=["min_quantity", "updated_at"])
+    sync_low_stock(balance)
     return balance
 
 
@@ -152,6 +153,7 @@ def receive(
     )
     balance.quantity_on_hand += quantity
     balance.save(update_fields=["quantity_on_hand", "updated_at"])
+    sync_low_stock(balance)
     StockMovement.objects.create(
         type=MovementType.RECEIPT,
         material=material,
@@ -239,6 +241,7 @@ def decrease(
             )
         )
     balance.save(update_fields=["quantity_on_hand", "updated_at"])
+    sync_low_stock(balance)
     return movements
 
 
@@ -349,6 +352,7 @@ def increase(
     locked.save(update_fields=["quantity_remaining"])
     balance.quantity_on_hand += quantity
     balance.save(update_fields=["quantity_on_hand", "updated_at"])
+    sync_low_stock(balance)
     reference_kind, reference_id = reference
     return StockMovement.objects.create(
         type=movement_type,
@@ -601,3 +605,32 @@ def reject_write_off(
     if changed:
         mark_decided(write_off, RequestStatus.REJECTED, user, note)
     return write_off, changed
+
+
+def sync_low_stock(balance: StockBalance) -> None:
+    """Qulf ostida: takror xabarsiz bir martalik o'tish, tranzaksiya bilan birga."""
+    from accounts.models import User
+
+    from .models import StockNotification
+
+    below = balance.is_below_min
+    if below and not balance.low_stock_notified:
+        recipients = [
+            user
+            for user in User.objects.filter(is_active=True).prefetch_related("roles")
+            if user.has_permission_code("inventory.view_stock")
+        ]
+        StockNotification.objects.bulk_create(
+            [
+                StockNotification(
+                    recipient=user,
+                    material=balance.material,
+                    quantity=balance.quantity_on_hand,
+                    minimum=balance.min_quantity,
+                )
+                for user in recipients
+            ]
+        )
+    if below != balance.low_stock_notified:
+        balance.low_stock_notified = below
+        balance.save(update_fields=["low_stock_notified"])

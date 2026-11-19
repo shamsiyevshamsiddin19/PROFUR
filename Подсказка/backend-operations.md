@@ -8,6 +8,10 @@
 
 Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bilan aniqlang. Chiqimda partiya tanlash qarorini PCRM-31 orqali tekshiring. @ozodbek101 bilan qoldiq tranzaksiyasi va migratsiyalarni, @jamoliddinusarov1-create bilan tasdiqlovchi ruxsatlarni kelishing.
 
+## Joriy yakunlash · 2026-11-18
+
+Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi saqlandi. Admin foydalanuvchi/rol va xarajat turi interfeysi, saqlanadigan minimal qoldiq xabarlari, avtomatik backup/restore vositasi va yakuniy integratsiya sinovlari qo‘shilmoqda. Ushbu qayddan pastdagi oldingi “navbatdagi ish”lar tarixiy bo‘lishi mumkin; yangi ish boshlashdan oldin [topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md), main va Jira dalilini tekshiring. PM/buyurtmachi qabuli uning nomidan belgilanmaydi.
+
 ## Vazifalar va holat
 
 `Reja` belgisi boshlang‘ich taqsimotni bildiradi. Ish holatini Jira va PR dalili bilan tekshiring.

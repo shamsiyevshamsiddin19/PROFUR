@@ -272,3 +272,8 @@ Katalog API’si `catalog.*`, xarajatlar API’si `expenses.*` kodlarini tekshir
 ### Integratsiya ko‘rigi · PR #44
 
 Akkaunt yaratish va parolni tiklash `AUTH_PASSWORD_VALIDATORS` dagi barcha tekshiruvlardan o‘tadi; xato `password` yoki `new_password` maydonida 400 bilan qaytadi. Ishlayotgan `ADMIN`/superuser va aniq permission kodlari shartnomasi saqlandi: yangi `accounts.manage_users` yoki prefiks maskasi o‘zidan rol boshqarish huquqini bermaydi. Oldingi ruxsatlar algoritmini yoki mavjud akkauntlarni migratsiyasiz o‘zgartirish kiritilmadi.
+
+
+### 1-qism yakunlash qo‘shimchasi · PR #46
+
+`Role.permissions` satrlar ro‘yxati sifatida tekshiriladi. Tizimli rol/ADMIN kodi o‘zgartirilmaydi; tizimli yoki biriktirilgan rol o‘chirilmaydi. `is_system` API orqali yozilmaydi. Admin o‘zini faolsizlantira olmaydi va superuser bo‘lmasa o‘z ADMIN rolini olib tashlay olmaydi. Boshqa akkauntlar faolsizlantirilishi mumkin; tarix saqlanadi. O‘z parolini yangilagan foydalanuvchi qayta kiradi. Admin interfeysi `#administration` da.

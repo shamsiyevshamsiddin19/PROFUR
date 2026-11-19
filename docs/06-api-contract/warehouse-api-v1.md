@@ -302,3 +302,11 @@ Bu savollar javobi chiqquncha shartnomadagi tegishli qism taklif sifatida qoladi
 ## 9. Bu versiyaga kirmaganlar
 
 Login va rol boshqaruvi (Jamoliddin). Minimal chegaradan pastga tushganda xabarnoma (OQ-014) — alohida vazifa. Loyiha va ishchi havolalari: ular keyingi bosqichda bo‘lgani uchun `StockMovement.reference_kind/reference_id` orqali ulanadi, to‘g‘ridan-to‘g‘ri bog‘lanmaydi. Birliklar orasidagi konvertatsiya (OQ-005).
+
+
+## Minimal qoldiq xabarlari · PR #46
+
+- `GET /api/v1/notifications/?unread=true` — faqat joriy foydalanuvchining xabarlari, standart pagination (`count/next/results`). `unread` bo‘lmasa barchasi.
+- `POST /api/v1/notifications/{id}/read/` — o‘qilgan deb belgilash; takror yuborish xavfsiz (200), boshqa xodim yozuvi 404.
+- Ikkala amal ham `inventory.view_stock` talab qiladi. Maydonlar: `id`, `material`, `material_name`, `quantity`, `minimum`, `created_at`, `read_at`. Miqdorlar xabar vaqtidagi nusxa; narx yo‘q.
+- Birinchi pastga o‘tishda faol ruxsatli xodimlarga yoziladi, qoldiq tiklanmaguncha takrorlanmaydi. Minimumni o‘rnatish ham joriy qoldiq past bo‘lsa xabar yaratadi. Tranzaksiya qaytsa xabar ham qaytadi. Eski qoldiqlar uchun `notify_low_stock` buyrug‘i takroriy xabar bermasdan ishlaydi.

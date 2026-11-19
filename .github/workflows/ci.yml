@@ -78,6 +78,28 @@ jobs:
             echo "Kod bazasi hali qo'shilmagan. Dastlabki CI tekshiruvi muvaffaqiyatli."
           fi
 
+      - name: Use PostgreSQL 16 client container
+        run: |
+          mkdir -p "$RUNNER_TEMP/profur-pg-bin"
+          for tool in pg_dump pg_restore psql createdb dropdb; do
+            printf '#!/usr/bin/env bash\nexec docker run --rm --network host -e PGHOST -e PGPORT -e PGUSER -e PGPASSWORD -e PGDATABASE -v "$RUNNER_TEMP:$RUNNER_TEMP" postgres:16-alpine "%s" "$@"\n' "$tool" > "$RUNNER_TEMP/profur-pg-bin/$tool"
+            chmod 700 "$RUNNER_TEMP/profur-pg-bin/$tool"
+          done
+
+      - name: Verify PostgreSQL backup and isolated restore
+        env:
+          DB_NAME: profur_db
+          DB_USER: profur_user
+          DB_PASSWORD: profur_password
+          DB_HOST: localhost
+          DB_PORT: 5432
+          PG_BIN: ${{ runner.temp }}/profur-pg-bin
+        run: |
+          python backend/manage.py migrate --noinput
+          python backend/manage.py shell -c 'from accounts.models import User; from apps.catalog.models import Category, Material; from apps.inventory import services; from django.utils import timezone; from decimal import Decimal; u=User.objects.create_user(username="ci_restore"); m=Material.objects.create(name="CI restore material", category=Category.objects.first(), unit="sheet"); services.receive(material=m, user=u, received_on=timezone.localdate(), quantity=Decimal("20"), total_amount=Decimal("600"))'
+          python ops/backup.py --directory "$RUNNER_TEMP/profur-backup"
+          python ops/restore_drill.py "$RUNNER_TEMP"/profur-backup/*.dump
+
   frontend:
     name: Frontend Build & Tests
     runs-on: ubuntu-latest

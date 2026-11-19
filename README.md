@@ -33,23 +33,26 @@ cp .env.example .env
 ```
 Zarur bo‘lsa, `.env` ichidagi ma’lumotlar bazasi yoki kalit qiymatlarini tahrirlang.
 
-### 3. Serverni ishga tushirish (Backend)
+### 3. PostgreSQL bazasini ishga tushirish
+
+`.env.example` dagi PostgreSQL sozlamalari uchun avval baza tayyor bo‘lsin:
+
+```bash
+docker compose up -d --wait
+```
+
+Docker bo‘lmasa, PostgreSQL 16+ da alohida baza va uning foydalanuvchisini tayyorlab, `.env` ni moslang. Ishlayotgan boshqa loyihaning bazasini ishlatmang. Mahalliy SQLite faqat tezkor preview uchun; parallel ombor amallari PostgreSQL’da tekshiriladi.
+
+### 4. Backend va birinchi administrator
+
 ```bash
 python backend/manage.py migrate
-python backend/manage.py runserver
+python backend/manage.py createsuperuser
+python backend/manage.py notify_low_stock
+python backend/manage.py runserver 127.0.0.1:8000
 ```
-Tekshirish uchun brauzerda oching: `http://127.0.0.1:8000/api/health/`
 
-
-### 4. Ma’lumotlar bazasini ishga tushirish (PostgreSQL)
-Docker o‘rnatilgan bo‘lsa, PostgreSQL bazasini bitta buyruq bilan ko‘taring:
-```bash
-docker compose up -d
-```
-Bazani to‘xtatish uchun:
-```bash
-docker compose down
-```
+`createsuperuser` login/parolni interaktiv so‘raydi; kodda tayyor hisob yo‘q. Superuser PROFUR’ning Boshqaruv sahifasidan xodim va rollarni yaratishi mumkin. Sog‘liq tekshiruvi: `http://127.0.0.1:8000/api/health/`. Bazani to‘xtatish uchun `docker compose down`; volume’ni o‘chirish ish ma’lumotlarini yo‘qotadi, oddiy to‘xtatishda `-v` ishlatmang.
 
 ### 5. Kod sifati va formatlash tekshiruvi (Ruff)
 Jamoamizda Python kodi uchun [Ruff](https://docs.astral.sh/ruff/) standart qilib belgilangan:
@@ -110,8 +113,8 @@ npm run build — TypeScript va ishlab chiqarish yig‘masi.
 npm test — login CSRF/til, kirimni qayta yuborish hamda mavjud bo‘lmagan
 katalog holati uchun avtomatik sinovlar.
 
-Joriy bog‘liqlik — main’da katalog va kirim endpointlari hali mavjud emas.
-Login haqiqiy accounts API’siga ulanadi. Material ro‘yxati va kirim API’si
-tayyor bo‘lgach frontend shartnomadagi /api/v1 manzillaridan foydalanadi.
-Bu API’lar 404 bersa, frontend xizmat mavjud emasligini ko‘rsatadi,
-saqlash muvaffaqiyatini esa faqat server javobidan keyin ko‘rsatadi.
+Joriy sayt haqiqiy Django API bilan katalog, kirim, qoldiq/partiya/minimum, chiqim, qaytarish va hisobdan chiqarish tasdig‘i, xarajat/teskari yozuv, tarix/CSV hamda shaxsiy xabarlarni bajaradi. Boshqaruv sahifasi faqat ADMIN/superuser uchun; boshqa rollar aynan berilgan permission kodlariga muvofiq ishlaydi. Xarajat turlarini boshqarish alohida ruxsat bilan ochiladi, xarajat yozuvlarini ko‘rish vakolati shart emas.
+
+Brauzer sinovi: `frontend` ichida `npx playwright install chromium`, keyin `npm run test:e2e`. Python virtual muhit tashqarida bo‘lsa `E2E_PYTHON` bilan yo‘l ko‘rsating. Bu sinov alohida vaqtinchalik bazadan foydalanadi. PostgreSQL parallel sinovlari `pytest` bilan bajariladi. CI ham build, 3 ekranli Chromium va zaxirani alohida bazaga tiklashni tekshiradi.
+
+[1-qism topshirish reyestri](docs/08-delivery/phase-one-acceptance.md) va [backup/restore](docs/08-delivery/backup-restore.md) joriy imkoniyatlar, hisob shartnomasi va jonli muhit qabuli chegarasini belgilaydi.

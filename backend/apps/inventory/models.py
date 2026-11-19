@@ -98,6 +98,7 @@ class StockBalance(models.Model):
     min_quantity = models.DecimalField(
         _("minimal qoldiq"), null=True, blank=True, **QUANTITY
     )
+    low_stock_notified = models.BooleanField(default=False)
     updated_at = models.DateTimeField(_("o'zgartirilgan"), auto_now=True)
 
     class Meta:
@@ -530,3 +531,18 @@ class WriteOffAllocation(models.Model):
     def __str__(self) -> str:
         """Qismni ko'rsatadi: so'rov, partiya va miqdor."""
         return f"#{self.write_off_id} ← partiya #{self.batch_id} · {self.quantity}"
+
+
+class StockNotification(models.Model):
+    """Minimal qoldiqdan pastga o'tishning har bir qabul qiluvchiga xabari."""
+
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    material = models.ForeignKey("catalog.Material", on_delete=models.PROTECT)
+    quantity = models.DecimalField(**QUANTITY)
+    minimum = models.DecimalField(**QUANTITY)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-id"]
+        indexes = [models.Index(fields=["recipient", "read_at", "-id"])]

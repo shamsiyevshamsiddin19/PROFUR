@@ -41,8 +41,10 @@ msgstr "Permissions"
 
 #: apps/accounts/models.py:38
 msgid ""
-"Ruxsatlar ro'yxati (masalan: ['view_catalog', 'add_receipt', 'manage_users'])"
-msgstr "List of permissions (e.g., ['view_catalog', 'add_receipt', 'manage_users'])"
+"Ruxsatlar ro'yxati (masalan: ['view_catalog', 'add_receipt', "
+"'manage_users'])"
+msgstr ""
+"List of permissions (e.g., ['view_catalog', 'add_receipt', 'manage_users'])"
 
 #: apps/accounts/models.py:43
 msgid "Tizimli rol"
@@ -107,3 +109,15 @@ msgstr "Password successfully updated."
 #: apps/accounts/serializers.py
 msgid "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak."
 msgstr "New password must be at least 6 characters long."
+
+msgid "Tizimli rol kodini o'zgartirib bo'lmaydi."
+msgstr "The system role code cannot be changed."
+
+msgid "O'z hisobingizni faolsizlantira olmaysiz."
+msgstr "You cannot deactivate your own account."
+
+msgid "O'zingizdan ADMIN rolini olib tashlay olmaysiz."
+msgstr "You cannot remove your own ADMIN role."
+
+msgid "Tizimli yoki foydalanuvchiga biriktirilgan rol o'chirilmaydi."
+msgstr "System roles and assigned roles cannot be deleted."

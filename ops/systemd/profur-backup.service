@@ -1,0 +1,16 @@
+[Unit]
+Description=PROFUR daily PostgreSQL backup
+After=network-online.target
+[Service]
+Type=oneshot
+User=profur
+Group=profur
+WorkingDirectory=/opt/profur
+EnvironmentFile=/etc/profur/backup.env
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/profur/ops/backup.py --directory /var/backups/profur
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/backups/profur
+PrivateTmp=true

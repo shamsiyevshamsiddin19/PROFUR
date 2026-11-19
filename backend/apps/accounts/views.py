@@ -15,6 +15,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -106,6 +107,13 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RoleSerializer
     permission_classes = [IsAdminRole]
 
+    def perform_destroy(self, instance):
+        if instance.is_system or instance.code == "ADMIN" or instance.users.exists():
+            raise ValidationError(
+                _("Tizimli yoki foydalanuvchiga biriktirilgan rol o'chirilmaydi.")
+            )
+        instance.delete()
+
 
 class UserListCreateView(generics.ListCreateAPIView):
     """
@@ -169,6 +177,8 @@ class UserDeactivateView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        if target_user.pk == request.user.pk:
+            raise ValidationError(_("O'z hisobingizni faolsizlantira olmaysiz."))
         target_user.is_active = False
         target_user.save(update_fields=["is_active"])
         return Response(
