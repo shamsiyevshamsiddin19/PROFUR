@@ -18,12 +18,15 @@ export function receiptKeyboard(
 ) {
   if (event.key !== "Enter" || event.nativeEvent.isComposing || event.altKey)
     return;
-  if (event.repeat) {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  const advances =
+    target instanceof HTMLInputElement &&
+    ["text", "number", "email", "tel", "url", "search"].includes(target.type);
+  if (event.repeat && (advances || event.ctrlKey || event.metaKey)) {
     event.preventDefault();
     return;
   }
-  const target = event.target;
-  if (!(target instanceof HTMLElement)) return;
   if (event.ctrlKey || event.metaKey) {
     event.preventDefault();
     if (!locked) {
@@ -34,7 +37,7 @@ export function receiptKeyboard(
     }
     return;
   }
-  if (!(target instanceof HTMLInputElement)) return;
+  if (!advances || !(target instanceof HTMLInputElement)) return;
   event.preventDefault();
   if (locked) return;
   // An invalid field remains focused so a mistake cannot be silently skipped.
