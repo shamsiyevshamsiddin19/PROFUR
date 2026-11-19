@@ -63,6 +63,7 @@ export function WarehouseContent({
   user: User;
 }) {
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
+  const viewPrices = can(user, "inventory.view_purchase_price");
   const [detail, setDetail] = useState<StockRow | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockRows, setStockRows] = useState<StockRow[]>([]);
@@ -345,7 +346,7 @@ export function WarehouseContent({
                   <th>{t("stock")}</th>
                   <th>{t("batches")}</th>
                   <th>{t("minLimit")}</th>
-                  <th>{t("stockValue")}</th>
+                  {viewPrices && <th>{t("stockValue")}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -381,11 +382,13 @@ export function WarehouseContent({
                     <td data-label={t("minLimit")}>
                       {row.min_quantity ?? "—"}
                     </td>
-                    <td data-label={t("stockValue")}>
-                      {row.value_by_currency?.[0]?.amount
-                        ? money(row.value_by_currency[0].amount, lang)
-                        : "—"}
-                    </td>
+                    {viewPrices && (
+                      <td data-label={t("stockValue")}>
+                        {row.value_by_currency?.[0]?.amount
+                          ? money(row.value_by_currency[0].amount, lang)
+                          : "—"}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -610,8 +613,8 @@ export function WarehouseContent({
                   <th>{t("material")}</th>
                   <th>{t("date")}</th>
                   <th>{t("quantity")}</th>
-                  <th>{t("unitPrice")}</th>
-                  <th>{t("total")}</th>
+                  {viewPrices && <th>{t("unitPrice")}</th>}
+                  {viewPrices && <th>{t("total")}</th>}
                   <th>{t("supplier")}</th>
                   <th>{t("document")}</th>
                   <th>{t("note")}</th>
@@ -627,21 +630,25 @@ export function WarehouseContent({
                     <td>
                       {r.quantity} {unitLabel(r.material.unit, lang)}
                     </td>
-                    <td>
-                      {r.unit_price
-                        ? money(r.unit_price, lang)
-                        : r.total_amount && Number(r.quantity)
-                          ? money(
-                              String(
-                                Number(r.total_amount) / Number(r.quantity),
-                              ),
-                              lang,
-                            )
-                          : "—"}
-                    </td>
-                    <td>
-                      {r.total_amount ? money(r.total_amount, lang) : "—"}
-                    </td>
+                    {viewPrices && (
+                      <td>
+                        {r.unit_price
+                          ? money(r.unit_price, lang)
+                          : r.total_amount && Number(r.quantity)
+                            ? money(
+                                String(
+                                  Number(r.total_amount) / Number(r.quantity),
+                                ),
+                                lang,
+                              )
+                            : "—"}
+                      </td>
+                    )}
+                    {viewPrices && (
+                      <td>
+                        {r.total_amount ? money(r.total_amount, lang) : "—"}
+                      </td>
+                    )}
                     <td title={r.supplier || undefined}>{r.supplier || "—"}</td>
                     <td title={r.document_number || undefined}>
                       {r.document_number || "—"}

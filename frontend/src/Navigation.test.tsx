@@ -70,7 +70,7 @@ test.each([
     expect(screenAllowed(user, "administration")).toBe(code === "ADMIN");
   },
 );
-test("accountant starts at Home, sees expenses and never loads restricted stock or accounts", async () => {
+test("an expense-only role starts at Home and never loads restricted stock or accounts", async () => {
   localStorage.setItem("profur.language", "en");
   const calls: string[] = [];
   vi.stubGlobal(
@@ -80,7 +80,7 @@ test("accountant starts at Home, sees expenses and never loads restricted stock 
       return new Response(
         JSON.stringify(
           path === "/api/auth/me/"
-            ? account("ACCOUNTANT", ["expenses.view_expense"])
+            ? account("EXPENSE_VIEWER", ["expenses.view_expense"])
             : { results: [], next: null, count: 0 },
         ),
         { headers: { "Content-Type": "application/json" } },

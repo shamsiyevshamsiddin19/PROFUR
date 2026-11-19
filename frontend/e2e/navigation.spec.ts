@@ -41,7 +41,9 @@ for (const role of [
       await expect(
         nav.getByRole("link", { name: "Stock", exact: true }),
       ).toHaveCount(
-        ["warehouse", "procurement", "production"].includes(role) ? 1 : 0,
+        ["warehouse", "procurement", "production", "accountant"].includes(role)
+          ? 1
+          : 0,
       );
       if (mobile) {
         // Keyboard focus stays inside the drawer, Escape restores the opener.
@@ -86,6 +88,28 @@ for (const role of [
         await expect(
           page.getByRole("button", { name: "Save receipt", exact: true }),
         ).toHaveCount(0);
+      }
+      if (role !== "worker") {
+        await page.goto("/#stock");
+        const prices = role === "warehouse" || role === "accountant";
+        await expect(
+          page.getByRole("columnheader", { name: "Stock value", exact: true }),
+        ).toHaveCount(prices ? 1 : 0);
+        await page
+          .locator(".table-wrap tbody tr")
+          .first()
+          .getByRole("button")
+          .click();
+        const detail = page.getByRole("dialog");
+        await expect(
+          detail.getByRole("spinbutton", { name: "Min. limit", exact: true }),
+        ).toHaveCount(role === "warehouse" ? 1 : 0);
+        await expect(
+          detail.getByRole("columnheader", { name: "Unit price", exact: true }),
+        ).toHaveCount(prices ? 1 : 0);
+        await detail
+          .getByRole("button", { name: "Close", exact: true })
+          .click();
       }
       if (role === "production") {
         await page.goto("/#operations");
