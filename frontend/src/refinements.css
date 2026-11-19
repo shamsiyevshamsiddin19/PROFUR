@@ -636,13 +636,6 @@ input[type="number"],
   border: none;
   box-shadow: none;
 }
-.tabular-receipt .panel-heading {
-  padding-bottom: 12px;
-}
-.tabular-receipt .panel-heading h2 {
-  font-size: 16px;
-  font-weight: 650;
-}
 .tabular-receipt .form-actions {
   margin-top: 12px;
   padding: 12px 0 0;

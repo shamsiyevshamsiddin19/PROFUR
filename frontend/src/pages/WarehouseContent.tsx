@@ -11,7 +11,6 @@ import {
 } from "react";
 import {
   AlertTriangle,
-  ArrowDownLeft,
   Check,
   ChevronRight,
   ClipboardList,
@@ -511,18 +510,10 @@ export function WarehouseContent({
       <div className="receipt-layout tabular-receipt">
         <form
           className="receipt-form"
+          aria-label={t("details")}
           onSubmit={submit}
           onKeyDown={(event) => receiptKeyboard(event, locked)}
         >
-          <div className="panel-heading">
-            <span className="section-icon">
-              <ArrowDownLeft size={22} />
-            </span>
-            <div>
-              <h2>{t("details")}</h2>
-              <p>{t("detailsHint")}</p>
-            </div>
-          </div>
           <EntryTable lang={lang} className="receipt-entry-table">
             <Field label={t("material")}>
               <select
