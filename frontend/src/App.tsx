@@ -200,8 +200,13 @@ export function App() {
         }
       }
     };
+    const onResize = () => {
+      if (window.innerWidth > 850) setDrawer(false);
+    };
+    window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKey);
     return () => {
+      window.removeEventListener("resize", onResize);
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
       menuRef.current?.focus();
