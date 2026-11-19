@@ -122,6 +122,9 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           <table>
             <thead>
               <tr>
+                {showDecisions && (
+                  <th className="sticky-actions">{t("actions")}</th>
+                )}
                 <th>{t("reference")}</th>
                 <th>{t("material")}</th>
                 <th>{t("quantity")}</th>
@@ -129,30 +132,11 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 <th>{t("recipient")}</th>
                 <th>{t("status")}</th>
                 <th>{t("createdBy")}</th>
-                {showDecisions && (
-                  <th className="sticky-actions">{t("actions")}</th>
-                )}
               </tr>
             </thead>
             <tbody>
               {records.data.map((row) => (
                 <tr key={row.id}>
-                  <td>#{row.id}</td>
-                  <td>{row.material.display_name}</td>
-                  <td>{row.quantity}</td>
-                  <td>
-                    {row.issued_on ||
-                      row.returned_on ||
-                      row.created_at.slice(0, 10)}
-                  </td>
-                  <td>
-                    {row.recipient_name || row.issue?.recipient_name || "—"}
-                  </td>
-                  <td>
-                    <Status value={row.status} lang={lang} />
-                    {!row.status && "—"}
-                  </td>
-                  <td>{row.created_by.name}</td>
                   {showDecisions && (
                     <td className="sticky-actions">
                       {row.status === "pending" && (
@@ -177,6 +161,22 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                       )}
                     </td>
                   )}
+                  <td>#{row.id}</td>
+                  <td>{row.material.display_name}</td>
+                  <td>{row.quantity}</td>
+                  <td>
+                    {row.issued_on ||
+                      row.returned_on ||
+                      row.created_at.slice(0, 10)}
+                  </td>
+                  <td>
+                    {row.recipient_name || row.issue?.recipient_name || "—"}
+                  </td>
+                  <td>
+                    <Status value={row.status} lang={lang} />
+                    {!row.status && "—"}
+                  </td>
+                  <td>{row.created_by.name}</td>
                 </tr>
               ))}
             </tbody>

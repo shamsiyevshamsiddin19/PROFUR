@@ -1390,10 +1390,10 @@ input[type="number"],
 /* Decision controls remain reachable while their record is scrolled sideways. */
 .table-region .sticky-actions {
   position: sticky;
-  right: 0;
+  left: 0;
   min-width: 160px;
   background: var(--surface);
-  box-shadow: -1px 0 var(--line);
+  box-shadow: 1px 0 var(--line);
   z-index: 1;
 }
 .table-region th.sticky-actions {
