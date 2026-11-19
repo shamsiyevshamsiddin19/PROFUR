@@ -14,7 +14,7 @@ import {
   type Operation,
   type Allocation,
 } from "../api";
-import { translate, type Language } from "../i18n";
+import { translate, unitLabel, type Language } from "../i18n";
 import { localDate, money } from "../format";
 import { useRecords } from "../hooks/useRecords";
 import { useIdempotentWrite } from "../hooks/useIdempotentWrite";
@@ -50,6 +50,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
     }
   }, [user, kind]);
   const [status, setStatus] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState("");
   const [revision, setRevision] = useState(0);
   const [decision, setDecision] = useState<{
     row: Operation;
@@ -68,6 +69,8 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
       ? "inventory.approve_return"
       : "inventory.approve_write_off";
   const showDecisions = kind !== "issues" && can(user, approvalCode);
+  const pendingRows = records.data.filter((row) => row.status === "pending");
+  const picked = pendingRows.find((row) => String(row.id) === selectedRequest);
   return (
     <>
       <div className="workflow-toolbar">
@@ -81,6 +84,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
               onClick={() => {
                 setKind(k);
                 setStatus("");
+                setSelectedRequest("");
               }}
             >
               {t(labels[k])}
@@ -118,6 +122,46 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
             {t("refresh")}
           </button>
         </div>
+        {showDecisions && pendingRows.length > 0 && (
+          <div
+            className="mobile-decision-toolbar"
+            role="group"
+            aria-label={t("reviewRequests")}
+          >
+            <Field label={t("pendingReview")}>
+              <select
+                value={selectedRequest}
+                onChange={(event) => setSelectedRequest(event.target.value)}
+              >
+                <option value="">{t("choose")}</option>
+                {pendingRows.map((row) => (
+                  <option key={row.id} value={row.id}>
+                    #{row.id} · {row.material.display_name} · {row.quantity}{" "}
+                    {unitLabel(row.material.unit, lang)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <button
+              className="primary"
+              disabled={!picked}
+              onClick={() => {
+                if (picked) setDecision({ row: picked, action: "approve" });
+              }}
+            >
+              {t("approve")}
+            </button>
+            <button
+              className="secondary danger-text"
+              disabled={!picked}
+              onClick={() => {
+                if (picked) setDecision({ row: picked, action: "reject" });
+              }}
+            >
+              {t("reject")}
+            </button>
+          </div>
+        )}
         <TableViewport lang={lang} className="">
           <table>
             <thead>
@@ -197,6 +241,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           close={() => setDecision(null)}
           saved={() => {
             setDecision(null);
+            setSelectedRequest("");
             setRevision((n) => n + 1);
           }}
         />

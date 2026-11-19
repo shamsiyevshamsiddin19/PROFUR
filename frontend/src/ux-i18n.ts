@@ -1,4 +1,14 @@
 export const uxMessages = {
+  reviewRequests: [
+    "So‘rovlarni ko‘rib chiqish",
+    "Рассмотрение заявок",
+    "Review requests",
+  ],
+  pendingReview: [
+    "Tasdiq kutilayotgan so‘rov",
+    "Заявка на рассмотрении",
+    "Pending request",
+  ],
   home: ["Bosh sahifa", "Главная", "Home"],
   homeHint: [
     "Kerakli ishni tanlang. Sizga ruxsat berilgan amallar ko‘rsatiladi.",

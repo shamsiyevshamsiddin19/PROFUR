@@ -1400,3 +1400,32 @@ input[type="number"],
   background: var(--surface-muted);
   z-index: 4;
 }
+
+.mobile-decision-toolbar {
+  display: none;
+}
+@media (max-width: 650px) {
+  .mobile-decision-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .mobile-decision-toolbar .field {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+  .mobile-decision-toolbar select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+  .mobile-decision-toolbar > button {
+    flex: 1;
+    min-height: 44px;
+  }
+  .table-region .sticky-actions {
+    display: none;
+  }
+}
