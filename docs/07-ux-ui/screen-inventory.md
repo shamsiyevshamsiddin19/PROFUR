@@ -1,3 +1,5 @@
+> **Joriy holat · 2026-11-19:** ushbu fayl boshlang‘ich reja/arxiv. Foydalanuvchi Figma maketini rad etgan; amaldagi interfeys noldan yaratilgan. Joriy ekran va sinov dalili [topshirish reyestrida](../08-delivery/phase-one-acceptance.md), ranglar [vizual uslubda](visual-style.md). Kelgusi buyurtma/ishlab chiqarish va native ilova ekranlari 1-qismga kirmaydi.
+
 # Foydalanuvchi interfeysi — ekranlar ro‘yxati
 
 **Holat:** Dastlabki reja. Figma dizaynlari hali tasdiqlanmagan.

@@ -8,9 +8,17 @@
 
 Xarajatlar API’sini alohida tayyorlang. Loyiha havolasi shaklini PM qarori bilan aniqlang. Chiqimda partiya tanlash qarorini PCRM-31 orqali tekshiring. @ozodbek101 bilan qoldiq tranzaksiyasi va migratsiyalarni, @jamoliddinusarov1-create bilan tasdiqlovchi ruxsatlarni kelishing.
 
-## Joriy yakunlash · 2026-11-18
+## Joriy natija · 2026-11-19
 
-Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi saqlandi. Admin foydalanuvchi/rol va xarajat turi interfeysi, saqlanadigan minimal qoldiq xabarlari, avtomatik backup/restore vositasi va yakuniy integratsiya sinovlari qo‘shilmoqda. Ushbu qayddan pastdagi oldingi “navbatdagi ish”lar tarixiy bo‘lishi mumkin; yangi ish boshlashdan oldin [topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md), main va Jira dalilini tekshiring. PM/buyurtmachi qabuli uning nomidan belgilanmaydi.
+1-qismning texnik yig‘masi main’ga [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46) orqali birlashdi (`28d290c`). Team Lead qolgan ishlarni o‘z zimmasiga olib yakunladi, jamoaning mavjud kodi saqlandi. [CI #44449909326](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326): 231 backend, 10 frontend, 12 Chromium (telefon/planshet/desktop), Ruff/build/migratsiya va alohida PostgreSQL restore o‘tdi.
+
+Admin akkaunt/rol va alohida xarajat turi ekranlari, saqlanadigan minimal qoldiq xabarlari va backup/restore vositalari mavjud. Ko‘rikdagi `*` vakolatini olib tashlash va xarajat turi sahifasining ruxsatlarini ajratish muammolari tuzatildi, regressiyalar o‘tdi. Main PR va uch majburiy CI tekshiruvi bilan himoyalangan.
+
+[Topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md) joriy manba. P1/P3/P5 yangi biznes qarorlari ochiq: hozir partiyalar qo‘lda aniq tanlanadi, miqdor 2 kasr xona, USD. Kirimni tuzatish API’si mavjud emas. Production timer/domen va PM/buyurtmachi jonli qabuli alohida; ular bajarilgan deb belgilanmagan. Quyidagi avvalgi kun qaydlari tarixiy; “navbatdagi ish”larni qayta boshlamang.
+
+## Keyingi qadam
+
+Team Lead bilan sinov muhitida ko‘rib chiqish; kerak bo‘lsa P1/P3/P5 ni tasdiqlash, keyin server/domen, kunlik zaxira va PM/xodimlar qabuli. Omborning mavjud API/UI ishlarini takrorlamang. Joriy Jira PCRM-5–9, PCRM-32/37/38–50 texnik vazifalari Done; kelgusi modullar bu doiraga kirmaydi.
 
 ## Vazifalar va holat
 
@@ -18,8 +26,8 @@ Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi sa
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Bajarildi (OQ-001 kutilmoqda) | Chiqim — [PR #34](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/34), qaytarish va hisobdan chiqarish — [PR #35](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/35) main’ga birlashgan, CI (PostgreSQL) o‘tgan. Partiya tanlash algoritmi (OQ-001) PM qarorini kutadi — [issues-api.md](../docs/06-api-contract/issues-api.md) |
-| [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Ko‘rib chiqishda | [PR #18](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/18) va [PR #35](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/35) (teskari yozuv, majburiy loyiha) birlashgan; takroriy yuborish himoyasi — `feat/PCRM-46-expense-idempotency`. [expenses-api.md](../docs/06-api-contract/expenses-api.md) |
+| [PCRM-44](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-44) | Chiqim, qaytarish va hisobdan chiqarish | Bajarildi (texnik) | [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46), [CI 231/10/12](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326); joriy 1-qism doirasi. |
+| [PCRM-46](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-46) | Qo‘shimcha xarajatlar modeli va API | Bajarildi (texnik) | [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46), [CI 231/10/12](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326); joriy 1-qism doirasi. |
 | [PCRM-47](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-47) | Operatsiyalar tarixi API qismi. UI egasi frontend | Bajarildi (backend qismi) | Chiqim/qaytarish/hisobdan chiqarish harakatlari `/api/v1/movements/` ga `reference` bilan ulangan ([PR #35](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/35)), filtrlar material/tur/sana — Ozodbek [PR #27](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/27). UI — Shamsiddin [PR #39](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/39) |
 
 **Qabul mezoni** — Parallel chiqimda qoldiq manfiy qolmaydi. Qayta yuborilgan so‘rov bitta harakat yozadi, tasdiqlash qoldiqni faqat bir marta o‘zgartiradi.
@@ -34,7 +42,7 @@ Undan oldingi qayd: `2026-11-18 · PCRM-46 · Jarayonda · xarajatlar API’si m
 
 Eng avvalgi qayd: `2026-11-18 · PCRM-46 · Jarayonda · expenses ilovasi: xarajat turi (uz/ru/en nom, 3 ta boshlang‘ich tur) va xarajat (faqat USD, summa > 0, loyiha ixtiyoriy, o‘chirish/tahrirlash yo‘q), /api/v1/expenses/ va /api/v1/expense-types/, ru/en tarjimalar, ruxsat `accounts.permissions.HasPermissionCode` orqali (`expenses.*` kodlari) · main (#15) bilan birlashtirilgandan keyin pytest 50 o‘tdi, 2 tasi o‘tkazildi (SQLite), ruff check/format va makemigrations --check toza; PostgreSQL’da lokal sinov bajarilmadi (Docker ishlamayapti), CI tekshiradi · keyingi qadam: PR ko‘rigi (Shamsiddin, Jamoliddin); OQ-010 bo‘yicha savol [expenses-api.md](../docs/06-api-contract/expenses-api.md) da`
 
-## Navbatdagi ish
+## Arxiv — avvalgi navbatdagi ish
 
 Avvalgi 1–4 bandlar bajarildi (PCRM-46: #18, #35; PCRM-44: #34, #35; PostgreSQL 7+7 va ikki marta tasdiq sinovlari CI’da; PCRM-47 harakatlar ulanishi).
 
