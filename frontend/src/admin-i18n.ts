@@ -35,6 +35,7 @@ export const adminMessages = {
   role: ["Rol", "Роль", "Role"],
   roleName: ["Rol nomi", "Название роли", "Role name"],
   fullName: ["Foydalanuvchi", "Пользователь", "User"],
+  userLogin: ["Login", "Логин", "Login"],
   permissions: ["Ruxsatlar", "Разрешения", "Permissions"],
   adminWarning: [
     "ADMIN kodi barcha vakolatlarni beradi.",
