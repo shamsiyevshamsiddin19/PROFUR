@@ -65,7 +65,6 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
               <ExpenseFields types={types.data} lang={lang} />
             </fieldset>
             <div className="dialog-actions">
-              <span>USD</span>
               {pending ? (
                 <button
                   type="button"

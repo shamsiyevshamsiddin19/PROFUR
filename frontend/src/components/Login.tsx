@@ -86,7 +86,6 @@ export function Login({
       </div>
       <footer>
         <span>PROFUR</span>
-        <span>{t("allMoney")} · USD</span>
       </footer>
     </div>
   );

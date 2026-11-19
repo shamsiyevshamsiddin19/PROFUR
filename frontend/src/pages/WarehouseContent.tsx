@@ -17,7 +17,6 @@ import {
   Package,
   Search,
   RefreshCw,
-  ShieldCheck,
 } from "lucide-react";
 import Decimal from "decimal.js";
 import {
@@ -583,10 +582,6 @@ export function WarehouseContent({
           )}
           <p className="form-hint keyboard-hint">{t("receiptKeyboard")}</p>
           <div className="form-actions">
-            <span>
-              <ShieldCheck size={15} />
-              USD · $
-            </span>
             <button
               type="submit"
               className="primary"
