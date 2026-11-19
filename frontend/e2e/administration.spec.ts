@@ -4,7 +4,7 @@ test.describe.configure({ retries: 0 });
 test("admin manages users, roles and expense types; stock notifications remain private", async ({
   page,
 }, info) => {
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page.getByRole("combobox", { name: "Language" }).selectOption("en");
   await page.getByLabel("Username").fill("browser_storekeeper");
   await page.getByLabel("Password").fill("browser-test-only-password");
@@ -164,7 +164,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   // Restricted user can sign in with the new password, and cannot reach admin APIs.
   const logout = await page.request.post("/api/auth/logout/", { headers });
   expect(logout.status()).toBe(200);
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page.getByLabel("Username").fill(username);
   await page.getByLabel("Password").fill("Warehouse-reset-user-2026");
   await page.getByRole("button", { name: "Sign in" }).click();

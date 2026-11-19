@@ -1,3 +1,4 @@
+import { operationAllowed } from "../navigation";
 import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useEffect, useState, type FormEvent } from "react";
@@ -37,7 +38,16 @@ const permissions = {
 };
 export function Operations({ lang, user }: { lang: Language; user: User }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
-  const [kind, setKind] = useState<Kind>("issues");
+  const availableKinds = (Object.keys(labels) as Kind[]).filter((kind) =>
+    operationAllowed(user, kind),
+  );
+  const [kind, setKind] = useState<Kind>(() => availableKinds[0] || "issues");
+  useEffect(() => {
+    if (!operationAllowed(user, kind) && availableKinds[0]) {
+      setKind(availableKinds[0]);
+      setStatus("");
+    }
+  }, [user, kind]);
   const [status, setStatus] = useState("");
   const [revision, setRevision] = useState(0);
   const [decision, setDecision] = useState<{
@@ -45,8 +55,10 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
     action: "approve" | "reject";
   } | null>(null);
   const records = useRecords<Operation>(
-    `/api/v1/${kind}/` +
-      (status && kind !== "issues" ? `?status=${status}` : ""),
+    operationAllowed(user, kind)
+      ? `/api/v1/${kind}/` +
+          (status && kind !== "issues" ? `?status=${status}` : "")
+      : null,
     lang,
     revision,
   );
@@ -58,7 +70,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
     <>
       <div className="workflow-toolbar">
         <div className="tabs" role="tablist" aria-label={t("operations")}>
-          {(Object.keys(labels) as Kind[]).map((k) => (
+          {availableKinds.map((k) => (
             <button
               key={k}
               role="tab"

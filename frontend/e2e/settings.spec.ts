@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 test("appearance preferences persist without changing warehouse currency or permissions", async ({
   page,
 }, info) => {
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page
     .getByRole("combobox", { name: "Language", exact: true })
     .selectOption("en");

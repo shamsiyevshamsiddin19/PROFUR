@@ -4,7 +4,7 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   page,
 }, info) => {
   test.setTimeout(60000);
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page
     .getByRole("combobox", { name: "Language", exact: true })
     .selectOption("en");
@@ -49,7 +49,7 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   const created = await page.request.post("/api/v1/materials/", {
     headers,
     data: {
-      name: "Keyboard " + info.project.name,
+      name: "Keyboard " + info.project.name + " " + Date.now(),
       category_id: categories.results[0].id,
       unit: "sheet",
     },

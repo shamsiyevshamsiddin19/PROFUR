@@ -11,30 +11,25 @@ Ushbu buyruq PostgreSQL (profur_db) bazasini quyidagilar bilan to'ldiradi:
 8. Turli xildagi qo'shimcha xarajatlar (loyiha va umumiy xarajatlar, bekor qilingan yozuvlar).
 """
 
+import random
 from datetime import date, timedelta
 from decimal import Decimal
-import random
 
+from accounts.models import Role, User
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from accounts.models import Role, User
 from apps.catalog.models import Category, Material, Unit
 from apps.expenses.models import Expense, ExpenseType
 from apps.inventory.models import (
     Batch,
     Currency,
-    MovementType,
-    RequestStatus,
     StockBalance,
     StockIssue,
-    StockIssueAllocation,
     StockMovement,
     StockNotification,
     StockReturn,
-    StockReturnAllocation,
     WriteOff,
-    WriteOffAllocation,
 )
 from apps.inventory.services import (
     Allocation,
@@ -268,7 +263,7 @@ class Command(BaseCommand):
             (cat_ldsp, "LDSP Kronospan Qora Matt", "Qora", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("10.0")),
             (cat_ldsp, "LDSP Kastamonu Krem Shokolad", "Krem", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("10.0")),
             (cat_ldsp, "LDSP Egger Beton Chiqindi", "Kulrang", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("12.0")),
-            
+
             # MDF
             (cat_mdf, "MDF AGT Oq Yaltiroq Gloss 601", "Oq Gloss", Decimal("280.0"), Decimal("122.0"), Decimal("1.8"), Unit.SHEET, Decimal("15.0")),
             (cat_mdf, "MDF AGT Supramat Qora Qaymoq", "Qora Matt", Decimal("280.0"), Decimal("122.0"), Decimal("1.8"), Unit.SHEET, Decimal("10.0")),
@@ -371,7 +366,7 @@ class Command(BaseCommand):
             for b_idx in range(num_batches):
                 days_ago = 55 - (b_idx * 16) - random.randint(0, 5)
                 received_date = today - timedelta(days=max(2, days_ago))
-                
+
                 # Partiya miqdori
                 qty_mult = {
                     Unit.SHEET: Decimal(random.randint(20, 60)),
@@ -461,7 +456,7 @@ class Command(BaseCommand):
                         note=f"{p_desc} uchun berildi",
                     )
                     created_issues.append((issue, b, take_qty))
-                except Exception as e:
+                except Exception:
                     # Qoldiq yetmagan bo'lsa davom etamiz
                     pass
 

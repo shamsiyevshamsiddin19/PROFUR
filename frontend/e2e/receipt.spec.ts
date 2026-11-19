@@ -6,7 +6,7 @@ test.describe.configure({ retries: 0 });
 test("mobile warehouse workflow persists receipts, issues, approvals and expenses through the real API", async ({
   page,
 }, testInfo) => {
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page.getByRole("combobox", { name: "Language" }).selectOption("en");
   await page.getByLabel("Username").fill("browser_storekeeper");
   await page.getByLabel("Password").fill("browser-test-only-password");

@@ -44,6 +44,15 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
         ],
     )
     user.roles.add(role)
+    # These accounts exist only in this temporary test database.
+    for code, permissions in {
+        "production": ["catalog.view_material", "inventory.view_stock", "inventory.add_issue", "inventory.add_return"],
+        "accountant": ["expenses.view_expense", "expenses.view_expensetype", "expenses.add_expense"],
+        "worker": [],
+    }.items():
+        scoped_role = Role.objects.create(code="E2E_" + code.upper(), name=code, permissions=permissions)
+        scoped_user = get_user_model().objects.create_user(username="browser_" + code, password="browser-test-only-password")
+        scoped_user.roles.add(scoped_role)
     category = Category.objects.get(name="LMDF")
     Material.objects.create(name="Browser MDF", category=category, unit=Unit.SHEET)
     Material.objects.create(

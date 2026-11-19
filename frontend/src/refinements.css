@@ -779,14 +779,31 @@ input[type="number"],
   }
 
   /* Kirim / Receiving Entry Table: 8 columns mapped across 100% */
-  .receipt-entry-table .entry-col-0 { width: 22%; } /* Material */
-  .receipt-entry-table .entry-col-1 { width: 12%; } /* Kirim sanasi */
-  .receipt-entry-table .entry-col-2 { width: 6.5%; text-align: center; } /* Birlik */
-  .receipt-entry-table .entry-col-3 { width: 9%; } /* Miqdor */
-  .receipt-entry-table .entry-col-4 { width: 11%; } /* Jami summa */
-  .receipt-entry-table .entry-col-5 { width: 13.5%; } /* Yetkazib beruvchi */
-  .receipt-entry-table .entry-col-6 { width: 11.5%; } /* Hujjat raqami */
-  .receipt-entry-table .entry-col-7 { width: 14.5%; } /* Izoh */
+  .receipt-entry-table .entry-col-0 {
+    width: 22%;
+  } /* Material */
+  .receipt-entry-table .entry-col-1 {
+    width: 12%;
+  } /* Kirim sanasi */
+  .receipt-entry-table .entry-col-2 {
+    width: 6.5%;
+    text-align: center;
+  } /* Birlik */
+  .receipt-entry-table .entry-col-3 {
+    width: 9%;
+  } /* Miqdor */
+  .receipt-entry-table .entry-col-4 {
+    width: 11%;
+  } /* Jami summa */
+  .receipt-entry-table .entry-col-5 {
+    width: 13.5%;
+  } /* Yetkazib beruvchi */
+  .receipt-entry-table .entry-col-6 {
+    width: 11.5%;
+  } /* Hujjat raqami */
+  .receipt-entry-table .entry-col-7 {
+    width: 14.5%;
+  } /* Izoh */
 
   /* Recent Receipts Table: parallel column widths with overflow protection */
   .recent-receipts-table {
@@ -819,14 +836,38 @@ input[type="number"],
   .recent-receipts-table td:last-child {
     padding-right: 10px;
   }
-  .recent-receipts-table th:nth-child(1), .recent-receipts-table td:nth-child(1) { width: 28%; }
-  .recent-receipts-table th:nth-child(2), .recent-receipts-table td:nth-child(2) { width: 10%; }
-  .recent-receipts-table th:nth-child(3), .recent-receipts-table td:nth-child(3) { width: 9%; }
-  .recent-receipts-table th:nth-child(4), .recent-receipts-table td:nth-child(4) { width: 10%; }
-  .recent-receipts-table th:nth-child(5), .recent-receipts-table td:nth-child(5) { width: 11%; }
-  .recent-receipts-table th:nth-child(6), .recent-receipts-table td:nth-child(6) { width: 12%; }
-  .recent-receipts-table th:nth-child(7), .recent-receipts-table td:nth-child(7) { width: 10%; }
-  .recent-receipts-table th:nth-child(8), .recent-receipts-table td:nth-child(8) { width: 10%; }
+  .recent-receipts-table th:nth-child(1),
+  .recent-receipts-table td:nth-child(1) {
+    width: 28%;
+  }
+  .recent-receipts-table th:nth-child(2),
+  .recent-receipts-table td:nth-child(2) {
+    width: 10%;
+  }
+  .recent-receipts-table th:nth-child(3),
+  .recent-receipts-table td:nth-child(3) {
+    width: 9%;
+  }
+  .recent-receipts-table th:nth-child(4),
+  .recent-receipts-table td:nth-child(4) {
+    width: 10%;
+  }
+  .recent-receipts-table th:nth-child(5),
+  .recent-receipts-table td:nth-child(5) {
+    width: 11%;
+  }
+  .recent-receipts-table th:nth-child(6),
+  .recent-receipts-table td:nth-child(6) {
+    width: 12%;
+  }
+  .recent-receipts-table th:nth-child(7),
+  .recent-receipts-table td:nth-child(7) {
+    width: 10%;
+  }
+  .recent-receipts-table th:nth-child(8),
+  .recent-receipts-table td:nth-child(8) {
+    width: 10%;
+  }
   .recent-receipts-table td.wrap-cell {
     min-width: 0;
     max-width: none;
@@ -836,30 +877,68 @@ input[type="number"],
   }
 
   /* Expenses Entry Table: 5 columns */
-  .expense-entry-table .entry-col-0 { width: 25%; } /* Xarajat turi */
-  .expense-entry-table .entry-col-1 { width: 16%; } /* Summa · USD */
-  .expense-entry-table .entry-col-2 { width: 15%; } /* Sana */
-  .expense-entry-table .entry-col-3 { width: 18%; } /* Loyiha */
-  .expense-entry-table .entry-col-4 { width: 26%; } /* Izoh */
+  .expense-entry-table .entry-col-0 {
+    width: 25%;
+  } /* Xarajat turi */
+  .expense-entry-table .entry-col-1 {
+    width: 16%;
+  } /* Summa · USD */
+  .expense-entry-table .entry-col-2 {
+    width: 15%;
+  } /* Sana */
+  .expense-entry-table .entry-col-3 {
+    width: 18%;
+  } /* Loyiha */
+  .expense-entry-table .entry-col-4 {
+    width: 26%;
+  } /* Izoh */
 
   /* Operations Entry Table */
-  .operation-entry-table[data-columns="4"] .entry-col-0 { width: 30%; }
-  .operation-entry-table[data-columns="4"] .entry-col-1 { width: 18%; }
-  .operation-entry-table[data-columns="4"] .entry-col-2 { width: 24%; }
-  .operation-entry-table[data-columns="4"] .entry-col-3 { width: 28%; }
+  .operation-entry-table[data-columns="4"] .entry-col-0 {
+    width: 30%;
+  }
+  .operation-entry-table[data-columns="4"] .entry-col-1 {
+    width: 18%;
+  }
+  .operation-entry-table[data-columns="4"] .entry-col-2 {
+    width: 24%;
+  }
+  .operation-entry-table[data-columns="4"] .entry-col-3 {
+    width: 28%;
+  }
 
-  .operation-entry-table[data-columns="3"] .entry-col-0 { width: 36%; }
-  .operation-entry-table[data-columns="3"] .entry-col-1 { width: 20%; }
-  .operation-entry-table[data-columns="3"] .entry-col-2 { width: 44%; }
+  .operation-entry-table[data-columns="3"] .entry-col-0 {
+    width: 36%;
+  }
+  .operation-entry-table[data-columns="3"] .entry-col-1 {
+    width: 20%;
+  }
+  .operation-entry-table[data-columns="3"] .entry-col-2 {
+    width: 44%;
+  }
 
   /* Catalog modal entry table */
-  .catalog-entry-table .entry-col-0 { width: 24%; }
-  .catalog-entry-table .entry-col-1 { width: 18%; }
-  .catalog-entry-table .entry-col-2 { width: 13%; }
-  .catalog-entry-table .entry-col-3 { width: 15%; }
-  .catalog-entry-table .entry-col-4 { width: 10%; }
-  .catalog-entry-table .entry-col-5 { width: 10%; }
-  .catalog-entry-table .entry-col-6 { width: 10%; }
+  .catalog-entry-table .entry-col-0 {
+    width: 24%;
+  }
+  .catalog-entry-table .entry-col-1 {
+    width: 18%;
+  }
+  .catalog-entry-table .entry-col-2 {
+    width: 13%;
+  }
+  .catalog-entry-table .entry-col-3 {
+    width: 15%;
+  }
+  .catalog-entry-table .entry-col-4 {
+    width: 10%;
+  }
+  .catalog-entry-table .entry-col-5 {
+    width: 10%;
+  }
+  .catalog-entry-table .entry-col-6 {
+    width: 10%;
+  }
 }
 
 /* Mobile & Tablet fallback: allow smooth scroll when screen is smaller than 850px */
@@ -951,7 +1030,9 @@ input[type="number"],
   border-radius: 7px;
   background: var(--surface);
   color: var(--text);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .admin-search-box input:focus {
@@ -1175,4 +1256,114 @@ input[type="number"],
 
 .admin-action-btn svg {
   flex-shrink: 0;
+}
+
+/* Task-based entry point and a contained mobile drawer. */
+.home-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.home-action {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  color: var(--text);
+  background: var(--surface);
+  text-decoration: none;
+}
+.home-action:hover,
+.home-action:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+}
+.home-action > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.home-action strong,
+.home-action small {
+  display: block;
+}
+.home-action strong {
+  font-size: 16px;
+  margin-bottom: 7px;
+}
+.home-action small {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 13px;
+}
+.home-action-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  color: var(--accent);
+  background: var(--accent-muted);
+  border-radius: 10px;
+}
+.workflow-guide {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+.workflow-guide h2 {
+  font-size: 17px;
+}
+.workflow-guide p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+.workflow-guide ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 36px;
+  padding-left: 20px;
+}
+.workflow-guide a {
+  color: var(--accent-ink);
+  text-underline-offset: 3px;
+}
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: -100px;
+  left: 16px;
+  padding: 12px;
+  background: var(--surface);
+  color: var(--accent-ink);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+}
+.skip-link:focus {
+  top: 12px;
+}
+.page-heading h1:focus {
+  outline: none;
+}
+.entry-viewport {
+  min-width: 0;
+  max-width: 100%;
+}
+.entry-table .field input,
+.entry-table .field select {
+  min-width: 0;
+}
+@media (max-width: 650px) {
+  .home-actions {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .home-action {
+    padding: 16px;
+    gap: 12px;
+  }
+  .home-action strong {
+    font-size: 15px;
+  }
 }
