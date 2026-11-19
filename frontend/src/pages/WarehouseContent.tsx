@@ -1,3 +1,5 @@
+import { EntryTable } from "../components/EntryTable";
+import { Field } from "../components/WorkflowUI";
 import { receiptKeyboard } from "../keyboard";
 import { TableViewport } from "../components/TableViewport";
 import {
@@ -9,17 +11,15 @@ import {
 } from "react";
 import {
   AlertTriangle,
-  ArrowDownLeft,
   Check,
   ChevronRight,
   ClipboardList,
   Package,
   Search,
   RefreshCw,
-  ShieldCheck,
 } from "lucide-react";
-import Decimal from "decimal.js";
 import {
+  allPages,
   ApiError,
   fieldErrors,
   request,
@@ -63,6 +63,7 @@ export function WarehouseContent({
   user: User;
 }) {
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
+  const viewPrices = can(user, "inventory.view_purchase_price");
   const [detail, setDetail] = useState<StockRow | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockRows, setStockRows] = useState<StockRow[]>([]);
@@ -131,14 +132,26 @@ export function WarehouseContent({
           setStockRows(page.results);
           setNext(page.next);
         } else {
-          const page = await request<Page<Material>>(
+          const materialPath =
             "/api/v1/materials/?is_active=true&search=" +
-              encodeURIComponent(search),
-            lang,
-            { signal: controller.signal },
-          );
-          setMaterials(page.results);
-          setNext(page.next);
+            encodeURIComponent(search);
+          if (screen === "receiving") {
+            const rows = await allPages<Material>(
+              materialPath,
+              lang,
+              controller.signal,
+            );
+            if (controller.signal.aborted) return;
+            setMaterials(rows);
+            setNext(null);
+          } else {
+            const page = await request<Page<Material>>(materialPath, lang, {
+              signal: controller.signal,
+            });
+            if (controller.signal.aborted) return;
+            setMaterials(page.results);
+            setNext(page.next);
+          }
           if (screen === "receiving") {
             const receipts = await request<Page<Receipt>>(
               "/api/v1/receipts/",
@@ -197,20 +210,6 @@ export function WarehouseContent({
     setSaved(null);
     setFields({});
     setSaveError(null);
-  }
-  let preview = "—";
-  try {
-    if (
-      new Decimal(draft.quantity || 0).gt(0) &&
-      new Decimal(draft.total_amount || 0).gt(0)
-    ) {
-      preview = money(
-        new Decimal(draft.total_amount).div(draft.quantity).toFixed(2),
-        lang,
-      );
-    }
-  } catch {
-    /* Kiritilayotgan to‘liq bo‘lmagan son hisoblanmaydi. */
   }
 
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -336,10 +335,7 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {unavailable}
-        <TableViewport
-          lang={lang}
-          className={screen === "stock" ? "stock-ledger" : ""}
-        >
+        <TableViewport lang={lang} className="">
           {screen === "stock" ? (
             <table>
               <thead>
@@ -350,7 +346,7 @@ export function WarehouseContent({
                   <th>{t("stock")}</th>
                   <th>{t("batches")}</th>
                   <th>{t("minLimit")}</th>
-                  <th>{t("stockValue")}</th>
+                  {viewPrices && <th>{t("stockValue")}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -386,11 +382,13 @@ export function WarehouseContent({
                     <td data-label={t("minLimit")}>
                       {row.min_quantity ?? "—"}
                     </td>
-                    <td data-label={t("stockValue")}>
-                      {row.value_by_currency?.[0]?.amount
-                        ? money(row.value_by_currency[0].amount, lang)
-                        : "—"}
-                    </td>
+                    {viewPrices && (
+                      <td data-label={t("stockValue")}>
+                        {row.value_by_currency?.[0]?.amount
+                          ? money(row.value_by_currency[0].amount, lang)
+                          : "—"}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -467,19 +465,14 @@ export function WarehouseContent({
     type = "text",
   ) {
     return (
-      <label className={field === "note" ? "wide" : ""}>
-        <span
-          className={optional ? "field-label optional-label" : "field-label"}
-        >
-          {t(key)}
-          {optional && <small>{t("optional")}</small>}
-        </span>
+      <Field label={t(key)}>
         <input
           type={type}
           value={draft[field]}
           disabled={locked}
           required={!optional}
           onChange={(e) => change(field, e.target.value)}
+          placeholder={optional ? t("optional") : undefined}
           step={type === "number" ? "0.01" : undefined}
           min={type === "number" ? "0.01" : undefined}
           max={type === "date" ? localDate() : undefined}
@@ -500,7 +493,7 @@ export function WarehouseContent({
             {fields[field]}
           </span>
         )}
-      </label>
+      </Field>
     );
   }
   return (
@@ -515,24 +508,15 @@ export function WarehouseContent({
           </span>
         </div>
       )}
-      <div className="receipt-layout">
+      <div className="receipt-layout tabular-receipt">
         <form
-          className="receipt-form panel"
+          className="receipt-form"
+          aria-label={t("details")}
           onSubmit={submit}
           onKeyDown={(event) => receiptKeyboard(event, locked)}
         >
-          <div className="panel-heading">
-            <span className="section-icon">
-              <ArrowDownLeft size={22} />
-            </span>
-            <div>
-              <h2>{t("details")}</h2>
-              <p>{t("detailsHint")}</p>
-            </div>
-          </div>
-          <div className="form-grid">
-            <label className="wide">
-              {t("material")}
+          <EntryTable lang={lang} className="receipt-entry-table">
+            <Field label={t("material")}>
               <select
                 required
                 aria-invalid={Boolean(fields.material_id)}
@@ -555,34 +539,21 @@ export function WarehouseContent({
                   {fields.material_id}
                 </span>
               )}
-            </label>
-            {next && (
-              <button
-                type="button"
-                className="text-button wide"
-                onClick={more}
-                disabled={locked}
-              >
-                {t("materials")}
-                <ChevronRight size={14} />
-              </button>
-            )}
+            </Field>
             {input("received_on", "date", false, "date")}
-            <label>
-              {t("unit")}
+            <Field label={t("unit")}>
               <div className="readonly">
                 {selected ? unitLabel(selected.unit, lang) : "—"}
               </div>
-            </label>
+            </Field>
             {input("quantity", "quantity", false, "number")}
             {input("total_amount", "total", false, "number")}
-          </div>
-          <div className="form-divider" />
-          <div className="form-grid">
+
             {input("supplier", "supplier", true)}
             {input("document_number", "document", true)}
             {input("note", "note", true)}
-          </div>
+          </EntryTable>
+
           {saveError && (
             <div className="notice error" role="alert">
               {t(saveError)}
@@ -599,12 +570,7 @@ export function WarehouseContent({
               )}
             </div>
           )}
-          <p className="form-hint keyboard-hint">{t("receiptKeyboard")}</p>
           <div className="form-actions">
-            <span>
-              <ShieldCheck size={15} />
-              USD · $
-            </span>
             <button
               type="submit"
               className="primary"
@@ -623,37 +589,6 @@ export function WarehouseContent({
             </button>
           </div>
         </form>
-        <aside className="summary panel">
-          <span className="eyebrow">{t("newReceipt")}</span>
-          <h2>{t("summary")}</h2>
-          <p className="selected-material">
-            {selected?.display_name || selected?.name || t("select")}
-          </p>
-          <dl>
-            <div>
-              <dt>{t("quantity")}</dt>
-              <dd>
-                {draft.quantity || "—"}{" "}
-                {selected && unitLabel(selected.unit, lang)}
-              </dd>
-            </div>
-            <div>
-              <dt>{t("unitPrice")}</dt>
-              <dd>{preview}</dd>
-            </div>
-            <div>
-              <dt>{t("currency")}</dt>
-              <dd>USD ($)</dd>
-            </div>
-          </dl>
-          <div className="total">
-            <span>{t("total")}</span>
-            <strong>
-              {draft.total_amount ? money(draft.total_amount, lang) : "$0.00"}
-            </strong>
-          </div>
-          <p className="summary-hint">{t("estimate")}</p>
-        </aside>
       </div>
       <section className="recent">
         <div className="section-heading">
@@ -671,26 +606,55 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {receipts.length ? (
-          <TableViewport lang={lang} className="">
-            <table>
+          <TableViewport lang={lang} className="recent-receipts-viewport">
+            <table className="recent-receipts-table">
               <thead>
                 <tr>
                   <th>{t("material")}</th>
                   <th>{t("date")}</th>
                   <th>{t("quantity")}</th>
-                  <th>{t("total")}</th>
+                  {viewPrices && <th>{t("unitPrice")}</th>}
+                  {viewPrices && <th>{t("total")}</th>}
+                  <th>{t("supplier")}</th>
+                  <th>{t("document")}</th>
+                  <th>{t("note")}</th>
                 </tr>
               </thead>
               <tbody>
                 {receipts.map((r) => (
                   <tr key={r.id}>
-                    <td>{r.material.display_name}</td>
+                    <td title={r.material.display_name}>
+                      {r.material.display_name}
+                    </td>
                     <td>{r.received_on}</td>
                     <td>
                       {r.quantity} {unitLabel(r.material.unit, lang)}
                     </td>
-                    <td>
-                      {r.total_amount ? money(r.total_amount, lang) : "—"}
+                    {viewPrices && (
+                      <td>
+                        {r.unit_price
+                          ? money(r.unit_price, lang)
+                          : r.total_amount && Number(r.quantity)
+                            ? money(
+                                String(
+                                  Number(r.total_amount) / Number(r.quantity),
+                                ),
+                                lang,
+                              )
+                            : "—"}
+                      </td>
+                    )}
+                    {viewPrices && (
+                      <td>
+                        {r.total_amount ? money(r.total_amount, lang) : "—"}
+                      </td>
+                    )}
+                    <td title={r.supplier || undefined}>{r.supplier || "—"}</td>
+                    <td title={r.document_number || undefined}>
+                      {r.document_number || "—"}
+                    </td>
+                    <td className="wrap-cell" title={r.note || undefined}>
+                      {r.note || "—"}
                     </td>
                   </tr>
                 ))}

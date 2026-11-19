@@ -135,7 +135,11 @@ test("expense form labels select their controls and an uncertain write reuses it
       {
         code: "ACCOUNTANT",
         name: "Accountant",
-        permissions: ["expenses.view_expense", "expenses.add_expense"],
+        permissions: [
+          "expenses.view_expense",
+          "expenses.add_expense",
+          "expenses.view_expensetype",
+        ],
       },
     ],
   };

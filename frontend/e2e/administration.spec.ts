@@ -4,7 +4,7 @@ test.describe.configure({ retries: 0 });
 test("admin manages users, roles and expense types; stock notifications remain private", async ({
   page,
 }, info) => {
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page.getByRole("combobox", { name: "Language" }).selectOption("en");
   await page.getByLabel("Username").fill("browser_storekeeper");
   await page.getByLabel("Password").fill("browser-test-only-password");
@@ -50,7 +50,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   await page
     .getByRole("textbox", { name: "Search users", exact: true })
     .fill(username);
-  const record = page.locator(".admin-record").filter({ hasText: username });
+  const record = page.getByRole("row").filter({ hasText: username });
   await expect(record).toHaveCount(1);
   await record.getByRole("button", { name: "Edit", exact: true }).click();
   await dialog.getByLabel("Phone", { exact: true }).fill("+998901234567");
@@ -143,7 +143,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   const wildcardRole = await wildcardResponse.json();
   await page.goto("/#administration");
   const wildcardRecord = page
-    .locator(".admin-record")
+    .getByRole("row")
     .filter({ hasText: "Wildcard " + suffix });
   await wildcardRecord
     .getByRole("button", { name: "Edit", exact: true })
@@ -164,7 +164,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   // Restricted user can sign in with the new password, and cannot reach admin APIs.
   const logout = await page.request.post("/api/auth/logout/", { headers });
   expect(logout.status()).toBe(200);
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page.getByLabel("Username").fill(username);
   await page.getByLabel("Password").fill("Warehouse-reset-user-2026");
   await page.getByRole("button", { name: "Sign in" }).click();

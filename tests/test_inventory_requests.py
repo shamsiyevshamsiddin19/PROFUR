@@ -629,3 +629,34 @@ def test_parallel_double_approval_of_write_off_moves_stock_once():
     assert statuses == [200, 200]
     assert StockMovement.objects.filter(type=MovementType.WRITE_OFF).count() == 1
     assert on_hand(material) == Decimal("7")
+
+
+def test_returnable_preview_counts_pending_and_approved_without_price_leaks(
+    keeper, keeper_user, egger
+):
+    """Ko‘rsatilgan chegara qayta qaytarilgan yoki band qilingan qismni ayiradi."""
+    batch = receive(egger, keeper_user, "10", "300")
+    issued = issue(keeper, egger, (batch, "7"))
+    pending = request_return(keeper, issued["id"], (batch, "2"))
+    assert pending.status_code == 201
+    url = f"{ISSUES}{issued['id']}/returnable/"
+    response = keeper.get(url)
+    assert response.status_code == 200
+    assert response.data["allocations"][0]["quantity"] == "7.00"
+    assert response.data["allocations"][0]["returnable_quantity"] == "5.00"
+    assert on_hand(egger) == Decimal("3.00")
+    approved = post(keeper, f"{RETURNS}{pending.data['id']}/approve/", {})
+    assert approved.status_code == 200
+    assert keeper.get(url).data["allocations"][0]["returnable_quantity"] == "5.00"
+    pending_again = request_return(keeper, issued["id"], (batch, "1"))
+    assert keeper.get(url).data["allocations"][0]["returnable_quantity"] == "4.00"
+    assert (
+        post(keeper, f"{RETURNS}{pending_again.data['id']}/reject/", {}).status_code
+        == 200
+    )
+    assert keeper.get(url).data["allocations"][0]["returnable_quantity"] == "5.00"
+    reader = client_for(make_user("return_reader", "inventory.view_stock"))
+    part = reader.get(url).data["allocations"][0]
+    assert part["returnable_quantity"] == "5.00"
+    assert "unit_price" not in part
+    assert client_for(make_user("no_inventory")).get(url).status_code == 403

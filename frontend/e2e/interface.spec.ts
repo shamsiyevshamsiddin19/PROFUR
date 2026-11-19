@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function loginAsStorekeeper(page: Page, lang: "uz" | "ru" | "en" = "en") {
-  await page.goto("/");
+  await page.goto("/#receiving");
   await page.getByRole("combobox", { name: "Language" }).selectOption(lang);
   await page.locator('input[name="username"]').fill("browser_storekeeper");
   await page

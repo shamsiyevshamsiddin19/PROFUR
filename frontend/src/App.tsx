@@ -1,8 +1,11 @@
+import { Home } from "./pages/Home";
+import { screenAllowed, type Screen } from "./navigation";
 import { focusCurrentSearch } from "./keyboard";
 import { initialAppearance } from "./appearance";
 import { Settings } from "./pages/Settings";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  LayoutDashboard,
   Search,
   Settings2,
   Tags,
@@ -11,7 +14,6 @@ import {
   ArrowDownLeft,
   Box,
   ChevronRight,
-  CircleDollarSign,
   Layers3,
   LogOut,
   Menu,
@@ -40,18 +42,8 @@ import { Catalog } from "./pages/Catalog";
 import { Operations } from "./pages/Operations";
 import { Expenses } from "./pages/Expenses";
 import { History } from "./pages/History";
-type Screen =
-  | "settings"
-  | "receiving"
-  | "materials"
-  | "stock"
-  | "operations"
-  | "expenses"
-  | "history"
-  | "expenseTypes"
-  | "administration"
-  | "notifications";
 const screens = {
+  home: LayoutDashboard,
   settings: Settings2,
   expenseTypes: Tags,
   administration: Users,
@@ -65,7 +57,7 @@ const screens = {
 };
 function currentScreen(): Screen {
   const hash = location.hash.slice(1);
-  return Object.hasOwn(screens, hash) ? (hash as Screen) : "receiving";
+  return Object.hasOwn(screens, hash) ? (hash as Screen) : "home";
 }
 export function App() {
   const [appearance, setAppearance] = useState(initialAppearance);
@@ -98,6 +90,9 @@ export function App() {
   const [screen, setScreen] = useState<Screen>(currentScreen);
   const [unreadCount, setUnreadCount] = useState(0);
   const navRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const previousScreen = useRef(screen);
   const [drawer, setDrawer] = useState(false);
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
 
@@ -130,6 +125,45 @@ export function App() {
       });
     return () => controller.abort();
   }, []);
+  // Refresh assigned rights after an administrator changes a role in another session.
+  useEffect(() => {
+    if (!user) return;
+    let stopped = false;
+    const controller = new AbortController();
+    const refresh = () => {
+      if (document.visibilityState === "hidden") return;
+      void request<User>("/api/auth/me/", lang, { signal: controller.signal })
+        .then((current) => {
+          if (!stopped)
+            setUser((previous) =>
+              JSON.stringify(previous) === JSON.stringify(current)
+                ? previous
+                : current,
+            );
+        })
+        .catch((error) => {
+          if (
+            !stopped &&
+            error instanceof ApiError &&
+            [401, 403].includes(error.status)
+          ) {
+            setUser(null);
+            setDrawer(false);
+            setAuthError("session");
+          }
+        });
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("hashchange", refresh);
+    const interval = window.setInterval(refresh, 60000);
+    return () => {
+      stopped = true;
+      controller.abort();
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("hashchange", refresh);
+      window.clearInterval(interval);
+    };
+  }, [user?.id, lang]);
   useEffect(() => {
     const onHash = () => {
       setScreen(currentScreen());
@@ -140,12 +174,53 @@ export function App() {
   }, []);
   useEffect(() => {
     if (!drawer) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setDrawer(false);
+    const sidebar = navRef.current?.closest("aside");
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const controls = () =>
+      Array.from(
+        sidebar?.querySelectorAll<HTMLElement>(
+          "a[href],button:not(:disabled)",
+        ) || [],
+      ).filter((node) => node.getClientRects().length);
+    controls()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setDrawer(false);
+      }
+      if (event.key === "Tab") {
+        const items = controls(),
+          first = items[0],
+          last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
     };
+    const onResize = () => {
+      if (window.innerWidth > 850) setDrawer(false);
+    };
+    window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+      menuRef.current?.focus();
+    };
   }, [drawer]);
+
+  useEffect(() => {
+    if (previousScreen.current === screen) return;
+    previousScreen.current = screen;
+    window.scrollTo?.({ top: 0 });
+    headingRef.current?.focus({ preventScroll: true });
+  }, [screen]);
 
   useEffect(() => {
     if (!user || !can(user, "inventory.view_stock")) return;
@@ -243,21 +318,7 @@ export function App() {
       />
     );
 
-  const allowed = (key: Screen) =>
-    key === "settings"
-      ? true
-      : key === "administration"
-        ? user.is_superuser || user.role_codes.includes("ADMIN")
-        : can(
-            user,
-            key === "expenseTypes"
-              ? "expenses.view_expensetype"
-              : key === "materials"
-                ? "catalog.view_material"
-                : key === "expenses"
-                  ? "expenses.view_expense"
-                  : "inventory.view_stock",
-          );
+  const allowed = (key: Screen) => screenAllowed(user, key);
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
@@ -276,6 +337,16 @@ export function App() {
   }
   return (
     <div className="app">
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("main-content")?.focus();
+        }}
+      >
+        {t("skipContent")}
+      </a>
       {drawer && (
         <button
           className="scrim"
@@ -283,8 +354,13 @@ export function App() {
           aria-label={t("close")}
         />
       )}
-      <aside className={drawer ? "sidebar open" : "sidebar"}>
-        <a className="brand" href="#receiving" onClick={() => setDrawer(false)}>
+      <aside
+        className={drawer ? "sidebar open" : "sidebar"}
+        role={drawer ? "dialog" : undefined}
+        aria-modal={drawer ? true : undefined}
+        aria-label={t("workspace")}
+      >
+        <a className="brand" href="#home" onClick={() => setDrawer(false)}>
           <span className="brand-icon">
             <Warehouse size={22} />
           </span>
@@ -301,9 +377,10 @@ export function App() {
         <nav ref={navRef} aria-label={t("workspace")}>
           {(
             [
+              ["home", ["home"]],
               [
                 "warehouseNav",
-                ["receiving", "materials", "stock", "operations"],
+                ["stock", "receiving", "operations", "materials"],
               ],
               ["activityNav", ["expenses", "history", "notifications"]],
               ["managementNav", ["expenseTypes", "administration", "settings"]],
@@ -364,10 +441,11 @@ export function App() {
           </div>
         </div>
       </aside>
-      <div className="workspace">
+      <div className="workspace" inert={drawer}>
         <header className="topbar">
           <div className="breadcrumbs">
             <button
+              ref={menuRef}
               className="icon-button mobile-menu"
               onClick={() => setDrawer(true)}
               aria-label={t("menu")}
@@ -396,38 +474,38 @@ export function App() {
             {languagePicker}
           </div>
         </header>
-        <main>
+        <main id="main-content" tabIndex={-1}>
           <div className="page-heading">
             <div>
-              <h1>{t(screen)}</h1>
+              <h1 ref={headingRef} tabIndex={-1}>
+                {t(screen)}
+              </h1>
               <p>
                 {screen === "receiving"
                   ? t("intro")
                   : t(
-                      screen === "settings"
-                        ? "settingsHint"
-                        : screen === "expenseTypes"
-                          ? "expenseTypesHint"
-                          : screen === "administration"
-                            ? "administrationHint"
-                            : screen === "notifications"
-                              ? "notificationsHint"
-                              : screen === "materials"
-                                ? "catalogueHint"
-                                : screen === "operations"
-                                  ? "operationsHint"
-                                  : screen === "expenses"
-                                    ? "expenseHint"
-                                    : screen === "history"
-                                      ? "historyHint"
-                                      : "stockHint",
+                      screen === "home"
+                        ? "homeHint"
+                        : screen === "settings"
+                          ? "settingsHint"
+                          : screen === "expenseTypes"
+                            ? "expenseTypesHint"
+                            : screen === "administration"
+                              ? "administrationHint"
+                              : screen === "notifications"
+                                ? "notificationsHint"
+                                : screen === "materials"
+                                  ? "catalogueHint"
+                                  : screen === "operations"
+                                    ? "operationsHint"
+                                    : screen === "expenses"
+                                      ? "expenseHint"
+                                      : screen === "history"
+                                        ? "historyHint"
+                                        : "stockHint",
                     )}
               </p>
             </div>
-            <span className="currency-badge">
-              <CircleDollarSign size={16} />
-              USD
-            </span>
           </div>
           {authError && (
             <div className="notice error" role="alert">
@@ -441,7 +519,11 @@ export function App() {
             </div>
           )}
           {!allowed(screen) ? (
-            <div className="notice">{t("noPermission")}</div>
+            <div className="notice">
+              {t("noPermission")} <a href="#home">{t("backHome")}</a>
+            </div>
+          ) : screen === "home" ? (
+            <Home lang={lang} user={user} />
           ) : screen === "settings" ? (
             <Settings
               lang={lang}
@@ -487,7 +569,6 @@ export function App() {
 
           <footer>
             <span>PROFUR</span>
-            <span>{t("allMoney")} · USD</span>
           </footer>
         </main>
       </div>

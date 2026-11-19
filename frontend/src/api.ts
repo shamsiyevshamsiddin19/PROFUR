@@ -170,6 +170,7 @@ export function can(user: User, code: string) {
 }
 export type Category = { id: number; name: string; is_active: boolean };
 export type Allocation = {
+  returnable_quantity?: string;
   batch_id: number;
   quantity: string;
   unit_price?: string;

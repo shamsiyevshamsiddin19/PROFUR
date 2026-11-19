@@ -1,8 +1,11 @@
+import { operationAllowed } from "../navigation";
+import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useEffect, useState, type FormEvent } from "react";
 import Decimal from "decimal.js";
 import {
   allPages,
+  request,
   can,
   write,
   type User,
@@ -11,7 +14,7 @@ import {
   type Operation,
   type Allocation,
 } from "../api";
-import { translate, type Language } from "../i18n";
+import { translate, unitLabel, type Language } from "../i18n";
 import { localDate, money } from "../format";
 import { useRecords } from "../hooks/useRecords";
 import { useIdempotentWrite } from "../hooks/useIdempotentWrite";
@@ -36,16 +39,28 @@ const permissions = {
 };
 export function Operations({ lang, user }: { lang: Language; user: User }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
-  const [kind, setKind] = useState<Kind>("issues");
+  const availableKinds = (Object.keys(labels) as Kind[]).filter((kind) =>
+    operationAllowed(user, kind),
+  );
+  const [kind, setKind] = useState<Kind>(() => availableKinds[0] || "issues");
+  useEffect(() => {
+    if (!operationAllowed(user, kind) && availableKinds[0]) {
+      setKind(availableKinds[0]);
+      setStatus("");
+    }
+  }, [user, kind]);
   const [status, setStatus] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState("");
   const [revision, setRevision] = useState(0);
   const [decision, setDecision] = useState<{
     row: Operation;
     action: "approve" | "reject";
   } | null>(null);
   const records = useRecords<Operation>(
-    `/api/v1/${kind}/` +
-      (status && kind !== "issues" ? `?status=${status}` : ""),
+    operationAllowed(user, kind)
+      ? `/api/v1/${kind}/` +
+          (status && kind !== "issues" ? `?status=${status}` : "")
+      : null,
     lang,
     revision,
   );
@@ -53,11 +68,14 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
     kind === "returns"
       ? "inventory.approve_return"
       : "inventory.approve_write_off";
+  const showDecisions = kind !== "issues" && can(user, approvalCode);
+  const pendingRows = records.data.filter((row) => row.status === "pending");
+  const picked = pendingRows.find((row) => String(row.id) === selectedRequest);
   return (
     <>
       <div className="workflow-toolbar">
         <div className="tabs" role="tablist" aria-label={t("operations")}>
-          {(Object.keys(labels) as Kind[]).map((k) => (
+          {availableKinds.map((k) => (
             <button
               key={k}
               role="tab"
@@ -66,6 +84,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
               onClick={() => {
                 setKind(k);
                 setStatus("");
+                setSelectedRequest("");
               }}
             >
               {t(labels[k])}
@@ -103,10 +122,53 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
             {t("refresh")}
           </button>
         </div>
+        {showDecisions && pendingRows.length > 0 && (
+          <div
+            className="mobile-decision-toolbar"
+            role="group"
+            aria-label={t("reviewRequests")}
+          >
+            <Field label={t("pendingReview")}>
+              <select
+                value={selectedRequest}
+                onChange={(event) => setSelectedRequest(event.target.value)}
+              >
+                <option value="">{t("choose")}</option>
+                {pendingRows.map((row) => (
+                  <option key={row.id} value={row.id}>
+                    #{row.id} · {row.material.display_name} · {row.quantity}{" "}
+                    {unitLabel(row.material.unit, lang)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <button
+              className="primary"
+              disabled={!picked}
+              onClick={() => {
+                if (picked) setDecision({ row: picked, action: "approve" });
+              }}
+            >
+              {t("approve")}
+            </button>
+            <button
+              className="secondary danger-text"
+              disabled={!picked}
+              onClick={() => {
+                if (picked) setDecision({ row: picked, action: "reject" });
+              }}
+            >
+              {t("reject")}
+            </button>
+          </div>
+        )}
         <TableViewport lang={lang} className="">
           <table>
             <thead>
               <tr>
+                {showDecisions && (
+                  <th className="sticky-actions">{t("actions")}</th>
+                )}
                 <th>{t("reference")}</th>
                 <th>{t("material")}</th>
                 <th>{t("quantity")}</th>
@@ -114,12 +176,35 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 <th>{t("recipient")}</th>
                 <th>{t("status")}</th>
                 <th>{t("createdBy")}</th>
-                <th>{t("actions")}</th>
               </tr>
             </thead>
             <tbody>
               {records.data.map((row) => (
                 <tr key={row.id}>
+                  {showDecisions && (
+                    <td className="sticky-actions">
+                      {row.status === "pending" && (
+                        <div className="row-actions">
+                          <button
+                            className="text-button"
+                            onClick={() =>
+                              setDecision({ row, action: "approve" })
+                            }
+                          >
+                            {t("approve")}
+                          </button>
+                          <button
+                            className="text-button danger-text"
+                            onClick={() =>
+                              setDecision({ row, action: "reject" })
+                            }
+                          >
+                            {t("reject")}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  )}
                   <td>#{row.id}</td>
                   <td>{row.material.display_name}</td>
                   <td>{row.quantity}</td>
@@ -136,26 +221,6 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                     {!row.status && "—"}
                   </td>
                   <td>{row.created_by.name}</td>
-                  <td>
-                    {row.status === "pending" && can(user, approvalCode) && (
-                      <div className="row-actions">
-                        <button
-                          className="text-button"
-                          onClick={() =>
-                            setDecision({ row, action: "approve" })
-                          }
-                        >
-                          {t("approve")}
-                        </button>
-                        <button
-                          className="text-button danger-text"
-                          onClick={() => setDecision({ row, action: "reject" })}
-                        >
-                          {t("reject")}
-                        </button>
-                      </div>
-                    )}
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -176,6 +241,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           close={() => setDecision(null)}
           saved={() => {
             setDecision(null);
+            setSelectedRequest("");
             setRevision((n) => n + 1);
           }}
         />
@@ -195,7 +261,12 @@ function OperationForm({
   saved: () => void;
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
-  const stocks = useRecords<StockRow>("/api/v1/stock/", lang);
+  const stocks = useRecords<StockRow>(
+    kind === "returns" ? null : "/api/v1/stock/",
+    lang,
+    0,
+    true,
+  );
   const issues = useRecords<Operation>(
     kind === "returns" ? "/api/v1/issues/" : null,
     lang,
@@ -216,12 +287,33 @@ function OperationForm({
     setPartError(null);
     setParts([]);
     setIssueParts([]);
+    const controller = new AbortController();
     if (kind === "returns") {
-      setIssueParts(selectedIssue?.allocations || []);
+      if (!selectedIssue) {
+        setPartLoading(false);
+        return;
+      }
+      setPartLoading(true);
+      request<{ allocations: Allocation[] }>(
+        `/api/v1/issues/${selectedIssue.id}/returnable/`,
+        lang,
+        { signal: controller.signal },
+      )
+        .then((result) => {
+          if (!controller.signal.aborted) setIssueParts(result.allocations);
+        })
+        .catch((error) => {
+          if (!controller.signal.aborted) setPartError(error);
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setPartLoading(false);
+        });
+      return () => controller.abort();
+    }
+    if (!material) {
+      setPartLoading(false);
       return;
     }
-    if (!material) return;
-    const controller = new AbortController();
     setPartLoading(true);
     allPages<StockBatch>(
       `/api/v1/stock/${material}/batches/`,
@@ -243,7 +335,7 @@ function OperationForm({
     kind === "returns"
       ? issueParts.map((p) => ({
           id: p.batch_id,
-          available: p.quantity,
+          available: p.returnable_quantity || "0.00",
           date: p.received_on,
           price: p.unit_price,
         }))
@@ -309,6 +401,16 @@ function OperationForm({
         error={operation.error || partError || stocks.error || issues.error}
         lang={lang}
       />
+      {stocks.loading && (
+        <div className="load-line" role="status">
+          {t("loading")}
+        </div>
+      )}
+      {Boolean(stocks.error) && (
+        <button className="secondary" onClick={stocks.reload}>
+          {t("retry")}
+        </button>
+      )}
       {operation.pending && !operation.busy && (
         <div className="notice" role="alert">
           {t("locked")}
@@ -316,7 +418,7 @@ function OperationForm({
       )}
       <form onSubmit={submit} key={reset}>
         <fieldset disabled={operation.busy || Boolean(operation.pending)}>
-          <div className="form-grid">
+          <EntryTable lang={lang} className="operation-entry-table">
             {kind === "returns" ? (
               <Field label={t("originalIssue")} wide>
                 <select
@@ -346,15 +448,19 @@ function OperationForm({
               <Field label={t("material")} wide>
                 <select
                   required
+                  disabled={stocks.loading}
+                  aria-busy={stocks.loading}
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
                 >
                   <option value="">{t("choose")}</option>
-                  {stocks.data.map((s) => (
-                    <option key={s.material.id} value={s.material.id}>
-                      {s.material.display_name} · {s.quantity_on_hand}
-                    </option>
-                  ))}
+                  {stocks.data
+                    .filter((s) => new Decimal(s.quantity_on_hand).gt(0))
+                    .map((s) => (
+                      <option key={s.material.id} value={s.material.id}>
+                        {s.material.display_name} · {s.quantity_on_hand}
+                      </option>
+                    ))}
                 </select>
                 {stocks.next && (
                   <button
@@ -395,7 +501,7 @@ function OperationForm({
                 maxLength={500}
               />
             </Field>
-          </div>
+          </EntryTable>
           <div className="allocation-section">
             <h3>{t("batchSelection")}</h3>
             <p className="form-hint">{t("manualBatches")}</p>

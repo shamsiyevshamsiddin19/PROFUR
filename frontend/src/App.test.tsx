@@ -86,6 +86,7 @@ test("login uses a fresh CSRF token and the selected language", async () => {
       return baseFetch(path);
     }),
   );
+  location.hash = "#receiving";
   render(<App />);
   await screen.findByLabelText("Foydalanuvchi nomi");
   fireEvent.change(screen.getByRole("combobox", { name: "Language" }), {
@@ -124,6 +125,7 @@ test("a failed receipt reuses its exact USD payload and key after remount", asyn
       return baseFetch(path);
     }),
   );
+  location.hash = "#receiving";
   const first = render(<App />);
   await screen.findByRole("option", { name: "MDF 18 mm · sheet" });
   fireEvent.change(screen.getByLabelText("Material"), {
@@ -138,6 +140,7 @@ test("a failed receipt reuses its exact USD payload and key after remount", asyn
   await userEvent.click(screen.getByRole("button", { name: "Save receipt" }));
   await screen.findByRole("button", { name: "Retry the same request" });
   first.unmount();
+  location.hash = "#receiving";
   render(<App />);
   const retry = await screen.findByRole("button", {
     name: "Retry the same request",
@@ -158,6 +161,7 @@ test("unavailable catalogue cannot submit a fabricated receipt", async () => {
     path === "/api/auth/me/" ? response(user) : response({}, 404),
   );
   vi.stubGlobal("fetch", fetchMock);
+  location.hash = "#receiving";
   render(<App />);
   await screen.findAllByText(
     "Bu xizmat hozircha ishlamayapti. Keyinroq qayta tekshiring.",
@@ -184,6 +188,7 @@ test("the mobile drawer closes after sign out and a new sign in", async () => {
       return baseFetch(path);
     }),
   );
+  location.hash = "#receiving";
   render(<App />);
   await screen.findByRole("heading", { name: "Material receipts" });
   await userEvent.click(screen.getByRole("button", { name: "Open menu" }));
@@ -228,6 +233,7 @@ test("receipt component submits one USD request with an idempotency key", async 
       return baseFetch(path);
     }),
   );
+  location.hash = "#receiving";
   render(<App />);
   await screen.findByRole("option", { name: "MDF 18 mm · list" });
   fireEvent.change(screen.getByLabelText("Material"), {

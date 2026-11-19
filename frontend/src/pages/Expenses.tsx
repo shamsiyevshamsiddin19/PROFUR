@@ -1,3 +1,4 @@
+import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { can, type Expense, type ExpenseType, type User } from "../api";
@@ -24,7 +25,7 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
     revision,
   );
   const types = useRecords<ExpenseType>(
-    "/api/v1/expense-types/",
+    can(user, "expenses.view_expensetype") ? "/api/v1/expense-types/" : null,
     lang,
     revision,
   );
@@ -56,41 +57,41 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
           {t("locked")}
         </div>
       )}
-      {can(user, "expenses.add_expense") && (
-        <section className="workflow-panel">
-          <h2>{t("expenses")}</h2>
-          <form onSubmit={submit}>
-            <fieldset disabled={busy || Boolean(pending)}>
-              <ExpenseFields types={types.data} lang={lang} />
-            </fieldset>
-            <div className="dialog-actions">
-              <span>USD</span>
-              {pending ? (
-                <button
-                  type="button"
-                  disabled={busy}
-                  className="primary"
-                  onClick={async () => {
-                    if (await operation.submit(null)) {
-                      setSuccess(true);
-                      setRevision((n) => n + 1);
-                    }
-                  }}
-                >
-                  {t(busy ? "saving" : "again")}
-                </button>
-              ) : (
-                <button
-                  disabled={busy || !types.data.length}
-                  className="primary"
-                >
-                  {t(busy ? "saving" : "saveChanges")}
-                </button>
-              )}
-            </div>
-          </form>
-        </section>
-      )}
+      {can(user, "expenses.add_expense") &&
+        can(user, "expenses.view_expensetype") && (
+          <section className="workflow-panel">
+            <h2>{t("expenses")}</h2>
+            <form onSubmit={submit}>
+              <fieldset disabled={busy || Boolean(pending)}>
+                <ExpenseFields types={types.data} lang={lang} />
+              </fieldset>
+              <div className="dialog-actions">
+                {pending ? (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="primary"
+                    onClick={async () => {
+                      if (await operation.submit(null)) {
+                        setSuccess(true);
+                        setRevision((n) => n + 1);
+                      }
+                    }}
+                  >
+                    {t(busy ? "saving" : "again")}
+                  </button>
+                ) : (
+                  <button
+                    disabled={busy || !types.data.length}
+                    className="primary"
+                  >
+                    {t(busy ? "saving" : "saveChanges")}
+                  </button>
+                )}
+              </div>
+            </form>
+          </section>
+        )}
       <div className="workflow-toolbar recent">
         <select
           aria-label={t("expenseType")}
@@ -219,6 +220,7 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
           userId={user.id}
           lang={lang}
           types={types.data}
+          allowCorrection={can(user, "expenses.view_expensetype")}
           close={() => setReverse(null)}
           saved={() => {
             setReverse(null);
@@ -250,7 +252,7 @@ function ExpenseFields({
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   return (
-    <div className="form-grid">
+    <EntryTable lang={lang} className="expense-entry-table">
       <Field label={t("expenseType")}>
         <select
           name="expense_type"
@@ -298,7 +300,7 @@ function ExpenseFields({
       <Field label={t("note")} wide>
         <input name="note" defaultValue={row?.note} />
       </Field>
-    </div>
+    </EntryTable>
   );
 }
 function ReverseExpense({
@@ -308,7 +310,9 @@ function ReverseExpense({
   types,
   close,
   saved,
+  allowCorrection,
 }: {
+  allowCorrection: boolean;
   row: Expense;
   userId: number;
   lang: Language;
@@ -355,14 +359,16 @@ function ReverseExpense({
           <Field label={t("reason")}>
             <input name="reason" required maxLength={1000} />
           </Field>
-          <label className="check-label">
-            <input
-              type="checkbox"
-              checked={correction}
-              onChange={(e) => setCorrection(e.target.checked)}
-            />
-            {t("correction")}
-          </label>
+          {allowCorrection && (
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={correction}
+                onChange={(e) => setCorrection(e.target.checked)}
+              />
+              {t("correction")}
+            </label>
+          )}
           {correction && <ExpenseFields lang={lang} types={types} row={row} />}
         </fieldset>
         <div className="dialog-actions">
