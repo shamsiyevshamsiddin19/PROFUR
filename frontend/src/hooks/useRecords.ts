@@ -22,6 +22,11 @@ export function useRecords<T>(
   });
   const [nonce, setNonce] = useState(0);
   useEffect(() => {
+    setPagination((current) =>
+      current.key === key ? current : { key, cursor: null },
+    );
+  }, [key]);
+  useEffect(() => {
     if (!path) return;
     const controller = new AbortController();
     setState((old) => ({

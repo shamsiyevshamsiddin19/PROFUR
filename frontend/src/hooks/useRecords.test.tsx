@@ -36,9 +36,12 @@ test("changing a filter after loading more never appends an old page to new resu
     late(page(2));
   });
   expect(result.current.data).toEqual([9]);
+  rerender({ path: "/items/?filter=A" });
+  await waitFor(() => expect(result.current.data).toEqual([1]));
   expect(calls).toEqual([
     "/items/?filter=A",
     "/items/?filter=A&page=2",
     "/items/?filter=B",
+    "/items/?filter=A",
   ]);
 });
