@@ -640,47 +640,6 @@ input[type="number"],
   border-top: none;
   justify-content: flex-end;
 }
-.tabular-receipt .summary {
-  max-width: none;
-  position: static;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px 20px;
-  padding: 14px 4px;
-  border-radius: 0;
-  background: transparent;
-  border: none;
-  border-top: 1px solid var(--line);
-  box-shadow: none;
-  margin-top: 16px;
-}
-.tabular-receipt .summary .selected-material {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-weight: 600;
-}
-.tabular-receipt .summary dl {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 24px;
-  margin: 0;
-}
-.tabular-receipt .summary dl div {
-  padding: 0;
-  gap: 8px;
-}
-.tabular-receipt .summary .total {
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding-top: 0;
-  border-top: 0;
-}
 
 /* Cardless workflow panel (Zero box-in-a-box across all views) */
 .workflow-panel {
@@ -829,7 +788,7 @@ input[type="number"],
   .receipt-entry-table .entry-col-6 { width: 11.5%; } /* Hujjat raqami */
   .receipt-entry-table .entry-col-7 { width: 14.5%; } /* Izoh */
 
-  /* Recent Receipts Table: parallel column widths */
+  /* Recent Receipts Table: parallel column widths with overflow protection */
   .recent-receipts-table {
     table-layout: fixed;
     width: 100%;
@@ -840,11 +799,17 @@ input[type="number"],
     color: var(--text);
     padding: 10px 8px;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .recent-receipts-table td {
-    padding: 8px;
+    padding: 8px 10px;
     font-size: 13px;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .recent-receipts-table th:first-child,
   .recent-receipts-table td:first-child {
@@ -854,14 +819,21 @@ input[type="number"],
   .recent-receipts-table td:last-child {
     padding-right: 10px;
   }
-  .recent-receipts-table th:nth-child(1), .recent-receipts-table td:nth-child(1) { width: 22%; }
-  .recent-receipts-table th:nth-child(2), .recent-receipts-table td:nth-child(2) { width: 12%; }
-  .recent-receipts-table th:nth-child(3), .recent-receipts-table td:nth-child(3) { width: 10%; }
+  .recent-receipts-table th:nth-child(1), .recent-receipts-table td:nth-child(1) { width: 28%; }
+  .recent-receipts-table th:nth-child(2), .recent-receipts-table td:nth-child(2) { width: 10%; }
+  .recent-receipts-table th:nth-child(3), .recent-receipts-table td:nth-child(3) { width: 9%; }
   .recent-receipts-table th:nth-child(4), .recent-receipts-table td:nth-child(4) { width: 10%; }
   .recent-receipts-table th:nth-child(5), .recent-receipts-table td:nth-child(5) { width: 11%; }
-  .recent-receipts-table th:nth-child(6), .recent-receipts-table td:nth-child(6) { width: 12.5%; }
-  .recent-receipts-table th:nth-child(7), .recent-receipts-table td:nth-child(7) { width: 10.5%; }
-  .recent-receipts-table th:nth-child(8), .recent-receipts-table td:nth-child(8) { width: 12%; }
+  .recent-receipts-table th:nth-child(6), .recent-receipts-table td:nth-child(6) { width: 12%; }
+  .recent-receipts-table th:nth-child(7), .recent-receipts-table td:nth-child(7) { width: 10%; }
+  .recent-receipts-table th:nth-child(8), .recent-receipts-table td:nth-child(8) { width: 10%; }
+  .recent-receipts-table td.wrap-cell {
+    min-width: 0;
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   /* Expenses Entry Table: 5 columns */
   .expense-entry-table .entry-col-0 { width: 25%; } /* Xarajat turi */
@@ -896,6 +868,9 @@ input[type="number"],
     min-width: 680px;
   }
   .receipt-entry-table {
+    min-width: 760px;
+  }
+  .recent-receipts-table {
     min-width: 760px;
   }
 }

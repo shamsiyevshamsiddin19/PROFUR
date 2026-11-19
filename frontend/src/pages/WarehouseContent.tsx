@@ -18,7 +18,6 @@ import {
   Search,
   RefreshCw,
 } from "lucide-react";
-import Decimal from "decimal.js";
 import {
   ApiError,
   fieldErrors,
@@ -131,8 +130,11 @@ export function WarehouseContent({
           setStockRows(page.results);
           setNext(page.next);
         } else {
+          const pageSize = screen === "receiving" ? "&page_size=250" : "";
           const page = await request<Page<Material>>(
-            "/api/v1/materials/?is_active=true&search=" +
+            "/api/v1/materials/?is_active=true" +
+              pageSize +
+              "&search=" +
               encodeURIComponent(search),
             lang,
             { signal: controller.signal },
@@ -197,20 +199,6 @@ export function WarehouseContent({
     setSaved(null);
     setFields({});
     setSaveError(null);
-  }
-  let preview = "—";
-  try {
-    if (
-      new Decimal(draft.quantity || 0).gt(0) &&
-      new Decimal(draft.total_amount || 0).gt(0)
-    ) {
-      preview = money(
-        new Decimal(draft.total_amount).div(draft.quantity).toFixed(2),
-        lang,
-      );
-    }
-  } catch {
-    /* Kiritilayotgan to‘liq bo‘lmagan son hisoblanmaydi. */
   }
 
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -552,17 +540,6 @@ export function WarehouseContent({
             {input("document_number", "document", true)}
             {input("note", "note", true)}
           </EntryTable>
-          {next && (
-            <button
-              type="button"
-              className="text-button wide"
-              onClick={more}
-              disabled={locked}
-            >
-              {t("materials")}
-              <ChevronRight size={14} />
-            </button>
-          )}
 
           {saveError && (
             <div className="notice error" role="alert">
@@ -580,7 +557,6 @@ export function WarehouseContent({
               )}
             </div>
           )}
-          <p className="form-hint keyboard-hint">{t("receiptKeyboard")}</p>
           <div className="form-actions">
             <button
               type="submit"
@@ -600,37 +576,6 @@ export function WarehouseContent({
             </button>
           </div>
         </form>
-        <aside className="summary">
-          <span className="eyebrow">{t("newReceipt")}</span>
-          <h2>{t("summary")}</h2>
-          <p className="selected-material">
-            {selected?.display_name || selected?.name || t("select")}
-          </p>
-          <dl>
-            <div>
-              <dt>{t("quantity")}</dt>
-              <dd>
-                {draft.quantity || "—"}{" "}
-                {selected && unitLabel(selected.unit, lang)}
-              </dd>
-            </div>
-            <div>
-              <dt>{t("unitPrice")}</dt>
-              <dd>{preview}</dd>
-            </div>
-            <div>
-              <dt>{t("currency")}</dt>
-              <dd>USD ($)</dd>
-            </div>
-          </dl>
-          <div className="total">
-            <span>{t("total")}</span>
-            <strong>
-              {draft.total_amount ? money(draft.total_amount, lang) : "$0.00"}
-            </strong>
-          </div>
-          <p className="summary-hint">{t("estimate")}</p>
-        </aside>
       </div>
       <section className="recent">
         <div className="section-heading">
@@ -665,7 +610,7 @@ export function WarehouseContent({
               <tbody>
                 {receipts.map((r) => (
                   <tr key={r.id}>
-                    <td>{r.material.display_name}</td>
+                    <td title={r.material.display_name}>{r.material.display_name}</td>
                     <td>{r.received_on}</td>
                     <td>
                       {r.quantity} {unitLabel(r.material.unit, lang)}
@@ -685,9 +630,9 @@ export function WarehouseContent({
                     <td>
                       {r.total_amount ? money(r.total_amount, lang) : "—"}
                     </td>
-                    <td>{r.supplier || "—"}</td>
-                    <td>{r.document_number || "—"}</td>
-                    <td className="wrap-cell">{r.note || "—"}</td>
+                    <td title={r.supplier || undefined}>{r.supplier || "—"}</td>
+                    <td title={r.document_number || undefined}>{r.document_number || "—"}</td>
+                    <td className="wrap-cell" title={r.note || undefined}>{r.note || "—"}</td>
                   </tr>
                 ))}
               </tbody>

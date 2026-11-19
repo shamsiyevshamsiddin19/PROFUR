@@ -595,3 +595,4 @@ class Command(BaseCommand):
         self.stdout.write("   • usta / usta123 (Ishlab chiqarish ustasi)")
         self.stdout.write("   • hisobchi / hisobchi123 (Bosh hisobchi)")
         self.stdout.write("   • taminotchi / taminot123 (Ta'minot mutaxassisi)")
+
