@@ -631,6 +631,39 @@ input[type="number"],
 }
 .tabular-receipt .summary {
   max-width: none;
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  padding: 14px 20px;
+  border-radius: 10px;
+}
+.tabular-receipt .summary .selected-material {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: 600;
+}
+.tabular-receipt .summary dl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin: 0;
+}
+.tabular-receipt .summary dl div {
+  padding: 0;
+  gap: 8px;
+}
+.tabular-receipt .summary .total {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-top: 0;
+  border-top: 0;
 }
 .entry-viewport {
   max-height: none;

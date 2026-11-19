@@ -668,7 +668,11 @@ export function WarehouseContent({
                   <th>{t("material")}</th>
                   <th>{t("date")}</th>
                   <th>{t("quantity")}</th>
+                  <th>{t("unitPrice")}</th>
                   <th>{t("total")}</th>
+                  <th>{t("supplier")}</th>
+                  <th>{t("document")}</th>
+                  <th>{t("note")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -680,8 +684,23 @@ export function WarehouseContent({
                       {r.quantity} {unitLabel(r.material.unit, lang)}
                     </td>
                     <td>
+                      {r.unit_price
+                        ? money(r.unit_price, lang)
+                        : r.total_amount && Number(r.quantity)
+                          ? money(
+                              String(
+                                Number(r.total_amount) / Number(r.quantity),
+                              ),
+                              lang,
+                            )
+                          : "—"}
+                    </td>
+                    <td>
                       {r.total_amount ? money(r.total_amount, lang) : "—"}
                     </td>
+                    <td>{r.supplier || "—"}</td>
+                    <td>{r.document_number || "—"}</td>
+                    <td className="wrap-cell">{r.note || "—"}</td>
                   </tr>
                 ))}
               </tbody>
