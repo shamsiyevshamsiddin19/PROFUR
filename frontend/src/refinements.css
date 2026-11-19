@@ -710,38 +710,96 @@ input[type="number"],
   max-height: none;
   border: 1px solid var(--line);
   border-radius: 10px;
+  background: var(--surface);
+  overflow-x: auto;
 }
 .entry-table {
   width: 100%;
-  min-width: max-content;
+  border-collapse: collapse;
 }
 .entry-table th {
   text-transform: none;
-  font-size: 12px;
+  font-size: 11.5px;
   letter-spacing: 0;
   color: var(--text-secondary);
   background: var(--surface-muted);
-  padding: 12px;
+  padding: 8px 6px;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.25;
+  white-space: normal;
+}
+.entry-table th .th-title {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.entry-table th .th-sub {
+  display: block;
+  font-size: 10px;
+  font-weight: normal;
+  color: var(--text-muted);
+  opacity: 0.85;
+  white-space: nowrap;
 }
 .entry-table td {
-  min-width: 165px;
-  vertical-align: top;
-  padding: 8px;
+  vertical-align: middle;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
 }
+.entry-table th:first-child,
 .entry-table td:first-child {
-  min-width: 240px;
+  padding-left: 10px;
+}
+.entry-table th:last-child,
+.entry-table td:last-child {
+  padding-right: 10px;
 }
 .entry-table .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   margin: 0;
 }
 .entry-table input,
 .entry-table select,
 .entry-table .readonly {
   width: 100%;
-  min-height: 44px;
+  box-sizing: border-box;
+  min-height: 38px;
+  height: 38px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border-radius: 6px;
+  margin: 0;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-input);
+  color: var(--text);
+}
+.entry-table select {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-right: 20px;
+}
+.entry-table input[type="date"] {
+  padding-inline: 6px;
+  font-size: 12px;
+  letter-spacing: -0.2px;
+}
+.entry-table input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  margin-left: 2px;
+  padding: 0;
+}
+.entry-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+.entry-table input[type="number"]::-webkit-outer-spin-button,
+.entry-table input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
   margin: 0;
 }
 .entry-table input:focus,
@@ -752,6 +810,104 @@ input[type="number"],
 .entry-table td:focus-within {
   background: var(--accent-muted);
 }
+.entry-table .readonly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  user-select: none;
+}
+.entry-table .field-error {
+  font-size: 11px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Desktop layout: fit 100% of viewport without horizontal scroll */
+@media (min-width: 851px) {
+  .entry-table {
+    table-layout: fixed;
+    min-width: 0;
+  }
+
+  /* Kirim / Receiving Entry Table: 8 columns mapped across 100% */
+  .receipt-entry-table .entry-col-0 { width: 22%; } /* Material */
+  .receipt-entry-table .entry-col-1 { width: 12%; } /* Kirim sanasi */
+  .receipt-entry-table .entry-col-2 { width: 6.5%; text-align: center; } /* Birlik */
+  .receipt-entry-table .entry-col-3 { width: 9%; } /* Miqdor */
+  .receipt-entry-table .entry-col-4 { width: 11%; } /* Jami summa */
+  .receipt-entry-table .entry-col-5 { width: 13.5%; } /* Yetkazib beruvchi */
+  .receipt-entry-table .entry-col-6 { width: 11.5%; } /* Hujjat raqami */
+  .receipt-entry-table .entry-col-7 { width: 14.5%; } /* Izoh */
+
+  /* Recent Receipts Table: parallel column widths */
+  .recent-receipts-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .recent-receipts-table th,
+  .recent-receipts-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  .recent-receipts-table th:first-child,
+  .recent-receipts-table td:first-child {
+    padding-left: 10px;
+  }
+  .recent-receipts-table th:last-child,
+  .recent-receipts-table td:last-child {
+    padding-right: 10px;
+  }
+  .recent-receipts-table th:nth-child(1), .recent-receipts-table td:nth-child(1) { width: 22%; }
+  .recent-receipts-table th:nth-child(2), .recent-receipts-table td:nth-child(2) { width: 12%; }
+  .recent-receipts-table th:nth-child(3), .recent-receipts-table td:nth-child(3) { width: 10%; }
+  .recent-receipts-table th:nth-child(4), .recent-receipts-table td:nth-child(4) { width: 10%; }
+  .recent-receipts-table th:nth-child(5), .recent-receipts-table td:nth-child(5) { width: 11%; }
+  .recent-receipts-table th:nth-child(6), .recent-receipts-table td:nth-child(6) { width: 12.5%; }
+  .recent-receipts-table th:nth-child(7), .recent-receipts-table td:nth-child(7) { width: 10.5%; }
+  .recent-receipts-table th:nth-child(8), .recent-receipts-table td:nth-child(8) { width: 12%; }
+
+  /* Expenses Entry Table: 5 columns */
+  .expense-entry-table .entry-col-0 { width: 25%; } /* Xarajat turi */
+  .expense-entry-table .entry-col-1 { width: 16%; } /* Summa · USD */
+  .expense-entry-table .entry-col-2 { width: 15%; } /* Sana */
+  .expense-entry-table .entry-col-3 { width: 18%; } /* Loyiha */
+  .expense-entry-table .entry-col-4 { width: 26%; } /* Izoh */
+
+  /* Operations Entry Table */
+  .operation-entry-table[data-columns="4"] .entry-col-0 { width: 30%; }
+  .operation-entry-table[data-columns="4"] .entry-col-1 { width: 18%; }
+  .operation-entry-table[data-columns="4"] .entry-col-2 { width: 24%; }
+  .operation-entry-table[data-columns="4"] .entry-col-3 { width: 28%; }
+
+  .operation-entry-table[data-columns="3"] .entry-col-0 { width: 36%; }
+  .operation-entry-table[data-columns="3"] .entry-col-1 { width: 20%; }
+  .operation-entry-table[data-columns="3"] .entry-col-2 { width: 44%; }
+
+  /* Catalog modal entry table */
+  .catalog-entry-table .entry-col-0 { width: 24%; }
+  .catalog-entry-table .entry-col-1 { width: 18%; }
+  .catalog-entry-table .entry-col-2 { width: 13%; }
+  .catalog-entry-table .entry-col-3 { width: 15%; }
+  .catalog-entry-table .entry-col-4 { width: 10%; }
+  .catalog-entry-table .entry-col-5 { width: 10%; }
+  .catalog-entry-table .entry-col-6 { width: 10%; }
+}
+
+/* Mobile & Tablet fallback: allow smooth scroll when screen is smaller than 850px */
+@media (max-width: 850px) {
+  .entry-table {
+    min-width: 680px;
+  }
+  .receipt-entry-table {
+    min-width: 760px;
+  }
+}
+
 .workflow-dialog:has(.entry-table) {
   width: min(1160px, calc(100% - 28px));
 }

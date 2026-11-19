@@ -16,34 +16,53 @@ function fields(children: ReactNode): ReactNode[] {
 export function EntryTable({
   children,
   lang,
+  className = "",
 }: {
   children: ReactNode;
   lang: Language;
+  className?: string;
 }) {
   const columns = fields(children).filter(
     (child) => isValidElement<{ label: string }>(child) && child.type === Field,
   );
   return (
-    <TableViewport lang={lang} className="entry-viewport">
-      <table className="entry-table">
+    <TableViewport
+      lang={lang}
+      className={`entry-viewport ${className}`.trim()}
+    >
+      <table
+        className={`entry-table ${className}`.trim()}
+        data-columns={columns.length}
+      >
         <caption className="visually-hidden">
           {translate(lang, "entryTable")}
         </caption>
         <thead>
           <tr>
-            {columns.map((column, index) => (
-              <th scope="col" key={index}>
-                {isValidElement<{ label: string }>(column)
-                  ? column.props.label
-                  : ""}
-              </th>
-            ))}
+            {columns.map((column, index) => {
+              const label = isValidElement<{ label: string }>(column)
+                ? column.props.label
+                : "";
+              const [title, subtitle] = label.split(" · ");
+              return (
+                <th
+                  scope="col"
+                  key={index}
+                  className={`entry-col-${index}`}
+                >
+                  <span className="th-title">{title}</span>
+                  {subtitle && <span className="th-sub">{subtitle}</span>}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
           <tr>
             {columns.map((column, index) => (
-              <td key={index}>{column}</td>
+              <td key={index} className={`entry-col-${index}`}>
+                {column}
+              </td>
             ))}
           </tr>
         </tbody>

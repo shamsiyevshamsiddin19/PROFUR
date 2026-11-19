@@ -317,7 +317,7 @@ function OperationForm({
       )}
       <form onSubmit={submit} key={reset}>
         <fieldset disabled={operation.busy || Boolean(operation.pending)}>
-          <EntryTable lang={lang}>
+          <EntryTable lang={lang} className="operation-entry-table">
             {kind === "returns" ? (
               <Field label={t("originalIssue")} wide>
                 <select

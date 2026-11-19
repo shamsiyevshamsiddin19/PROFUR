@@ -275,7 +275,7 @@ function MaterialForm({
       <form onSubmit={submit}>
         <Feedback error={error} lang={lang} />
         <fieldset disabled={busy}>
-          <EntryTable lang={lang}>
+          <EntryTable lang={lang} className="catalog-entry-table">
             <Field label={t("name")} wide>
               <input
                 name="name"

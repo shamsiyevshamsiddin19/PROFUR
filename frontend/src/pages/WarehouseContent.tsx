@@ -523,7 +523,7 @@ export function WarehouseContent({
               <p>{t("detailsHint")}</p>
             </div>
           </div>
-          <EntryTable lang={lang}>
+          <EntryTable lang={lang} className="receipt-entry-table">
             <Field label={t("material")}>
               <select
                 required
@@ -661,8 +661,8 @@ export function WarehouseContent({
         </div>
         {loadingNotice}
         {receipts.length ? (
-          <TableViewport lang={lang} className="">
-            <table>
+          <TableViewport lang={lang} className="recent-receipts-viewport">
+            <table className="recent-receipts-table">
               <thead>
                 <tr>
                   <th>{t("material")}</th>

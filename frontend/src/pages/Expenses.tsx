@@ -251,7 +251,7 @@ function ExpenseFields({
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   return (
-    <EntryTable lang={lang}>
+    <EntryTable lang={lang} className="expense-entry-table">
       <Field label={t("expenseType")}>
         <select
           name="expense_type"
