@@ -32,6 +32,9 @@ export const adminMessages = {
   resetPassword: ["Parolni yangilash", "Изменить пароль", "Reset password"],
   newPassword: ["Yangi parol", "Новый пароль", "New password"],
   roleCode: ["Rol kodi", "Код роли", "Role code"],
+  role: ["Rol", "Роль", "Role"],
+  roleName: ["Rol nomi", "Название роли", "Role name"],
+  fullName: ["Foydalanuvchi", "Пользователь", "User"],
   permissions: ["Ruxsatlar", "Разрешения", "Permissions"],
   adminWarning: [
     "ADMIN kodi barcha vakolatlarni beradi.",

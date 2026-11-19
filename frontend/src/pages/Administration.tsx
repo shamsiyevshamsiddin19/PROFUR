@@ -3,6 +3,7 @@ import { type User, write } from "../api";
 import { translate, type Language, type MessageKey } from "../i18n";
 import { useRecords } from "../hooks/useRecords";
 import { Field, Feedback, Modal, RecordsState } from "../components/WorkflowUI";
+import { TableViewport } from "../components/TableViewport";
 
 type Role = {
   id: number;
@@ -175,44 +176,78 @@ export function Administration({
             <option value="false">{t("inactive")}</option>
           </select>
         </div>
-        <div className="admin-records">
-          {accounts.data.map((account) => (
-            <article className="admin-record" key={account.id}>
-              <div>
-                <strong>
-                  {[account.first_name, account.last_name]
-                    .filter(Boolean)
-                    .join(" ") || account.username}
-                </strong>
-                <p>
-                  {account.username} ·{" "}
-                  {t(account.is_active ? "active" : "inactive")}
-                </p>
-                <p>{account.roles.map((role) => role.name).join(", ")}</p>
-              </div>
-              <div className="record-actions">
-                <button
-                  className="secondary"
-                  onClick={() => {
-                    setError(null);
-                    setEditor({ kind: "user", value: account });
-                  }}
-                >
-                  {t("edit")}
-                </button>
-                <button
-                  className="secondary"
-                  onClick={() => {
-                    setError(null);
-                    setEditor({ kind: "password", value: account });
-                  }}
-                >
-                  {t("resetPassword")}
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
+        {accounts.data.length > 0 && (
+          <TableViewport lang={lang} className="admin-table-viewport">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{t("fullName")}</th>
+                  <th>{t("username")}</th>
+                  <th>{t("role")}</th>
+                  <th>{t("status")}</th>
+                  <th className="cell-actions">{t("actions")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {accounts.data.map((account) => (
+                  <tr key={account.id}>
+                    <td>
+                      <strong>
+                        {[account.first_name, account.last_name]
+                          .filter(Boolean)
+                          .join(" ") || account.username}
+                      </strong>
+                      {(account.email || account.phone) && (
+                        <span className="cell-subtext">
+                          {[account.email, account.phone]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <code>{account.username}</code>
+                    </td>
+                    <td>
+                      {account.roles.length > 0
+                        ? account.roles.map((role) => role.name).join(", ")
+                        : "—"}
+                    </td>
+                    <td>
+                      <span
+                        className={`status-pill ${account.is_active ? "active" : "inactive"}`}
+                      >
+                        {t(account.is_active ? "active" : "inactive")}
+                      </span>
+                    </td>
+                    <td className="cell-actions">
+                      <button
+                        type="button"
+                        className="secondary compact"
+                        onClick={() => {
+                          setError(null);
+                          setEditor({ kind: "user", value: account });
+                        }}
+                      >
+                        {t("edit")}
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary compact"
+                        onClick={() => {
+                          setError(null);
+                          setEditor({ kind: "password", value: account });
+                        }}
+                      >
+                        {t("resetPassword")}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableViewport>
+        )}
         <RecordsState
           {...accounts}
           empty={!accounts.data.length}
@@ -233,25 +268,54 @@ export function Administration({
             {t("newRole")}
           </button>
         </div>
-        <div className="admin-records">
-          {roles.data.map((role) => (
-            <article className="admin-record" key={role.id}>
-              <div>
-                <strong>{role.name}</strong>
-                <p>{role.code}</p>
-              </div>
-              <button
-                className="secondary"
-                onClick={() => {
-                  setError(null);
-                  setEditor({ kind: "role", value: role });
-                }}
-              >
-                {t("edit")}
-              </button>
-            </article>
-          ))}
-        </div>
+        {roles.data.length > 0 && (
+          <TableViewport lang={lang} className="admin-table-viewport">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{t("roleName")}</th>
+                  <th>{t("roleCode")}</th>
+                  <th>{t("permissions")}</th>
+                  <th className="cell-actions">{t("actions")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {roles.data.map((role) => (
+                  <tr key={role.id}>
+                    <td>
+                      <strong>{role.name}</strong>
+                      {role.description && (
+                        <span className="cell-subtext">
+                          {role.description}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <code>{role.code}</code>
+                    </td>
+                    <td>
+                      {role.permissions?.includes("*")
+                        ? t("fullAccess")
+                        : `${role.permissions?.length || 0} ${t("permissions").toLowerCase()}`}
+                    </td>
+                    <td className="cell-actions">
+                      <button
+                        type="button"
+                        className="secondary compact"
+                        onClick={() => {
+                          setError(null);
+                          setEditor({ kind: "role", value: role });
+                        }}
+                      >
+                        {t("edit")}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableViewport>
+        )}
         <RecordsState
           {...roles}
           empty={!roles.data.length}
