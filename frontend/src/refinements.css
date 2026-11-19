@@ -7,7 +7,7 @@
 .sidebar .brand {
   letter-spacing: 2.5px;
   font-size: 22px;
-  padding: 0 10px 23px;
+  padding: 0 10px 20px;
 }
 .sidebar .brand-icon {
   width: 36px;
@@ -26,7 +26,7 @@
   border: 1px solid var(--sidebar-line);
   border-radius: 12px;
   padding: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   background: var(--sidebar-panel);
   flex-shrink: 0;
 }
@@ -52,21 +52,21 @@
   margin-top: 4px;
 }
 .nav-group + .nav-group {
-  margin-top: 18px;
+  margin-top: 12px;
 }
 .sidebar-label {
   font-size: 9px;
   letter-spacing: 1.4px;
-  margin: 10px 14px 9px;
+  margin: 8px 14px 6px;
   font-weight: 650;
 }
 .nav-item {
-  padding: 8px 11px;
+  padding: 6px 11px;
   gap: 10px;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   border-radius: 9px;
   font-size: 12px;
-  min-height: 44px;
+  min-height: 40px;
   border: 1px solid transparent;
   transition:
     background 0.18s,
@@ -490,5 +490,14 @@
   }
   .settings-section-heading {
     margin-bottom: 21px;
+  }
+}
+
+.sidebar nav {
+  position: relative;
+}
+@media (pointer: coarse) {
+  .nav-item {
+    min-height: 44px;
   }
 }

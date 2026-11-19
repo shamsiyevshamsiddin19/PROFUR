@@ -59,6 +59,10 @@ test("appearance preferences persist without changing warehouse currency or perm
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  if (info.project.name === "desktop-chromium")
+    await expect(
+      page.getByRole("link", { name: "Settings", exact: true }),
+    ).toBeInViewport({ ratio: 1 });
   await page.screenshot({
     path: info.outputPath("settings-" + info.project.name + ".png"),
     fullPage: true,

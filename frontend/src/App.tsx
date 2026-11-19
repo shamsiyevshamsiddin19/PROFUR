@@ -1,6 +1,6 @@
 import { initialAppearance } from "./appearance";
 import { Settings } from "./pages/Settings";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Settings2,
   Tags,
@@ -95,6 +95,7 @@ export function App() {
   const [authError, setAuthError] = useState<MessageKey | null>(null);
   const [screen, setScreen] = useState<Screen>(currentScreen);
   const [unreadCount, setUnreadCount] = useState(0);
+  const navRef = useRef<HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
 
@@ -164,6 +165,19 @@ export function App() {
       clearInterval(interval);
     };
   }, [user, lang, screen]);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !active) return;
+    if (active.offsetTop < nav.scrollTop) nav.scrollTop = active.offsetTop;
+    else if (
+      active.offsetTop + active.offsetHeight >
+      nav.scrollTop + nav.clientHeight
+    )
+      nav.scrollTop =
+        active.offsetTop + active.offsetHeight - nav.clientHeight + 8;
+  }, [screen, lang, user, drawer]);
 
   const languagePicker = (
     <select
@@ -264,7 +278,7 @@ export function App() {
             <small>{t("warehouseWorkspace")}</small>
           </span>
         </div>
-        <nav aria-label={t("workspace")}>
+        <nav ref={navRef} aria-label={t("workspace")}>
           {(
             [
               [
