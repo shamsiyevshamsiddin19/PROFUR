@@ -18,6 +18,10 @@ export function receiptKeyboard(
 ) {
   if (event.key !== "Enter" || event.nativeEvent.isComposing || event.altKey)
     return;
+  if (event.repeat) {
+    event.preventDefault();
+    return;
+  }
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
   if (event.ctrlKey || event.metaKey) {
