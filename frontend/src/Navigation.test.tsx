@@ -93,7 +93,7 @@ test("an expense-only role starts at Home and never loads restricted stock or ac
   expect(nav.getByRole("link", { name: "Expenses" })).toBeTruthy();
   for (const name of [
     "Material receipts",
-    "Warehouse operations",
+    "Stock operations",
     "Stock",
     "Administration",
   ])
