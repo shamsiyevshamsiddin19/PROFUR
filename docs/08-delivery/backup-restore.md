@@ -116,4 +116,4 @@ VPS o‘rnatish: repo `/opt/profur`, `profur` xizmat foydalanuvchisi, PostgreSQL
 
 Retention qiymati kelishilmagani sababli vosita eski zaxiralarni o‘chirmaydi. Serverdan tashqari nusxa, disk sig‘imi nazorati va real ma’lumot hajmidagi 4 soatlik RTO mashqi production qabulida tekshiriladi. Ushbu fayllar tayyorligi timer jonli serverda o‘rnatilganiga dalil emas.
 
-PostgreSQL client va server asosiy versiyalari mos bo‘lsin. `PG_BIN=/usr/lib/postgresql/16/bin` kabi parametr barcha `pg_dump`, `pg_restore`, `psql`, `createdb`, `dropdb` yo‘lini belgilaydi. CI PostgreSQL 16 uchun aynan client 16 ni o‘rnatadi; yangi client chiqargan `transaction_timeout` buyrug‘ini eski serverda e’tiborsiz qoldirish ishlatilmaydi.
+PostgreSQL client va server asosiy versiyalari mos bo‘lsin. `PG_BIN=/usr/lib/postgresql/16/bin` kabi parametr barcha `pg_dump`, `pg_restore`, `psql`, `createdb`, `dropdb` yo‘lini belgilaydi. CI PostgreSQL 16 uchun aynan `postgres:16-alpine` client konteynerini ishlatadi; yangi client chiqargan `transaction_timeout` buyrug‘ini eski serverda e’tiborsiz qoldirish ishlatilmaydi.
