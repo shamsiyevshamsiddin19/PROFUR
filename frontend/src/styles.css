@@ -337,13 +337,15 @@ label small {
   white-space: nowrap;
 }
 .language {
-  width: 122px;
-  padding: 8px 10px;
-  min-height: 40px;
+  width: auto;
+  padding: 4px 6px;
+  min-height: 0;
   font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--surface);
-  border-color: var(--line);
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
 }
 main {
   width: 100%;
@@ -715,6 +717,23 @@ footer > span:first-child {
   border-radius: 8px;
   background: var(--danger);
   color: #fff;
+}
+.input-currency {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-currency input {
+  flex: 1;
+  padding-right: 28px;
+}
+.currency-suffix {
+  position: absolute;
+  right: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
 }
 @media (min-width: 851px) {
   .collapse-toggle {

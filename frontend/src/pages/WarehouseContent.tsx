@@ -445,36 +445,41 @@ export function WarehouseContent({
       </>
     );
 
+  const moneyFields = ["total_amount"];
   function input(
     field: keyof typeof draft,
     key: MessageKey,
     optional = false,
     type = "text",
   ) {
+    const isMoney = moneyFields.includes(field);
+    const inp = (
+      <input
+        type={type}
+        value={draft[field]}
+        disabled={locked}
+        required={!optional}
+        onChange={(e) => change(field, e.target.value)}
+        placeholder={optional ? t("optional") : undefined}
+        step={type === "number" ? "0.01" : undefined}
+        min={type === "number" ? "0.01" : undefined}
+        max={type === "date" ? localDate() : undefined}
+        maxLength={
+          field === "supplier"
+            ? 200
+            : field === "document_number"
+              ? 100
+              : field === "note"
+                ? 500
+                : undefined
+        }
+        aria-invalid={Boolean(fields[field])}
+        aria-describedby={fields[field] ? "error-" + field : undefined}
+      />
+    );
     return (
       <Field label={t(key)}>
-        <input
-          type={type}
-          value={draft[field]}
-          disabled={locked}
-          required={!optional}
-          onChange={(e) => change(field, e.target.value)}
-          placeholder={optional ? t("optional") : undefined}
-          step={type === "number" ? "0.01" : undefined}
-          min={type === "number" ? "0.01" : undefined}
-          max={type === "date" ? localDate() : undefined}
-          maxLength={
-            field === "supplier"
-              ? 200
-              : field === "document_number"
-                ? 100
-                : field === "note"
-                  ? 500
-                  : undefined
-          }
-          aria-invalid={Boolean(fields[field])}
-          aria-describedby={fields[field] ? "error-" + field : undefined}
-        />
+        {isMoney ? <div className="input-currency">{inp}<span className="currency-suffix">$</span></div> : inp}
         {fields[field] && (
           <span className="field-error" id={"error-" + field}>
             {fields[field]}

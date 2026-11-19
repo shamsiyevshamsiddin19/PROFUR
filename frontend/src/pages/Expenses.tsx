@@ -267,15 +267,18 @@ function ExpenseFields({
             ))}
         </select>
       </Field>
-      <Field label={t("amount") + " · USD"}>
-        <input
-          name="amount"
-          type="number"
-          required
-          min="0.01"
-          step="0.01"
-          defaultValue={row?.amount}
-        />
+      <Field label={t("amount")}>
+        <div className="input-currency">
+          <input
+            name="amount"
+            type="number"
+            required
+            min="0.01"
+            step="0.01"
+            defaultValue={row?.amount}
+          />
+          <span className="currency-suffix">$</span>
+        </div>
       </Field>
       <Field label={t("spentOn")}>
         <input

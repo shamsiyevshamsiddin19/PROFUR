@@ -3,7 +3,6 @@ import { initialAppearance } from "./appearance";
 import { Settings } from "./pages/Settings";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Search,
   Settings2,
   Tags,
   Users,
@@ -427,18 +426,6 @@ export function App() {
             <strong>{t(screen)}</strong>
           </div>
           <div className="topbar-actions">
-            {["materials", "stock", "administration"].includes(screen) &&
-              allowed(screen) && (
-                <button
-                  className="search-shortcut"
-                  onClick={focusCurrentSearch}
-                  aria-label={t("quickSearch")}
-                >
-                  <Search size={15} />
-                  <span>{t("quickSearch")}</span>
-                  <kbd>/</kbd>
-                </button>
-              )}
             {languagePicker}
             {allowed("notifications") && (
               <a
