@@ -212,6 +212,9 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
 
   await page.goto("/#stock");
   await page
+    .getByRole("textbox", { name: "Search materials", exact: true })
+    .fill(materialName);
+  await page
     .getByRole("combobox", { name: "Category", exact: true })
     .selectOption({ label: "LMDF" });
   await page.getByRole("button", { name: materialName, exact: true }).click();

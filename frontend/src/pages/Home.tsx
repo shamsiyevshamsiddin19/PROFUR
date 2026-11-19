@@ -46,7 +46,13 @@ export function Home({ user, lang }: { user: User; lang: Language }) {
       {can(user, "inventory.add_receipt") && steps.length === 3 && (
         <section className="workflow-guide" aria-label={t("homeGuide")}>
           <h2>{t("homeGuide")}</h2>
-          <p>{t("homeGuideHint")}</p>
+          <p>
+            {t(
+              can(user, "catalog.add_material")
+                ? "homeGuideHint"
+                : "homeGuideReadHint",
+            )}
+          </p>
           <ol>
             {steps.map((screen) => (
               <li key={screen}>

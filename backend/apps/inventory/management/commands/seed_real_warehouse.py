@@ -51,7 +51,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--clear",
             action="store_true",
-            help="Eski ombor va harakatlar ma'lumotlarini tozalab, keyin to'ldirish.",
+            help="Qo‘llab-quvvatlanmaydi: mavjud omborni tozalash rad etiladi.",
         )
 
     @transaction.atomic

@@ -46,6 +46,11 @@ export const uxMessages = {
     "Найдите или создайте материал, сохраните поступление и проверьте остаток.",
     "Find or create a material, save its receipt, then check stock.",
   ],
+  homeGuideReadHint: [
+    "Materialni katalogdan toping, kirimni saqlang va qoldiqni tekshiring. Material topilmasa administratorga murojaat qiling.",
+    "Найдите материал в каталоге, сохраните поступление и проверьте остаток. Если материала нет, обратитесь к администратору.",
+    "Find the material in the catalogue, save its receipt and check stock. Contact your administrator if the material is missing.",
+  ],
   homeNoTasks: [
     "Hozircha sizga ish bo‘limlari biriktirilmagan. Administratorga murojaat qiling.",
     "Рабочие разделы пока не назначены. Обратитесь к администратору.",
