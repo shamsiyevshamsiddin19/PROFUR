@@ -510,7 +510,7 @@ export function WarehouseContent({
       )}
       <div className="receipt-layout tabular-receipt">
         <form
-          className="receipt-form panel"
+          className="receipt-form"
           onSubmit={submit}
           onKeyDown={(event) => receiptKeyboard(event, locked)}
         >
@@ -613,7 +613,7 @@ export function WarehouseContent({
             </button>
           </div>
         </form>
-        <aside className="summary panel">
+        <aside className="summary">
           <span className="eyebrow">{t("newReceipt")}</span>
           <h2>{t("summary")}</h2>
           <p className="selected-material">
