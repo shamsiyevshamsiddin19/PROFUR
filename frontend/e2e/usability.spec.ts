@@ -69,9 +69,14 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
     exact: true,
   });
   await quantity.fill("2");
-  await quantity.press("Enter");
-  await expect(total).toBeFocused();
   await total.fill("60");
+  await quantity.focus();
+  await page.keyboard.down("Enter");
+  await expect(total).toBeFocused();
+  // Holding Enter must not skip filled fields and reach the save button.
+  await page.keyboard.down("Enter");
+  await expect(total).toBeFocused();
+  await page.keyboard.up("Enter");
   await total.press("Enter");
   await expect(page.getByRole("textbox", { name: /Supplier/ })).toBeFocused();
   // Enter has advanced the form without creating a financial record.
@@ -91,7 +96,8 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   await page.getByRole("textbox", { name: /Supplier/ }).press("Control+Enter");
   const saved = await response;
   expect(saved.status()).toBe(201);
-  expect((await saved.json()).quantity_on_hand_after).toBe("2.00");
+  const receipt = await saved.json();
+  expect(receipt.quantity_on_hand_after).toBe("2.00");
   // Enough real rows to exercise sticky headers and a genuinely overflowing viewport.
   for (let i = 0; i < 24; i++) {
     const result = await page.request.post("/api/v1/receipts/", {
@@ -101,7 +107,7 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
         quantity: "1.00",
         total_amount: "30.00",
         currency: "USD",
-        received_on: "2026-11-19",
+        received_on: receipt.received_on,
       },
     });
     expect(result.status()).toBe(201);
