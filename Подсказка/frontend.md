@@ -8,9 +8,17 @@
 
 API kelishuvidan keyin material qidirish, tanlash va kirim yuborish oqimini quring. Namuna javobdan haqiqiy API’ga o‘ting. Formada kutish, muvaffaqiyat, validatsiya va server xatosiga mos holatlarni ko‘rsating. @ozodbek101 bilan katalog va qoldiqni, Akbar (@thealiiheere) bilan chiqim va tarixni, @jamoliddinusarov1-create bilan login va qabul sinovini ulang.
 
-## Joriy yakunlash · 2026-11-18
+## Joriy natija · 2026-11-19
 
-Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi saqlandi. Admin foydalanuvchi/rol va xarajat turi interfeysi, saqlanadigan minimal qoldiq xabarlari, avtomatik backup/restore vositasi va yakuniy integratsiya sinovlari qo‘shilmoqda. Ushbu qayddan pastdagi oldingi “navbatdagi ish”lar tarixiy bo‘lishi mumkin; yangi ish boshlashdan oldin [topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md), main va Jira dalilini tekshiring. PM/buyurtmachi qabuli uning nomidan belgilanmaydi.
+1-qismning texnik yig‘masi main’ga [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46) orqali birlashdi (`28d290c`). Team Lead qolgan ishlarni o‘z zimmasiga olib yakunladi, jamoaning mavjud kodi saqlandi. [CI #44449909326](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326): 231 backend, 10 frontend, 12 Chromium (telefon/planshet/desktop), Ruff/build/migratsiya va alohida PostgreSQL restore o‘tdi.
+
+Admin akkaunt/rol va alohida xarajat turi ekranlari, saqlanadigan minimal qoldiq xabarlari va backup/restore vositalari mavjud. Ko‘rikdagi `*` vakolatini olib tashlash va xarajat turi sahifasining ruxsatlarini ajratish muammolari tuzatildi, regressiyalar o‘tdi. Main PR va uch majburiy CI tekshiruvi bilan himoyalangan.
+
+[Topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md) joriy manba. P1/P3/P5 yangi biznes qarorlari ochiq: hozir partiyalar qo‘lda aniq tanlanadi, miqdor 2 kasr xona, USD. Kirimni tuzatish API’si mavjud emas. Production timer/domen va PM/buyurtmachi jonli qabuli alohida; ular bajarilgan deb belgilanmagan. Quyidagi avvalgi kun qaydlari tarixiy; “navbatdagi ish”larni qayta boshlamang.
+
+## Keyingi qadam
+
+Team Lead bilan sinov muhitida ko‘rib chiqish; kerak bo‘lsa P1/P3/P5 ni tasdiqlash, keyin server/domen, kunlik zaxira va PM/xodimlar qabuli. Omborning mavjud API/UI ishlarini takrorlamang. Joriy Jira PCRM-5–9, PCRM-32/37/38–50 texnik vazifalari Done; kelgusi modullar bu doiraga kirmaydi.
 
 ## Vazifalar va holat
 
@@ -31,7 +39,7 @@ Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi sa
 
 2026-11-18 · PCRM-39/41/43/45/47/48 · Bajarildi · PR #39 (`36787ec`) va #42 (`28ef64e`) main’da; Jira Done. Yakuniy CI: 206 backend testi, 10 frontend testi va haqiqiy Chromium/Django ombor oqimi (kategoriya/min. chegara ham). Quyidagi avvalgi sana qaydlari tarixiy; joriy holat shu bo‘lim va yakuniy topshirishda.
 
-## Navbatdagi ish
+## Arxiv — avvalgi navbatdagi ish
 
 1. **PCRM-50 qabulini qo‘llab-quvvatlang.** Jamoliddinning qabul matritsasi va yangi PR’ini joriy main ustida ko‘rib chiqing. Mavjud kirim → chiqim → qaytarish/tasdiq → hisobdan chiqarish/tasdiq → xarajat/teskari yozuv → tarix/CSV Chromium ssenariysini qayta yaratmang.
 2. **Ochiq PM qarorlari.** P1/P3/P5 bo‘yicha aniq qaror kelganda API va UI ta’sirini kelishing. FIFO yoki kirimni tuzatish mexanizmini o‘zingiz tasdiqlangan deb joriy qilmang.

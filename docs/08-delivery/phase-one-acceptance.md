@@ -33,4 +33,4 @@ P1 (FIFO yoki qo‘lda), P3 (miqdor aniqligini o‘zgartirish), P5 (kirim tuzati
 
 ## Yakuniy qabul chegarasi
 
-Avtomatik sinov va main’ga merge — texnik topshirish dalili. OQ-047 bo‘yicha PM/buyurtmachi va haqiqiy xodimlar bilan qabul ularning nomidan belgilanmaydi. Server/domen sozlash va jonli muhitdagi kundalik zaxira dalili alohida kerak. Joriy ish natijasi PR/CI dalili bilan to‘ldiriladi.
+Avtomatik sinov va main’ga merge — texnik topshirish dalili. OQ-047 bo‘yicha PM/buyurtmachi va haqiqiy xodimlar bilan qabul ularning nomidan belgilanmaydi. Server/domen sozlash va jonli muhitdagi kundalik zaxira dalili alohida kerak. 2026-11-19: [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46) main’ga `28d290c` sifatida birlashdi. [CI #44449909326](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326) — 231 backend, 10 frontend, 12 Chromium, lint/build/migratsiya va PostgreSQL 16 konteyneri bilan restore o‘tdi (kichik ma’lumotda 1.1 s). Jira PCRM-5–9, PCRM-32/37/38–50 texnik vazifalari Done. Bu PM yoki production qabuli emas.

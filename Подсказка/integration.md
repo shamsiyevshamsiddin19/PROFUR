@@ -8,9 +8,17 @@
 
 Avval umumiy ishga tushirish tartibi, muhit sozlamasi namunasi va tekshiruv buyruqlarini tayyorlang. Login va ombor rol huquqlarini backendchilar bilan kelishing. Har bir dasturchi o‘z funksiyasining testini yozadi. Siz foydalanuvchi oqimini birlashtirib tekshirasiz.
 
-## Joriy yakunlash · 2026-11-18
+## Joriy natija · 2026-11-19
 
-Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi saqlandi. Admin foydalanuvchi/rol va xarajat turi interfeysi, saqlanadigan minimal qoldiq xabarlari, avtomatik backup/restore vositasi va yakuniy integratsiya sinovlari qo‘shilmoqda. Ushbu qayddan pastdagi oldingi “navbatdagi ish”lar tarixiy bo‘lishi mumkin; yangi ish boshlashdan oldin [topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md), main va Jira dalilini tekshiring. PM/buyurtmachi qabuli uning nomidan belgilanmaydi.
+1-qismning texnik yig‘masi main’ga [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46) orqali birlashdi (`28d290c`). Team Lead qolgan ishlarni o‘z zimmasiga olib yakunladi, jamoaning mavjud kodi saqlandi. [CI #44449909326](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326): 231 backend, 10 frontend, 12 Chromium (telefon/planshet/desktop), Ruff/build/migratsiya va alohida PostgreSQL restore o‘tdi.
+
+Admin akkaunt/rol va alohida xarajat turi ekranlari, saqlanadigan minimal qoldiq xabarlari va backup/restore vositalari mavjud. Ko‘rikdagi `*` vakolatini olib tashlash va xarajat turi sahifasining ruxsatlarini ajratish muammolari tuzatildi, regressiyalar o‘tdi. Main PR va uch majburiy CI tekshiruvi bilan himoyalangan.
+
+[Topshirish reyestri](../docs/08-delivery/phase-one-acceptance.md) joriy manba. P1/P3/P5 yangi biznes qarorlari ochiq: hozir partiyalar qo‘lda aniq tanlanadi, miqdor 2 kasr xona, USD. Kirimni tuzatish API’si mavjud emas. Production timer/domen va PM/buyurtmachi jonli qabuli alohida; ular bajarilgan deb belgilanmagan. Quyidagi avvalgi kun qaydlari tarixiy; “navbatdagi ish”larni qayta boshlamang.
+
+## Keyingi qadam
+
+Team Lead bilan sinov muhitida ko‘rib chiqish; kerak bo‘lsa P1/P3/P5 ni tasdiqlash, keyin server/domen, kunlik zaxira va PM/xodimlar qabuli. Omborning mavjud API/UI ishlarini takrorlamang. Joriy Jira PCRM-5–9, PCRM-32/37/38–50 texnik vazifalari Done; kelgusi modullar bu doiraga kirmaydi.
 
 ## Vazifalar va holat
 
@@ -18,9 +26,9 @@ Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi sa
 
 | Jira | Natija | Holat | Dalil |
 |---|---|---|---|
-| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session, ombor ruxsatlari va admin foydalanuvchi boshqaruvi (OQ-040) | Ko‘rikda | [#12](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/12), [commit `f0078b2`] |
-| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, PostgreSQL, backup/restore, frontend build va CI | Ko‘rikda | [#8](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/8), [backup-restore.md](../docs/08-delivery/backup-restore.md) |
-| [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Qabul sinovlari, PostgreSQL parallel konkurentlik va 3 ekranli Chromium E2E | Ko‘rikda | [#26](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/26), [tests/test_concurrency_postgres.py](../tests/test_concurrency_postgres.py), [frontend/e2e/receipt.spec.ts](../frontend/e2e/receipt.spec.ts) |
+| [PCRM-32](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-32) | Login/session, ombor ruxsatlari va admin foydalanuvchi boshqaruvi (OQ-040) | Bajarildi (texnik) | [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46), [CI 231/10/12](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326); joriy 1-qism doirasi. |
+| [PCRM-37](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-37) | Ishga tushirish sozlamalari, PostgreSQL, backup/restore, frontend build va CI | Bajarildi (texnik) | [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46), [CI 231/10/12](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326); joriy 1-qism doirasi. |
+| [PCRM-50](https://shamsiyevshamsiddin19.atlassian.net/browse/PCRM-50) | Qabul sinovlari, PostgreSQL parallel konkurentlik va 3 ekranli Chromium E2E | Bajarildi (texnik) | [PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46), [CI 231/10/12](https://github.com/shamsiyevshamsiddin19/PROFUR/actions/runs/44449909326); joriy 1-qism doirasi. |
 
 **Qabul mezoni** — To‘rt jamoadosh loyihani toza muhitda ishga tushira oladi. Ruxsatsiz amal rad etiladi. Haqiqiy PostgreSQL'da parallel amallar qoldiqni buzmaydi. Brauzerda mobil, planshet va kompyuter ekranlarida to'liq oqim va uch tilda barqaror ishlaydi.
 
@@ -35,7 +43,7 @@ Team Lead qolgan 1-qism ishlarini o‘z zimmasiga oldi. Jamoaning mavjud kodi sa
 
 2026-11-18 · PCRM-32/37/50 · Ko‘rikda · PR #44: joriy main bilan to‘qnashuvlar yechildi, kuchsiz parolni qabul qilish xatosiga regressiya qo‘shildi, auth kontrakti va barcha yangi ombor oqimlari saqlandi. Python yo‘li CI’ga moslandi; uch ekranli E2E ma’lumotlari ajratildi. Lokal tekshiruv va CI dalili PR’da. PR merge va PM/buyurtmachi qabulisiz PCRM-50 Done qilinmaydi.
 
-## Navbatdagi ish
+## Arxiv — avvalgi navbatdagi ish
 
 1. **PCRM-37** qaytadan tekshiriladi. Django asosi PR #8 orqali main’ga birlashgan. README’ni boshqa jamoadosh kompyuteridagi ketma-ketlik bilan tekshiring. Xususan, migratsiyadan oldin PostgreSQL ishlashi, muhit sozlamalari yuklanishi va health javobini tekshiring. Kichik tuzatish kerak bo‘lsa alohida PR qiling.
 2. **PCRM-32** uchun mavjud foydalanuvchi modeli, auth/session va DRF sozlamalarini ko‘ring. Admin hamda ombor mas’ulining amallar jadvalini docs ichida aniqlang. Login, logout va joriy foydalanuvchi/ruxsatlar javobini Shamsiddin bilan kelishing. Model migratsiyasi boshqa app’larning bog‘liqligiga ta’sir qilsa backendchilar bilan muvofiqlashtiring.

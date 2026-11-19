@@ -20,7 +20,7 @@ PM qaroriga bog‘liq qismlar **[PM]** bilan belgilangan va [8-bo‘limda](#8-pm
 | Kirish | Sessiya cookie (`SessionAuthentication`, amaldagi `settings.py`). Yozuvchi so‘rovlar `X-CSRFToken` sarlavhasini yuboradi. Login API’si — Jamoliddin vazifasi. |
 | Til | Frontend `Accept-Language: uz` / `ru` / `en` yuboradi. Server xato `message`ini shu tilda qaytaradi. Birlik va tur kabi qiymatlar **kod** bo‘lib keladi (`sheet`, `receipt`). Ularning yozuvini frontend tarjima qiladi. |
 | Sahifalash | Ro‘yxatlar: `?page=2`. Javob: `{"count", "next", "previous", "results"}`. Bir sahifada 20 ta yozuv bo‘ladi (amaldagi sozlama). |
-| O‘chirish | Ombor yozuvlari o‘chirilmaydi. Katalog `is_active=false` bilan faolsizlantiriladi. Kirimdagi xato tuzatish harakati bilan to‘g‘rilanadi ([8-bo‘lim](#8-pmga-ochiq-savollar-team-lead-orqali), P5). |
+| O‘chirish | Ombor yozuvlari o‘chirilmaydi. Katalog `is_active=false` bilan faolsizlantiriladi. Kirim tuzatish API’si hali yo‘q, P5 kelishuvi talab etiladi; asl yozuv saqlanadi ([8-bo‘lim](#8-pmga-ochiq-savollar-team-lead-orqali), P5). |
 
 **Amaldagi ruxsat ulanishi:** endpointlar accounts.permissions.HasPermissionCode va ko‘rinishdagi required_permission orqali jadvaldagi kodni tekshiradi. Masalan, kirim uchun inventory.add_receipt.
 
@@ -191,7 +191,7 @@ Frontend kalitni forma ochilganda yaratadi va muvaffaqiyatli javob kelguncha o�
 
 `GET /api/v1/receipts/?material=41&date_from=2026-11-01&date_to=2026-11-30&currency=USD` — eng yangisi birinchi. Har bir yozuv 4.1 dagi javob bilan bir xil shaklda, faqat `quantity_on_hand_after` maydonisiz qaytadi.
 `GET /api/v1/receipts/{id}/` — bitta kirim.
-`PUT`, `PATCH`, `DELETE` qo‘llab-quvvatlanmaydi (`405`). Xato kirim tuzatish harakati bilan to‘g‘rilanadi. **[PM: P5]**
+`PUT`, `PATCH`, `DELETE` qo‘llab-quvvatlanmaydi (`405`). Xato kirimni tuzatish API’si hali mavjud emas; P5 kelishilgach alohida tuzatish harakati qo‘shiladi. **[PM: P5]**
 
 ## 5. Qoldiq va tarix · PCRM-42
 

@@ -15,7 +15,7 @@ Jadval vazifa taqsimoti rejasini ko‘rsatadi. Amaldagi ijrochi, vazifa va sprin
 
 ## Parallel ishlash va birlashtirish
 
-1. **Umumiy asos.** [@jamoliddinusarov1-create](https://github.com/jamoliddinusarov1-create) PCRM-37 doirasida lokal ishga tushirish yo‘riqnomasi, muhit sozlamalari namunalari, docker-compose va CI’ni tayyorladi ([feat/PCRM-37-setup-and-ci](https://github.com/shamsiyevshamsiddin19/PROFUR/tree/feat/PCRM-37-setup-and-ci), Ko‘rikda). Jamoadoshlar ushbu poydevor asosida o‘z ishlarini boshlashi mumkin. Ikki backendchi umumiy model va migratsiyalardagi o‘zgarishlarni kelishadi.
+1. **Umumiy asos.** [@jamoliddinusarov1-create](https://github.com/jamoliddinusarov1-create) PCRM-37 doirasida lokal ishga tushirish yo‘riqnomasi, muhit sozlamalari namunalari, docker-compose va CI’ni tayyorladi ([PR #46](https://github.com/shamsiyevshamsiddin19/PROFUR/pull/46), main’da, tekshiruvlar o‘tgan). Jamoadoshlar ushbu poydevor asosida o‘z ishlarini boshlashi mumkin. Ikki backendchi umumiy model va migratsiyalardagi o‘zgarishlarni kelishadi.
 2. **Birinchi oqim.** Siz va [@ozodbek101](https://github.com/ozodbek101) material → kirim → qoldiq uchun API manzillari, maydonlar, javob va xato namunalarini kelishasiz. Shundan so‘ng formani namunaviy javoblar bilan, API’ni esa PostgreSQL bilan parallel qurasiz. [Akbar (@thealiiheere)](https://github.com/thealiiheere) xarajatlar ustida parallel ishlaydi.
 3. **PR tartibi.** Bitta vazifaga bitta qisqa branch, masalan `feat/PCRM-40-receipt-api`. Ketma-ketlik — umumiy asos → katalog va kirim API’si → forma integratsiyasi. Mustaqil xarajatlar PR’i o‘z tekshiruvlaridan o‘tgach shu orada birlashishi mumkin. Bog‘liq PR tavsifida oldin qaysi PR birlashishi ko‘rsatiladi.
 4. **Qabul.** Kamida bir jamoadosh PR’ni ko‘rib chiqadi. Tegishli testlar va migratsiya tekshiruvi o‘tgach birlashtiriladi. Birinchi qabul sinovida telefon orqali kirim yuboriladi, bitta partiya yaratiladi va ekranda qoldiq ko‘rinadi.
@@ -25,3 +25,7 @@ Biznes talablari va tasdiqlar [OQ reyestrida](../docs/01-requirements/open-quest
 [Birgalikda ishlash tartibi](COLLABORATION.md) — kim bilan kelishish, AI qanday maslahat berishi va holatni qachon yangilash.
 
 [AI bajarish qo‘llanmasi](EXECUTION.md) — har bir vazifani kod, sinov va PR’gacha yetkazish. Har bir rol faylida navbatdagi ishlarning ketma-ketligi bor.
+
+## Joriy topshirish · 2026-11-19
+
+1-qism texnik yig‘masi main’da. [Talablar va dalillar](../docs/08-delivery/phase-one-acceptance.md). Quyidagi rol fayllari joriy holatni, eski bo‘limlar esa tarixni saqlaydi. PM/buyurtmachi jonli qabuli va serverga chiqarish alohida.
