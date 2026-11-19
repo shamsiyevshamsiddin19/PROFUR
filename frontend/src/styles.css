@@ -1644,3 +1644,15 @@ fieldset:disabled {
   padding: 2px 7px;
   font-size: 12px;
 }
+
+.sidebar nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+.sidebar .brand,
+.sidebar-label,
+.sidebar-bottom {
+  flex-shrink: 0;
+}
