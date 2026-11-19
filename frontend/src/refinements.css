@@ -1376,3 +1376,13 @@ input[type="number"],
     visibility: visible;
   }
 }
+
+/* Keep the whole action group inside its cell so scrolling can reveal every button. */
+.row-actions {
+  min-width: max-content;
+  flex-wrap: nowrap;
+}
+.row-actions > button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}

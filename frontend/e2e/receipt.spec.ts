@@ -126,7 +126,11 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await expect(
     page.getByText("Request saved. Awaiting approval.", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await page
+    .getByRole("row")
+    .filter({ hasText: materialName })
+    .getByRole("button", { name: "Approve", exact: true })
+    .click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Approve", exact: true })
@@ -148,7 +152,11 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await expect(
     page.getByText("Request saved. Awaiting approval.", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await page
+    .getByRole("row")
+    .filter({ hasText: materialName })
+    .getByRole("button", { name: "Approve", exact: true })
+    .click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Approve", exact: true })

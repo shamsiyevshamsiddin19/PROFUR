@@ -50,7 +50,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   await page
     .getByRole("textbox", { name: "Search users", exact: true })
     .fill(username);
-  const record = page.locator(".admin-record").filter({ hasText: username });
+  const record = page.getByRole("row").filter({ hasText: username });
   await expect(record).toHaveCount(1);
   await record.getByRole("button", { name: "Edit", exact: true }).click();
   await dialog.getByLabel("Phone", { exact: true }).fill("+998901234567");
@@ -143,7 +143,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   const wildcardRole = await wildcardResponse.json();
   await page.goto("/#administration");
   const wildcardRecord = page
-    .locator(".admin-record")
+    .getByRole("row")
     .filter({ hasText: "Wildcard " + suffix });
   await wildcardRecord
     .getByRole("button", { name: "Edit", exact: true })
