@@ -1,3 +1,4 @@
+import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { can, type Expense, type ExpenseType, type User } from "../api";
@@ -64,7 +65,6 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
               <ExpenseFields types={types.data} lang={lang} />
             </fieldset>
             <div className="dialog-actions">
-              <span>USD</span>
               {pending ? (
                 <button
                   type="button"
@@ -250,7 +250,7 @@ function ExpenseFields({
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   return (
-    <div className="form-grid">
+    <EntryTable lang={lang} className="expense-entry-table">
       <Field label={t("expenseType")}>
         <select
           name="expense_type"
@@ -298,7 +298,7 @@ function ExpenseFields({
       <Field label={t("note")} wide>
         <input name="note" defaultValue={row?.note} />
       </Field>
-    </div>
+    </EntryTable>
   );
 }
 function ReverseExpense({

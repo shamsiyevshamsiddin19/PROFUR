@@ -135,3 +135,5 @@ Team Lead topshirig‘i: palitra, chap panel va sozlamalar. Standart zumrad rang
 2026-11-19 · PCRM-48 · Foydalanuvchi chap paneldagi “Asosiy ombor / Ombor boshqaruvi” kartasini rad etdi. Butun blok va uning maxsus uslublari olib tashlandi; qaytarilmang. Sozlamalardagi ombor ma’lumoti bu o‘zgarishga kirmaydi.
 
 2026-11-19 · PCRM-48 · UI/UX tahlili asosida jadval viewporti, sticky sarlavha, haqiqiy scroll soyasi/ko‘rsatmasi, raqamlar tekisligi, 11px nav guruhlari, bo‘sh natija amallari va qidiruv/kirim klaviatura oqimi qo‘shildi. Warehouse formasi asl ruxsat/validatsiya/idempotency yo‘lidan foydalanadi. Oq fon saqlanadi. Build va mavjud testlar o‘tdi; uch ekranli real API regressiyasi PR/CI’da tekshiriladi.
+
+2026-11-19 · PCRM-48 · Ma’lumot kiritish va ko‘rish foydalanuvchi talabiga ko‘ra jadval shakliga o‘tkazildi: kirim, material, ombor amallari va xarajatlar. Yagona EntryTable komponenti, native form yorliqlari, mobil gorizontal surish; qoldiq ham barcha ekranlarda jadval. Saqlash bir yozuv uchun, avvalgi ruxsat/validatsiya/idempotency saqlanadi. Build va 10 frontend testi o‘tdi; real API bilan uch ekranli CI tekshiruvi PR’da. Issue #54.

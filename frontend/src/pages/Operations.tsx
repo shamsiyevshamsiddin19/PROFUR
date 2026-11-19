@@ -1,3 +1,4 @@
+import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useEffect, useState, type FormEvent } from "react";
 import Decimal from "decimal.js";
@@ -316,7 +317,7 @@ function OperationForm({
       )}
       <form onSubmit={submit} key={reset}>
         <fieldset disabled={operation.busy || Boolean(operation.pending)}>
-          <div className="form-grid">
+          <EntryTable lang={lang} className="operation-entry-table">
             {kind === "returns" ? (
               <Field label={t("originalIssue")} wide>
                 <select
@@ -395,7 +396,7 @@ function OperationForm({
                 maxLength={500}
               />
             </Field>
-          </div>
+          </EntryTable>
           <div className="allocation-section">
             <h3>{t("batchSelection")}</h3>
             <p className="form-hint">{t("manualBatches")}</p>

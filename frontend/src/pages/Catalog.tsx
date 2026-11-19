@@ -1,3 +1,4 @@
+import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
 import { Plus, Pencil } from "lucide-react";
@@ -282,7 +283,7 @@ function MaterialForm({
       <form onSubmit={submit}>
         <Feedback error={error} lang={lang} />
         <fieldset disabled={busy}>
-          <div className="form-grid">
+          <EntryTable lang={lang} className="catalog-entry-table">
             <Field label={t("name")} wide>
               <input
                 name="name"
@@ -327,25 +328,25 @@ function MaterialForm({
               />
             </Field>
             {(["length", "width", "thickness"] as const).map((key) => (
-                <Field key={key} label={t(key)}>
-                  <input
-                    name={key + "_cm"}
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    defaultValue={material?.[`${key}_cm`] || ""}
-                  />
-                </Field>
-              ))}
-            <label className="check-label">
-              <input
-                type="checkbox"
-                name="is_active"
-                defaultChecked={material?.is_active ?? true}
-              />
-              {t("active")}
-            </label>
-          </div>
+              <Field key={key} label={t(key)}>
+                <input
+                  name={key + "_cm"}
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  defaultValue={material?.[`${key}_cm`] || ""}
+                />
+              </Field>
+            ))}
+          </EntryTable>
+          <label className="check-label">
+            <input
+              type="checkbox"
+              name="is_active"
+              defaultChecked={material?.is_active ?? true}
+            />
+            {t("active")}
+          </label>
         </fieldset>
         <div className="dialog-actions">
           <button

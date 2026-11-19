@@ -57,6 +57,13 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   expect(created.status()).toBe(201);
   const material = await created.json();
   await page.goto("/#receiving");
+  const entry = page.getByRole("table", {
+    name: "New record entry",
+    exact: true,
+  });
+  await expect(entry.getByRole("columnheader")).toHaveCount(8);
+  await expect(entry.getByRole("row")).toHaveCount(2);
+  await expect(entry.getByLabel("Quantity", { exact: true })).toBeEditable();
   await page
     .getByRole("combobox", { name: "Material", exact: true })
     .selectOption(String(material.id));
@@ -70,6 +77,17 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   });
   await quantity.fill("2");
   await total.fill("60");
+  // A narrow viewport scrolls inside the entry table, never the whole page.
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await entry.getByRole("columnheader").first().scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: info.outputPath("tabular-entry-" + info.project.name + ".png"),
+    fullPage: true,
+  });
   await quantity.focus();
   await page.keyboard.down("Enter");
   await expect(total).toBeFocused();

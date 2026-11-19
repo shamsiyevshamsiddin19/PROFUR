@@ -1,8 +1,19 @@
 import { useState, type FormEvent } from "react";
+import {
+  Pencil,
+  KeyRound,
+  Plus,
+  UserPlus,
+  Search,
+  Shield,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { type User, write } from "../api";
 import { translate, type Language, type MessageKey } from "../i18n";
 import { useRecords } from "../hooks/useRecords";
 import { Field, Feedback, Modal, RecordsState } from "../components/WorkflowUI";
+import { TableViewport } from "../components/TableViewport";
 
 type Role = {
   id: number;
@@ -137,82 +148,147 @@ export function Administration({
     }
   }
   return (
-    <>
+    <div className="admin-page-container">
       {saved && (
         <div className="notice success" role="status">
           {t("savedChanges")}
         </div>
       )}
-      <section className="workflow-panel">
-        <div className="workflow-toolbar">
-          <h2>{t("users")}</h2>
-          <button
-            className="primary"
-            onClick={() => {
-              setError(null);
-              setEditor({ kind: "user" });
-            }}
-          >
-            {t("newUser")}
-          </button>
+      <section className="admin-section">
+        <div className="admin-toolbar">
+          <div className="admin-toolbar-start">
+            <h2>{t("users")}</h2>
+            <span className="count-pill">{accounts.data.length}</span>
+          </div>
+          <div className="admin-toolbar-end">
+            <div className="admin-search-box">
+              <Search size={15} className="admin-search-icon" aria-hidden="true" />
+              <input
+                data-search-field
+                aria-keyshortcuts="/ Control+k Meta+k"
+                aria-label={t("searchUsers")}
+                placeholder={t("searchUsers")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <select
+              aria-label={t("status")}
+              value={active}
+              onChange={(e) => setActive(e.target.value)}
+              className="admin-filter-select"
+            >
+              <option value="">{t("all")}</option>
+              <option value="true">{t("active")}</option>
+              <option value="false">{t("inactive")}</option>
+            </select>
+            <button
+              type="button"
+              className="primary admin-create-btn"
+              onClick={() => {
+                setError(null);
+                setEditor({ kind: "user" });
+              }}
+            >
+              <UserPlus size={15} aria-hidden="true" />
+              <span>{t("newUser")}</span>
+            </button>
+          </div>
         </div>
-        <div className="workflow-toolbar">
-          <input
-            data-search-field
-            aria-keyshortcuts="/ Control+k Meta+k"
-            aria-label={t("searchUsers")}
-            placeholder={t("searchUsers")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select
-            aria-label={t("status")}
-            value={active}
-            onChange={(e) => setActive(e.target.value)}
-          >
-            <option value="">{t("all")}</option>
-            <option value="true">{t("active")}</option>
-            <option value="false">{t("inactive")}</option>
-          </select>
-        </div>
-        <div className="admin-records">
-          {accounts.data.map((account) => (
-            <article className="admin-record" key={account.id}>
-              <div>
-                <strong>
-                  {[account.first_name, account.last_name]
-                    .filter(Boolean)
-                    .join(" ") || account.username}
-                </strong>
-                <p>
-                  {account.username} ·{" "}
-                  {t(account.is_active ? "active" : "inactive")}
-                </p>
-                <p>{account.roles.map((role) => role.name).join(", ")}</p>
-              </div>
-              <div className="record-actions">
-                <button
-                  className="secondary"
-                  onClick={() => {
-                    setError(null);
-                    setEditor({ kind: "user", value: account });
-                  }}
-                >
-                  {t("edit")}
-                </button>
-                <button
-                  className="secondary"
-                  onClick={() => {
-                    setError(null);
-                    setEditor({ kind: "password", value: account });
-                  }}
-                >
-                  {t("resetPassword")}
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
+        {accounts.data.length > 0 && (
+          <TableViewport lang={lang} className="admin-table-viewport">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th style={{ width: "26%" }}>{t("fullName")}</th>
+                  <th style={{ width: "16%" }}>{t("userLogin")}</th>
+                  <th style={{ width: "22%" }}>{t("role")}</th>
+                  <th style={{ width: "12%" }}>{t("status")}</th>
+                  <th className="cell-actions" style={{ width: "24%" }}>{t("actions")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {accounts.data.map((account) => (
+                  <tr key={account.id}>
+                    <td>
+                      <div className="user-name-cell">
+                        <strong>
+                          {[account.first_name, account.last_name]
+                            .filter(Boolean)
+                            .join(" ") || account.username}
+                        </strong>
+                        {(account.email || account.phone) && (
+                          <span className="cell-subtext">
+                            {[account.email, account.phone]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <code>{account.username}</code>
+                    </td>
+                    <td>
+                      {account.roles.length > 0 ? (
+                        <span className="role-tags">
+                          {account.roles.map((role) => (
+                            <span key={role.id} className="role-tag">
+                              <Shield size={12} aria-hidden="true" />
+                              {role.name}
+                            </span>
+                          ))}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={`status-pill ${account.is_active ? "active" : "inactive"}`}
+                      >
+                        {account.is_active ? (
+                          <CheckCircle2 size={12} aria-hidden="true" />
+                        ) : (
+                          <XCircle size={12} aria-hidden="true" />
+                        )}
+                        <span>{t(account.is_active ? "active" : "inactive")}</span>
+                      </span>
+                    </td>
+                    <td className="cell-actions">
+                      <div className="admin-actions">
+                        <button
+                          type="button"
+                          className="admin-action-btn edit-btn"
+                          onClick={() => {
+                            setError(null);
+                            setEditor({ kind: "user", value: account });
+                          }}
+                          title={t("edit")}
+                        >
+                          <Pencil size={13} aria-hidden="true" />
+                          <span>{t("edit")}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action-btn password-btn"
+                          onClick={() => {
+                            setError(null);
+                            setEditor({ kind: "password", value: account });
+                          }}
+                          title={t("resetPassword")}
+                        >
+                          <KeyRound size={13} aria-hidden="true" />
+                          <span>{t("resetPassword")}</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableViewport>
+        )}
         <RecordsState
           {...accounts}
           empty={!accounts.data.length}
@@ -220,38 +296,83 @@ export function Administration({
           lang={lang}
         />
       </section>
-      <section className="workflow-panel">
-        <div className="workflow-toolbar">
-          <h2>{t("roles")}</h2>
-          <button
-            className="primary"
-            onClick={() => {
-              setError(null);
-              setEditor({ kind: "role" });
-            }}
-          >
-            {t("newRole")}
-          </button>
+
+      <section className="admin-section roles-section">
+        <div className="admin-toolbar">
+          <div className="admin-toolbar-start">
+            <h2>{t("roles")}</h2>
+            <span className="count-pill">{roles.data.length}</span>
+          </div>
+          <div className="admin-toolbar-end">
+            <button
+              type="button"
+              className="primary admin-create-btn"
+              onClick={() => {
+                setError(null);
+                setEditor({ kind: "role" });
+              }}
+            >
+              <Plus size={15} aria-hidden="true" />
+              <span>{t("newRole")}</span>
+            </button>
+          </div>
         </div>
-        <div className="admin-records">
-          {roles.data.map((role) => (
-            <article className="admin-record" key={role.id}>
-              <div>
-                <strong>{role.name}</strong>
-                <p>{role.code}</p>
-              </div>
-              <button
-                className="secondary"
-                onClick={() => {
-                  setError(null);
-                  setEditor({ kind: "role", value: role });
-                }}
-              >
-                {t("edit")}
-              </button>
-            </article>
-          ))}
-        </div>
+        {roles.data.length > 0 && (
+          <TableViewport lang={lang} className="admin-table-viewport">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th style={{ width: "28%" }}>{t("roleName")}</th>
+                  <th style={{ width: "18%" }}>{t("roleCode")}</th>
+                  <th style={{ width: "38%" }}>{t("permissions")}</th>
+                  <th className="cell-actions" style={{ width: "16%" }}>{t("actions")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {roles.data.map((role) => (
+                  <tr key={role.id}>
+                    <td>
+                      <div className="role-name-cell">
+                        <strong>{role.name}</strong>
+                        {role.description && (
+                          <span className="cell-subtext">
+                            {role.description}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <code>{role.code}</code>
+                    </td>
+                    <td>
+                      <span className="permissions-badge">
+                        {role.permissions?.includes("*")
+                          ? t("fullAccess")
+                          : `${role.permissions?.length || 0} ${t("permissions").toLowerCase()}`}
+                      </span>
+                    </td>
+                    <td className="cell-actions">
+                      <div className="admin-actions">
+                        <button
+                          type="button"
+                          className="admin-action-btn edit-btn"
+                          onClick={() => {
+                            setError(null);
+                            setEditor({ kind: "role", value: role });
+                          }}
+                          title={t("edit")}
+                        >
+                          <Pencil size={13} aria-hidden="true" />
+                          <span>{t("edit")}</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableViewport>
+        )}
         <RecordsState
           {...roles}
           empty={!roles.data.length}
@@ -468,6 +589,6 @@ export function Administration({
           </form>
         </Modal>
       )}
-    </>
+    </div>
   );
 }

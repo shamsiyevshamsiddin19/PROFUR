@@ -11,7 +11,6 @@ import {
   ArrowDownLeft,
   Box,
   ChevronRight,
-  CircleDollarSign,
   Layers3,
   LogOut,
   Menu,
@@ -455,10 +454,6 @@ export function App() {
                     )}
               </p>
             </div>
-            <span className="currency-badge">
-              <CircleDollarSign size={16} />
-              USD
-            </span>
           </div>
           {authError && (
             <div className="notice error" role="alert">
@@ -518,7 +513,6 @@ export function App() {
 
           <footer>
             <span>PROFUR</span>
-            <span>{t("allMoney")} · USD</span>
           </footer>
         </main>
       </div>
