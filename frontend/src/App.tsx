@@ -269,15 +269,6 @@ export function App() {
         >
           <X size={20} />
         </button>
-        <div className="sidebar-workspace">
-          <span className="workspace-monogram">
-            <Warehouse size={18} />
-          </span>
-          <span>
-            <strong>{t("mainWarehouse")}</strong>
-            <small>{t("warehouseWorkspace")}</small>
-          </span>
-        </div>
         <nav ref={navRef} aria-label={t("workspace")}>
           {(
             [

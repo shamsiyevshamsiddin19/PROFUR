@@ -57,6 +57,8 @@ Bu to‘liq WCAG muvofiqligi auditi emas. Brauzerda 320/768 px va desktop, uch t
 
 ## 2026-11-19 · Rang, navigatsiya va sozlamalar yangilanishi
 
-Foydalanuvchi oldingi ranglar/chap panelni oddiy deb baholadi. Asosiy oq ish maydoni saqlandi; standart aksent zumrad (#087d68), navigatsiya to‘q yashil-grafit. Sidebar ombor, nazorat va boshqaruv guruhlariga ajratildi. Faol sahifa ikonka, chegara va fon bilan belgilanadi; rangning o‘zi yagona belgi emas. Asosiy ombor bloki va profil pastda aniq ajratilgan. Past ekranlarda menyu o‘z ichida aylanadi.
+Foydalanuvchi oldingi ranglar/chap panelni oddiy deb baholadi. Asosiy oq ish maydoni saqlandi; standart aksent zumrad (#087d68), navigatsiya to‘q yashil-grafit. Sidebar ombor, nazorat va boshqaruv guruhlariga ajratildi. Faol sahifa ikonka, chegara va fon bilan belgilanadi; rangning o‘zi yagona belgi emas. Profil pastda alohida joylashgan. Past ekranlarda menyu o‘z ichida aylanadi.
 
 `#settings`: zumrad/indigo/binafsha aksent, keng/ixcham qatorlar, kamaytirilgan animatsiya, uz/ru/en til tanlovi va qayta tiklash. Ko‘rinish sozlamalari ushbu brauzerda `profur.appearance` bilan saqlanadi; server yoki boshqa xodim sozlamasini o‘zgartirmaydi. Brauzer saqlashni taqiqlasa sessiyadagi tanlov ishlaydi va holat tushuntiriladi. USD va ombor ma’lumotlari axborot sifatida ko‘rsatiladi. Ruxsatlar serverdagi shartnoma bo‘yicha qoladi.
+
+2026-11-19 foydalanuvchi tuzatishi: chap paneldagi “Asosiy ombor / Ombor boshqaruvi” kartasi olib tashlandi. Uning o‘rniga dekor yoki takroriy yozuv qo‘shilmang.
