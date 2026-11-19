@@ -305,7 +305,7 @@ export function App() {
             aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
             title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
           >
-            {collapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+            {collapsed ? <PanelLeftOpen size={22} /> : <PanelLeftClose size={22} />}
           </button>
           <a className="brand" href="#receiving" onClick={() => setDrawer(false)}>
             <span className="brand-text">PROFUR</span>

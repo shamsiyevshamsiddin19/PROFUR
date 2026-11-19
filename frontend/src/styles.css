@@ -167,6 +167,13 @@ label small {
   width: 34px;
   height: 36px;
 }
+.sidebar .brand-icon.collapse-toggle {
+  background: none;
+  border-radius: 0;
+  width: auto;
+  height: auto;
+  color: var(--sidebar-on);
+}
 .brand-dot {
   width: 5px;
   height: 5px;
@@ -690,13 +697,14 @@ footer > span:first-child {
 .brand-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-left: 8px;
+  gap: 6px;
+  padding: 0 14px;
 }
 .collapse-toggle {
   display: none;
   border: none;
   cursor: pointer;
+  padding: 4px;
 }
 .topbar-notifications {
   position: relative;
@@ -739,12 +747,12 @@ footer > span:first-child {
 }
 @media (min-width: 851px) {
   .collapse-toggle {
-    display: grid;
-    color: var(--sidebar-muted);
+    display: flex;
+    align-items: center;
+    color: var(--sidebar-on);
   }
   .collapse-toggle:hover {
-    color: var(--sidebar-on);
-    background: var(--sidebar-hover);
+    color: var(--sidebar-active-text);
   }
   .sidebar-collapsed .sidebar {
     width: 68px;
@@ -765,6 +773,7 @@ footer > span:first-child {
   }
   .sidebar-collapsed .brand-row {
     justify-content: center;
+    padding: 0;
     padding-bottom: 10px;
   }
   .sidebar-collapsed .nav-item {
