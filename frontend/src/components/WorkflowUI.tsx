@@ -45,10 +45,12 @@ export function RecordsState({
   more,
   reload,
   lang,
+  emptyAction,
 }: {
   error: unknown;
   loading: boolean;
   empty: boolean;
+  emptyAction?: ReactNode;
   more?: () => void;
   reload: () => void;
   lang: Language;
@@ -63,7 +65,10 @@ export function RecordsState({
         </div>
       )}
       {!loading && empty && !error && (
-        <div className="empty">{translate(lang, "empty")}</div>
+        <div className="empty">
+          <p>{translate(lang, "empty")}</p>
+          {emptyAction && <div className="empty-actions">{emptyAction}</div>}
+        </div>
       )}
       {error ? (
         <button className="secondary" onClick={reload}>

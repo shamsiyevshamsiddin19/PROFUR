@@ -93,3 +93,7 @@
   --sidebar-line: #51415f;
   --sidebar-avatar: #5b4173;
 }
+:root {
+  --button-highlight: #ffffff33;
+  --table-scroll-shadow: #1b302c29;
+}

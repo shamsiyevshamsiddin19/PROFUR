@@ -1,3 +1,4 @@
+import { TableViewport } from "../components/TableViewport";
 import { useEffect, useState, type FormEvent } from "react";
 import Decimal from "decimal.js";
 import {
@@ -102,7 +103,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
             {t("refresh")}
           </button>
         </div>
-        <div className="table-wrap">
+        <TableViewport lang={lang} className="">
           <table>
             <thead>
               <tr>
@@ -159,7 +160,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableViewport>
         <RecordsState
           {...records}
           empty={!records.data.length}
@@ -403,7 +404,7 @@ function OperationForm({
               <p className="empty">{t("noBatches")}</p>
             )}
             {allocations.length > 0 && (
-              <div className="table-wrap">
+              <TableViewport lang={lang} className="">
                 <table>
                   <thead>
                     <tr>
@@ -446,7 +447,7 @@ function OperationForm({
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </TableViewport>
             )}
           </div>
         </fieldset>

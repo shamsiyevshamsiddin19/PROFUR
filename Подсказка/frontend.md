@@ -133,3 +133,5 @@ PCRM-43 mezonini to‘liq yopish uchun kichik ekranda qoldiq jadvali bitta DOM a
 Team Lead topshirig‘i: palitra, chap panel va sozlamalar. Standart zumrad rang, guruhlangan navigatsiya va `#settings` qo‘shildi. Aksent/ixchamlik/animatsiya tanlovi brauzerda saqlanadi; USD va server ruxsatlari o‘zgarmaydi. Build va mavjud testlar, uch ekranda sozlamalar saqlanishi, rus/ingliz til almashtirish va 320px overflow tekshiruvi bajariladi. Ranglar tokens.css da, yangi vizual qoidalar refinements.css da.
 
 2026-11-19 · PCRM-48 · Foydalanuvchi chap paneldagi “Asosiy ombor / Ombor boshqaruvi” kartasini rad etdi. Butun blok va uning maxsus uslublari olib tashlandi; qaytarilmang. Sozlamalardagi ombor ma’lumoti bu o‘zgarishga kirmaydi.
+
+2026-11-19 · PCRM-48 · UI/UX tahlili asosida jadval viewporti, sticky sarlavha, haqiqiy scroll soyasi/ko‘rsatmasi, raqamlar tekisligi, 11px nav guruhlari, bo‘sh natija amallari va qidiruv/kirim klaviatura oqimi qo‘shildi. Warehouse formasi asl ruxsat/validatsiya/idempotency yo‘lidan foydalanadi. Oq fon saqlanadi. Build va mavjud testlar o‘tdi; uch ekranli real API regressiyasi PR/CI’da tekshiriladi.

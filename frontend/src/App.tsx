@@ -1,7 +1,9 @@
+import { focusCurrentSearch } from "./keyboard";
 import { initialAppearance } from "./appearance";
 import { Settings } from "./pages/Settings";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Search,
   Settings2,
   Tags,
   Users,
@@ -179,6 +181,33 @@ export function App() {
         active.offsetTop + active.offsetHeight - nav.clientHeight + 8;
   }, [screen, lang, user, drawer]);
 
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.isComposing ||
+        event.altKey ||
+        event.repeat
+      )
+        return;
+      if (document.querySelector("dialog[open]")) return;
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest(
+          'input,select,textarea,[contenteditable]:not([contenteditable="false"])',
+        )
+      )
+        return;
+      const slash = event.key === "/" && !event.ctrlKey && !event.metaKey;
+      const command =
+        event.key.toLowerCase() === "k" && (event.ctrlKey || event.metaKey);
+      if ((slash || command) && focusCurrentSearch()) event.preventDefault();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   const languagePicker = (
     <select
       className="language"
@@ -351,7 +380,21 @@ export function App() {
             <ChevronRight size={14} />
             <strong>{t(screen)}</strong>
           </div>
-          {languagePicker}
+          <div className="topbar-actions">
+            {["materials", "stock", "administration"].includes(screen) &&
+              allowed(screen) && (
+                <button
+                  className="search-shortcut"
+                  onClick={focusCurrentSearch}
+                  aria-label={t("quickSearch")}
+                >
+                  <Search size={15} />
+                  <span>{t("quickSearch")}</span>
+                  <kbd>/</kbd>
+                </button>
+              )}
+            {languagePicker}
+          </div>
         </header>
         <main>
           <div className="page-heading">

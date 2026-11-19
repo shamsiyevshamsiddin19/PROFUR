@@ -158,6 +158,8 @@ export function Administration({
         </div>
         <div className="workflow-toolbar">
           <input
+            data-search-field
+            aria-keyshortcuts="/ Control+k Meta+k"
             aria-label={t("searchUsers")}
             placeholder={t("searchUsers")}
             value={search}

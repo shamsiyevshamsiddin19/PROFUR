@@ -62,3 +62,9 @@ Foydalanuvchi oldingi ranglar/chap panelni oddiy deb baholadi. Asosiy oq ish may
 `#settings`: zumrad/indigo/binafsha aksent, keng/ixcham qatorlar, kamaytirilgan animatsiya, uz/ru/en til tanlovi va qayta tiklash. Ko‘rinish sozlamalari ushbu brauzerda `profur.appearance` bilan saqlanadi; server yoki boshqa xodim sozlamasini o‘zgartirmaydi. Brauzer saqlashni taqiqlasa sessiyadagi tanlov ishlaydi va holat tushuntiriladi. USD va ombor ma’lumotlari axborot sifatida ko‘rsatiladi. Ruxsatlar serverdagi shartnoma bo‘yicha qoladi.
 
 2026-11-19 foydalanuvchi tuzatishi: chap paneldagi “Asosiy ombor / Ombor boshqaruvi” kartasi olib tashlandi. Uning o‘rniga dekor yoki takroriy yozuv qo‘shilmang.
+
+## 2026-11-19 · UI/UX tahlilidan amaliy yaxshilash
+
+Oq canvas bo‘yicha foydalanuvchining avvalgi qarori saqlandi. Sidebar guruhlari 11px; barcha jadvallar va raqamli maydonlarda tabular raqamlar; asosiy tugmada semantik token bilan nozik ichki yorug‘lik. Jadvalni o‘rash `TableViewport` da: sarlavha jadvalning o‘z scroll hududida yopishadi, faqat haqiqiy gorizontal overflow bo‘lsa chet soyasi va uch tilli surish ko‘rsatmasi chiqadi. Scroll hududi kerak bo‘lganda klaviaturadan fokuslanadi, ekran/baza o‘zgarsa ResizeObserver bilan yangilanadi. Stock mobil kartalari sahifada tabiiy davom etadi.
+
+`/`, Ctrl+K yoki Cmd+K joriy sahifadagi mavjud qidiruvga fokus beradi. Matn yozish, IME va ochiq dialog ichidagi tugmalarni tortib olmaydi. Kirimda input ichidagi Enter maydonni tekshirib keyingisiga o‘tkazadi; Ctrl/Cmd+Enter native forma validatsiyasi va mavjud saqlash/ruxsat/idempotency orqali yozadi. Select, tugma va oddiy textarea xatti-harakati saqlanadi. Bo‘sh katalog/qoldiq/xarajat/tarixda filtrni tozalash, kerakli bo‘limga o‘tish yoki ruxsatli yaratish amali taklif qilinadi. Jonli birlik narxi avvaldan mavjud bo‘lgani uchun qayta qurilmadi.
