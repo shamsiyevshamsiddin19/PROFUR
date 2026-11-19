@@ -27,6 +27,11 @@ def connection_env():
     return env
 
 
+def pg_tool(name):
+    """PG_BIN belgilansa, serverga mos client vositalari shu yerdan olinadi."""
+    return str(Path(os.environ["PG_BIN"]) / name) if os.environ.get("PG_BIN") else name
+
+
 def backup(directory: Path):
     """Faqat to'liq va pg_restore tanigan arxivni yakuniy nom bilan e'lon qiladi."""
     env = connection_env()
@@ -38,7 +43,7 @@ def backup(directory: Path):
     try:
         subprocess.run(
             [
-                "pg_dump",
+                pg_tool("pg_dump"),
                 "--format=custom",
                 "--no-owner",
                 "--no-acl",
@@ -49,7 +54,7 @@ def backup(directory: Path):
             check=True,
         )
         subprocess.run(
-            ["pg_restore", "--list", temporary],
+            [pg_tool("pg_restore"), "--list", temporary],
             env=env,
             check=True,
             stdout=subprocess.DEVNULL,

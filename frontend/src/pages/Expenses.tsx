@@ -5,7 +5,6 @@ import { localDate, money } from "../format";
 import { useIdempotentWrite } from "../hooks/useIdempotentWrite";
 import { useRecords } from "../hooks/useRecords";
 import { Field, Feedback, Modal, RecordsState } from "../components/WorkflowUI";
-import { ExpenseTypes } from "./ExpenseTypes";
 export function Expenses({ lang, user }: { lang: Language; user: User }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   const [filters, setFilters] = useState({
@@ -45,15 +44,6 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
   }
   return (
     <>
-      {can(user, "expenses.view_expensetype") &&
-        (can(user, "expenses.add_expensetype") ||
-          can(user, "expenses.change_expensetype")) && (
-          <ExpenseTypes
-            lang={lang}
-            user={user}
-            changed={() => setRevision((n) => n + 1)}
-          />
-        )}
       <Feedback error={error || types.error} lang={lang} />
       {success && (
         <div className="notice success" role="status">

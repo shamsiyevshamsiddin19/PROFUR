@@ -1,4 +1,19 @@
 export const adminMessages = {
+  fullAccess: [
+    "Barcha ruxsatlar (*)",
+    "Все разрешения (*)",
+    "All permissions (*)",
+  ],
+  customPermission: [
+    "Qo‘shimcha ruxsat",
+    "Дополнительное разрешение",
+    "Additional permission",
+  ],
+  expenseTypesHint: [
+    "Xarajat turlarini boshqaring.",
+    "Управляйте видами расходов.",
+    "Manage expense types.",
+  ],
   administration: ["Boshqaruv", "Управление", "Administration"],
   administrationHint: [
     "Foydalanuvchilar va ularning vakolatlarini boshqaring.",

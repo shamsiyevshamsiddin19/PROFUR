@@ -78,6 +78,9 @@ jobs:
             echo "Kod bazasi hali qo'shilmagan. Dastlabki CI tekshiruvi muvaffaqiyatli."
           fi
 
+      - name: Install matching PostgreSQL clients
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client-16
+
       - name: Verify PostgreSQL backup and isolated restore
         env:
           DB_NAME: profur_db
@@ -85,6 +88,7 @@ jobs:
           DB_PASSWORD: profur_password
           DB_HOST: localhost
           DB_PORT: 5432
+          PG_BIN: /usr/lib/postgresql/16/bin
         run: |
           python backend/manage.py migrate --noinput
           python backend/manage.py shell -c 'from accounts.models import User; from apps.catalog.models import Category, Material; from apps.inventory import services; from django.utils import timezone; from decimal import Decimal; u=User.objects.create_user(username="ci_restore"); m=Material.objects.create(name="CI restore material", category=Category.objects.first(), unit="sheet"); services.receive(material=m, user=u, received_on=timezone.localdate(), quantity=Decimal("20"), total_amount=Decimal("600"))'

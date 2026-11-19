@@ -4,15 +4,7 @@ import { translate, type Language } from "../i18n";
 import { useRecords } from "../hooks/useRecords";
 import { Field, Feedback, Modal, RecordsState } from "../components/WorkflowUI";
 type Type = ExpenseType & { name_uz: string; name_ru: string; name_en: string };
-export function ExpenseTypes({
-  lang,
-  user,
-  changed,
-}: {
-  lang: Language;
-  user: User;
-  changed: () => void;
-}) {
+export function ExpenseTypes({ lang, user }: { lang: Language; user: User }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   const records = useRecords<Type>("/api/v1/expense-types/", lang);
   const [editor, setEditor] = useState<Type | "new" | null>(null);
@@ -41,7 +33,6 @@ export function ExpenseTypes({
       );
       setEditor(null);
       records.reload();
-      changed();
     } catch (e) {
       setError(e);
     } finally {

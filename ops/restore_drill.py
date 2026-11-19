@@ -11,7 +11,7 @@ import time
 import uuid
 from pathlib import Path
 
-from backup import connection_env
+from backup import connection_env, pg_tool
 
 
 def drill(archive: Path):
@@ -25,14 +25,14 @@ def drill(archive: Path):
     created = False
     try:
         subprocess.run(
-            ["createdb", "--maintenance-db", env["PGDATABASE"], target],
+            [pg_tool("createdb"), "--maintenance-db", env["PGDATABASE"], target],
             env=env,
             check=True,
         )
         created = True
         subprocess.run(
             [
-                "pg_restore",
+                pg_tool("pg_restore"),
                 "--exit-on-error",
                 "--no-owner",
                 "--no-acl",
@@ -52,7 +52,7 @@ def drill(archive: Path):
         """
         check = subprocess.run(
             [
-                "psql",
+                pg_tool("psql"),
                 "--no-psqlrc",
                 "--set",
                 "ON_ERROR_STOP=1",
@@ -72,7 +72,7 @@ def drill(archive: Path):
             raise ValueError("Tiklangan qoldiq, partiya va tarix summalari mos emas.")
         counts = subprocess.run(
             [
-                "psql",
+                pg_tool("psql"),
                 "--no-psqlrc",
                 "--set",
                 "ON_ERROR_STOP=1",
@@ -100,7 +100,7 @@ def drill(archive: Path):
     finally:
         if created:
             subprocess.run(
-                ["dropdb", "--maintenance-db", env["PGDATABASE"], target],
+                [pg_tool("dropdb"), "--maintenance-db", env["PGDATABASE"], target],
                 env=env,
                 check=True,
             )

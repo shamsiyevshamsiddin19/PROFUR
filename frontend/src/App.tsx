@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  Tags,
   Users,
   Bell,
   ArrowDownLeft,
@@ -28,6 +29,7 @@ import {
 import { Login } from "./components/Login";
 import { WarehouseContent } from "./pages/WarehouseContent";
 
+import { ExpenseTypes } from "./pages/ExpenseTypes";
 import { Administration } from "./pages/Administration";
 import { Notifications } from "./pages/Notifications";
 import { Catalog } from "./pages/Catalog";
@@ -41,9 +43,11 @@ type Screen =
   | "operations"
   | "expenses"
   | "history"
+  | "expenseTypes"
   | "administration"
   | "notifications";
 const screens = {
+  expenseTypes: Tags,
   administration: Users,
   notifications: Bell,
   receiving: ArrowDownLeft,
@@ -174,11 +178,13 @@ export function App() {
       ? user.is_superuser || user.role_codes.includes("ADMIN")
       : can(
           user,
-          key === "materials"
-            ? "catalog.view_material"
-            : key === "expenses"
-              ? "expenses.view_expense"
-              : "inventory.view_stock",
+          key === "expenseTypes"
+            ? "expenses.view_expensetype"
+            : key === "materials"
+              ? "catalog.view_material"
+              : key === "expenses"
+                ? "expenses.view_expense"
+                : "inventory.view_stock",
         );
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
@@ -293,19 +299,21 @@ export function App() {
                 {screen === "receiving"
                   ? t("intro")
                   : t(
-                      screen === "administration"
-                        ? "administrationHint"
-                        : screen === "notifications"
-                          ? "notificationsHint"
-                          : screen === "materials"
-                            ? "catalogueHint"
-                            : screen === "operations"
-                              ? "operationsHint"
-                              : screen === "expenses"
-                                ? "expenseHint"
-                                : screen === "history"
-                                  ? "historyHint"
-                                  : "stockHint",
+                      screen === "expenseTypes"
+                        ? "expenseTypesHint"
+                        : screen === "administration"
+                          ? "administrationHint"
+                          : screen === "notifications"
+                            ? "notificationsHint"
+                            : screen === "materials"
+                              ? "catalogueHint"
+                              : screen === "operations"
+                                ? "operationsHint"
+                                : screen === "expenses"
+                                  ? "expenseHint"
+                                  : screen === "history"
+                                    ? "historyHint"
+                                    : "stockHint",
                     )}
               </p>
             </div>
@@ -345,6 +353,8 @@ export function App() {
             <Catalog lang={lang} user={user} />
           ) : screen === "operations" ? (
             <Operations lang={lang} user={user} />
+          ) : screen === "expenseTypes" ? (
+            <ExpenseTypes lang={lang} user={user} />
           ) : screen === "expenses" ? (
             <Expenses lang={lang} user={user} />
           ) : screen === "history" ? (

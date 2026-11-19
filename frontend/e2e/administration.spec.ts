@@ -25,6 +25,15 @@ test("admin manages users, roles and expense types; stock notifications remain p
   await dialog.getByLabel("Name", { exact: true }).fill(roleName);
   await dialog.getByRole("checkbox", { name: /catalog.view_material/ }).check();
   await dialog.getByRole("checkbox", { name: /inventory.view_stock/ }).check();
+  await dialog
+    .getByRole("checkbox", { name: /expenses.view_expensetype/ })
+    .check();
+  await dialog
+    .getByRole("checkbox", { name: /expenses.add_expensetype/ })
+    .check();
+  await dialog
+    .getByRole("checkbox", { name: /expenses.change_expensetype/ })
+    .check();
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await page.getByRole("button", { name: "Add user", exact: true }).click();
@@ -65,7 +74,7 @@ test("admin manages users, roles and expense types; stock notifications remain p
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
   await expect(dialog).not.toBeVisible();
 
-  await page.goto("/#expenses");
+  await page.goto("/#expenseTypes");
   await page
     .getByRole("button", { name: "Add expense type", exact: true })
     .click();
@@ -122,6 +131,36 @@ test("admin manages users, roles and expense types; stock notifications remain p
     ),
   ).toBe(true);
 
+  const wildcardResponse = await page.request.post("/api/auth/roles/", {
+    headers,
+    data: {
+      code: "WILDCARD_" + suffix,
+      name: "Wildcard " + suffix,
+      permissions: ["*"],
+    },
+  });
+  expect(wildcardResponse.status()).toBe(201);
+  const wildcardRole = await wildcardResponse.json();
+  await page.goto("/#administration");
+  const wildcardRecord = page
+    .locator(".admin-record")
+    .filter({ hasText: "Wildcard " + suffix });
+  await wildcardRecord
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
+  await dialog
+    .getByRole("checkbox", { name: "All permissions (*)", exact: false })
+    .uncheck();
+  await dialog.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(dialog).not.toBeVisible();
+  expect(
+    (
+      await (
+        await page.request.get(`/api/auth/roles/${wildcardRole.id}/`)
+      ).json()
+    ).permissions,
+  ).toEqual([]);
+
   // Restricted user can sign in with the new password, and cannot reach admin APIs.
   const logout = await page.request.post("/api/auth/logout/", { headers });
   expect(logout.status()).toBe(200);
@@ -137,6 +176,11 @@ test("admin manages users, roles and expense types; stock notifications remain p
     page.getByRole("button", { name: "Add user", exact: true }),
   ).toHaveCount(0);
   expect((await page.request.get("/api/auth/users/")).status()).toBe(403);
+  await page.goto("/#expenseTypes");
+  await expect(
+    page.getByRole("button", { name: "Add expense type", exact: true }),
+  ).toBeVisible();
+  expect((await page.request.get("/api/v1/expenses/")).status()).toBe(403);
   expect(
     (await page.request.get("/api/v1/notifications/?unread=true")).status(),
   ).toBe(200);

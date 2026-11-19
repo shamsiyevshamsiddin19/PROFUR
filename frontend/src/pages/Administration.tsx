@@ -19,6 +19,7 @@ type Account = Omit<User, "roles"> & {
   roles: Role[];
 };
 const permissions: [string, MessageKey][] = [
+  ["*", "fullAccess"],
   ["catalog.view_material", "materials"],
   ["catalog.add_material", "newMaterial"],
   ["catalog.change_material", "edit"],
@@ -87,12 +88,6 @@ export function Administration({
         description: data.get("description"),
         permissions: data.getAll("permissions"),
       };
-      // Preserve existing future permission codes instead of silently stripping them.
-      const known = new Set(permissions.map(([code]) => code));
-      body.permissions = [
-        ...data.getAll("permissions"),
-        ...(editor.value?.permissions.filter((code) => !known.has(code)) || []),
-      ];
       if (value) path += value.id + "/";
     } else {
       body = {
@@ -325,7 +320,21 @@ export function Administration({
                       <p>{t("adminWarning")}</p>
                       <fieldset className="permission-list">
                         <legend>{t("permissions")}</legend>
-                        {permissions.map(([code, label]) => (
+                        {[
+                          ...permissions,
+                          ...(editor.value?.permissions
+                            .filter(
+                              (code) =>
+                                !permissions.some(([known]) => known === code),
+                            )
+                            .map(
+                              (code) =>
+                                [code, "customPermission"] as [
+                                  string,
+                                  MessageKey,
+                                ],
+                            ) || []),
+                        ].map(([code, label]) => (
                           <label key={code}>
                             <input
                               type="checkbox"
