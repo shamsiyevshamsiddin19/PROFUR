@@ -26,7 +26,6 @@ import { ApiError, request, write, type User, can } from "./api";
 import { errorKey } from "./format";
 import {
   initialLanguage,
-  languages,
   translate,
   type Language,
   type MessageKey,
@@ -231,9 +230,9 @@ export function App() {
       value={lang}
       onChange={(e) => setLang(e.target.value as Language)}
     >
-      {Object.entries(languages).map(([code, name]) => (
+      {Object.entries({ uz: "uz", ru: "ru", en: "eng" }).map(([code, label]) => (
         <option key={code} value={code}>
-          {name}
+          {label}
         </option>
       ))}
     </select>
@@ -300,12 +299,37 @@ export function App() {
         />
       )}
       <aside className={drawer ? "sidebar open" : "sidebar"}>
-        <a className="brand" href="#receiving" onClick={() => setDrawer(false)}>
-          <span className="brand-icon">
-            <Warehouse size={22} />
-          </span>
-          <span className="brand-text">PROFUR</span>
-        </a>
+        <div className="brand-row">
+          <a
+            className="brand"
+            href="#receiving"
+            onClick={(e) => {
+              if (collapsed) {
+                e.preventDefault();
+                setCollapsed(false);
+              } else {
+                setDrawer(false);
+              }
+            }}
+          >
+            <span className="brand-icon">
+              {collapsed ? (
+                <PanelLeftOpen size={20} />
+              ) : (
+                <Warehouse size={22} />
+              )}
+            </span>
+            <span className="brand-text">PROFUR</span>
+          </a>
+          <button
+            className="icon-button collapse-toggle"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
+            title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
+          >
+            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
+        </div>
         <button
           className="icon-button drawer-close"
           onClick={() => setDrawer(false)}
@@ -364,14 +388,6 @@ export function App() {
           )}
         </nav>
         <div className="sidebar-bottom">
-          <button
-            className="icon-button collapse-toggle"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
-            title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
-          >
-            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-          </button>
           <div className="profile">
             <span className="avatar">{name.slice(0, 1).toUpperCase()}</span>
             <span className="profile-name">
@@ -424,6 +440,19 @@ export function App() {
                 </button>
               )}
             {languagePicker}
+            {allowed("notifications") && (
+              <a
+                href="#notifications"
+                className="icon-button topbar-notifications"
+                aria-label={t("notifications")}
+                onClick={() => { setScreen("notifications"); setDrawer(false); }}
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span className="notification-badge">{unreadCount}</span>
+                )}
+              </a>
+            )}
           </div>
         </header>
         <main>
