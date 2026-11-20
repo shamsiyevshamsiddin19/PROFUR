@@ -78,7 +78,16 @@ class ReceiptCreateSerializer(serializers.Serializer):
     material_id = ActiveMaterialField(queryset=Material.objects.all())
     received_on = serializers.DateField()
     quantity = serializers.DecimalField(**QUANTITY, min_value=Decimal("0.01"))
-    total_amount = serializers.DecimalField(**AMOUNT, min_value=Decimal("0.01"))
+    total_amount = serializers.DecimalField(
+        **AMOUNT, min_value=Decimal("0.01"), required=False, allow_null=True
+    )
+    unit_price = serializers.DecimalField(
+        max_digits=18,
+        decimal_places=6,
+        min_value=Decimal("0.000001"),
+        required=False,
+        allow_null=True,
+    )
     currency = serializers.ChoiceField(choices=Currency.choices)
     supplier = serializers.CharField(
         max_length=200, required=False, allow_blank=True, default=""
@@ -97,6 +106,25 @@ class ReceiptCreateSerializer(serializers.Serializer):
                 code="date_in_future",
             )
         return value
+
+    def validate(self, data):
+        total = data.get("total_amount")
+        unit = data.get("unit_price")
+        quantity = data.get("quantity")
+
+        if total and unit:
+            raise serializers.ValidationError(
+                _("total_amount yoki unit_price dan faqat bittasini kiriting, ikkalasini emas.")
+            )
+        if not total and not unit:
+            raise serializers.ValidationError(
+                _("total_amount yoki unit_price dan bittasi majburiy.")
+            )
+        if unit and not total:
+            data["total_amount"] = (unit * quantity).quantize(Decimal("0.01"))
+        # unit_price is computed by the service layer, remove from data
+        data.pop("unit_price", None)
+        return data
 
 
 class ReceiptSerializer(HidePricesMixin, serializers.ModelSerializer):

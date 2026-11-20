@@ -25,3 +25,6 @@ class MaterialAdmin(admin.ModelAdmin):
     list_filter = ["category", "unit", "is_active"]
     search_fields = ["name", "color"]
     list_select_related = ["category"]
+
+    def has_delete_permission(self, request, obj=None):
+        return False

@@ -3,6 +3,7 @@ from accounts.permissions import IsAdminRole
 from accounts.serializers import (
     LoginSerializer,
     PasswordResetSerializer,
+    RegisterSerializer,
     RoleSerializer,
     UserAdminCreateSerializer,
     UserAdminUpdateSerializer,
@@ -219,3 +220,82 @@ class UserResetPasswordView(APIView):
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterView(APIView):
+    """Ishchi o'z-o'zini ro'yxatdan o'tkazish API'si. Admin tasdiqini kutadi."""
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    throttle_scope = "registration"
+
+    def post(self, request):
+        ser = RegisterSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response(
+            {"detail": "Registration submitted. Waiting for admin approval."},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class PendingUsersView(APIView):
+    """Tasdiqlash kutayotgan foydalanuvchilar ro'yxati."""
+
+    permission_classes = [IsAdminRole]
+
+    def get(self, request):
+        pending = User.objects.filter(is_approved=False, is_active=True)
+        data = [
+            {
+                "id": u.id,
+                "username": u.username,
+                "first_name": u.first_name,
+                "last_name": u.last_name,
+                "phone": u.phone,
+                "date_joined": u.date_joined,
+            }
+            for u in pending
+        ]
+        return Response(data)
+
+
+class ApproveUserView(APIView):
+    """Kutayotgan foydalanuvchini tasdiqlash."""
+
+    permission_classes = [IsAdminRole]
+
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": _("Foydalanuvchi topilmadi.")},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        role_ids = request.data.get("role_ids", [])
+        if role_ids:
+            roles = Role.objects.filter(id__in=role_ids)
+            user.roles.set(roles)
+
+        user.is_approved = True
+        user.save(update_fields=["is_approved"])
+        return Response({"detail": _("Foydalanuvchi tasdiqlandi.")})
+
+
+class RejectUserView(APIView):
+    """Kutayotgan foydalanuvchini rad etish (o'chirish)."""
+
+    permission_classes = [IsAdminRole]
+
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk, is_approved=False)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": _("Kutayotgan foydalanuvchi topilmadi.")},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        user.delete()
+        return Response({"detail": _("Foydalanuvchi rad etildi va o'chirildi.")})

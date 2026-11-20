@@ -74,6 +74,11 @@ class User(AbstractUser):
         blank=True,
         verbose_name=_("Telefon raqami"),
     )
+    is_approved = models.BooleanField(
+        default=True,
+        verbose_name=_("Tasdiqlangan"),
+        help_text=_("Admin tomonidan tasdiqlangan foydalanuvchi tizimga kirishi mumkin."),
+    )
 
     class Meta:
         verbose_name = _("Foydalanuvchi")

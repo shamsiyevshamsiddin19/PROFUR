@@ -46,6 +46,17 @@ from .models import (
 UNIT_PRICE_STEP = Decimal("0.000001")
 
 
+def _enforce_integer_unit(material: Material, quantity: Decimal) -> None:
+    """Raise if material uses integer units but quantity is fractional."""
+    if material.unit in ("sheet", "piece") and quantity != quantity.to_integral_value():
+        from django.core.exceptions import ValidationError
+
+        raise ValidationError(
+            f"Material uses integer units ({material.unit}). "
+            f"Fractional quantity {quantity} is not allowed."
+        )
+
+
 class Allocation(NamedTuple):
     """Qaysi partiyadan qancha olinadi: kamaytiruvchi amallar uchun bitta qism."""
 
@@ -137,6 +148,7 @@ def receive(
     hech narsa saqlanmaydi. Qiymatlar oldindan serializer'da tekshirilgan
     bo'lishi kerak; baza cheklovlari oxirgi himoya.
     """
+    _enforce_integer_unit(material, quantity)
     balance = locked_balance(material)
     batch = Batch.objects.create(
         material=material,
@@ -209,6 +221,7 @@ def decrease(
     funksiya partiyani o'zi tanlamaydi: ``allocations`` majburiy va
     yig'indisi ``quantity`` ga teng bo'lishi kerak.
     """
+    _enforce_integer_unit(material, quantity)
     if not allocations or sum(part.quantity for part in allocations) != quantity:
         raise ValueError("Allocations must be non-empty and sum up to quantity.")
 
@@ -262,6 +275,7 @@ def issue_stock(
     ham saqlanmaydi. Chiqim hujjati va keyingi qoldiqni qaytaradi.
     """
     quantity = total_of(allocations)
+    _enforce_integer_unit(material, quantity)
     issue = StockIssue.objects.create(
         material=material,
         quantity=quantity,

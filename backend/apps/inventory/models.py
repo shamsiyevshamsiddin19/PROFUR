@@ -19,6 +19,19 @@ from django.db import models
 from django.db.models import F, Q
 from django.utils.translation import gettext_lazy as _
 
+
+class ImmutableLedgerError(Exception):
+    """Raised when attempting to modify an append-only ledger entry."""
+    pass
+
+
+class ImmutableLedgerQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ImmutableLedgerError("Ledger entries cannot be modified.")
+
+    def delete(self):
+        raise ImmutableLedgerError("Ledger entries cannot be deleted.")
+
 QUANTITY = {"max_digits": 12, "decimal_places": 2}
 AMOUNT = {"max_digits": 14, "decimal_places": 2}
 UNIT_PRICE = {"max_digits": 18, "decimal_places": 6}
@@ -137,6 +150,8 @@ class MovementType(models.TextChoices):
 class StockMovement(models.Model):
     """Qoldiq harakati. ``quantity`` musbat — qoldiq oshadi, manfiy — kamayadi."""
 
+    objects = ImmutableLedgerQuerySet.as_manager()
+
     type = models.CharField(_("turi"), max_length=20, choices=MovementType.choices)
     material = models.ForeignKey(
         "catalog.Material",
@@ -182,6 +197,14 @@ class StockMovement(models.Model):
 
     def __str__(self) -> str:
         return f"{self.get_type_display()} · {self.material} · {self.quantity}"
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ImmutableLedgerError("Ledger entries cannot be modified.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ImmutableLedgerError("Ledger entries cannot be deleted.")
 
 
 class IdempotencyKey(models.Model):
@@ -546,3 +569,60 @@ class StockNotification(models.Model):
     class Meta:
         ordering = ["-id"]
         indexes = [models.Index(fields=["recipient", "read_at", "-id"])]
+
+
+OFFCUT_UNITS = ("sheet", "meter")
+
+
+class LeftoverOffcut(models.Model):
+    """Qoldiq material: list yoki chiziqli materialdan kesish ortishi."""
+
+    material = models.ForeignKey(
+        "catalog.Material",
+        on_delete=models.PROTECT,
+        related_name="offcuts",
+        verbose_name=_("material"),
+    )
+    length_mm = models.DecimalField(
+        _("uzunligi, mm"), max_digits=10, decimal_places=2
+    )
+    width_mm = models.DecimalField(
+        _("eni, mm"), max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    quantity = models.DecimalField(
+        _("miqdor"), max_digits=12, decimal_places=2, default=1
+    )
+    note = models.CharField(_("izoh"), max_length=500, blank=True, default="")
+    registered_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="registered_offcuts",
+        verbose_name=_("qayd etgan"),
+    )
+    created_at = models.DateTimeField(_("yaratilgan"), auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = _("qoldiq material")
+        verbose_name_plural = _("qoldiq materiallar")
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(quantity__gt=0),
+                name="offcut_quantity_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(length_mm__gt=0),
+                name="offcut_length_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(width_mm__isnull=True) | Q(width_mm__gt=0),
+                name="offcut_width_positive",
+            ),
+        ]
+        indexes = [models.Index(fields=["material", "-created_at"])]
+
+    def __str__(self):
+        dims = f"{self.length_mm}"
+        if self.width_mm:
+            dims += f"×{self.width_mm}"
+        return f"{self.material} offcut {dims}mm (qty: {self.quantity})"

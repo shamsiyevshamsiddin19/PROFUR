@@ -1,10 +1,14 @@
 """Foydalanuvchi autentifikatsiyasi va rollar uchun URL marshrutlari."""
 
 from accounts.views import (
+    ApproveUserView,
     CsrfTokenView,
     LoginView,
     LogoutView,
     MeView,
+    PendingUsersView,
+    RegisterView,
+    RejectUserView,
     RoleDetailView,
     RoleListCreateView,
     UserDeactivateView,
@@ -17,6 +21,8 @@ from django.urls import path
 app_name = "accounts"
 
 urlpatterns = [
+    path("register/", RegisterView.as_view(), name="register"),
+    path("pending/", PendingUsersView.as_view(), name="pending-users"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
@@ -34,5 +40,15 @@ urlpatterns = [
         "users/<int:pk>/reset-password/",
         UserResetPasswordView.as_view(),
         name="user-reset-password",
+    ),
+    path(
+        "users/<int:pk>/approve/",
+        ApproveUserView.as_view(),
+        name="approve-user",
+    ),
+    path(
+        "users/<int:pk>/reject/",
+        RejectUserView.as_view(),
+        name="reject-user",
     ),
 ]

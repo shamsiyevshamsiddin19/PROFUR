@@ -56,6 +56,10 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = "accounts.User"
 
+AUTHENTICATION_BACKENDS = [
+    "apps.accounts.backends.ApprovedUserBackend",
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -172,6 +176,11 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.ScopedRateThrottle"],
+    "DEFAULT_THROTTLE_RATES": {
+        "registration": "10/hour",
+    },
+    "EXCEPTION_HANDLER": "apps.inventory.exception_handler.custom_exception_handler",
 }
 
 
@@ -193,6 +202,23 @@ csrf_trusted_raw = os.getenv(
 CSRF_TRUSTED_ORIGINS = [
     origin.strip() for origin in csrf_trusted_raw.split(",") if origin.strip()
 ]
+# Security hardening
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
+
+SESSION_COOKIE_AGE = 1209600
+
 if DEBUG:
     # Dinamik IP va Wi-Fi subneti uchun CSRF ruxsati
     for port in ("5173", "8000", "3000"):

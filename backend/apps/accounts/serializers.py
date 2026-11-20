@@ -88,12 +88,13 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(username=username, password=password)
         if not user:
             existing_user = User.objects.filter(username=username).first()
-            if (
-                existing_user
-                and existing_user.check_password(password)
-                and not existing_user.is_active
-            ):
-                raise serializers.ValidationError(_("Ushbu hisob faolsizlantirilgan."))
+            if existing_user and existing_user.check_password(password):
+                if not existing_user.is_active:
+                    raise serializers.ValidationError(
+                        _("Ushbu hisob faolsizlantirilgan.")
+                    )
+                if not existing_user.is_approved:
+                    raise serializers.ValidationError({"detail": "pending_approval"})
             raise serializers.ValidationError(
                 _("Login yoki parol noto'g'ri kiritildi.")
             )
@@ -235,6 +236,34 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
         if roles is not None:
             instance.roles.set(roles)
         return instance
+
+
+class RegisterSerializer(serializers.Serializer):
+    """Ishchi o'z-o'zini ro'yxatdan o'tkazish uchun serializer."""
+
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True, min_length=6)
+    first_name = serializers.CharField(max_length=150, required=False, default="")
+    last_name = serializers.CharField(max_length=150, required=False, default="")
+    phone = serializers.CharField(max_length=20, required=False, default="")
+
+    def validate_username(self, value):
+        if User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError(_("Bu foydalanuvchi nomi allaqachon mavjud."))
+        return value
+
+    def create(self, validated_data):
+        user = User(
+            username=validated_data["username"],
+            first_name=validated_data.get("first_name", ""),
+            last_name=validated_data.get("last_name", ""),
+            phone=validated_data.get("phone", ""),
+            is_approved=False,
+            is_active=True,
+        )
+        user.set_password(validated_data["password"])
+        user.save()
+        return user
 
 
 class PasswordResetSerializer(serializers.Serializer):

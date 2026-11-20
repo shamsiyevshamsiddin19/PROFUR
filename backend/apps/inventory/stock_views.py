@@ -81,6 +81,13 @@ class StockViewSet(
             )
             .order_by("category__name", "name", "id")
         )
+        # Role-based material visibility
+        user = self.request.user
+        if not (user.is_superuser or user.has_role("ADMIN")):
+            user_roles = user.role_codes
+            queryset = queryset.filter(
+                Q(allowed_roles=[]) | Q(allowed_roles__contained_by=user_roles)
+            )
         if search := params.get("search", "").strip():
             queryset = queryset.filter(
                 Q(name__icontains=search) | Q(color__icontains=search)

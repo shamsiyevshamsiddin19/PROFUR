@@ -72,6 +72,14 @@ class Material(TimeStampedModel):
     width_cm = _dimension_field(_("eni, sm"))
     thickness_cm = _dimension_field(_("qalinligi, sm"))
     unit = models.CharField(_("o'lchov birligi"), max_length=10, choices=Unit.choices)
+    container_size = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Container capacity (e.g. 12L bucket). Null means no container."
+    )
+    allowed_roles = models.JSONField(
+        default=list, blank=True,
+        help_text="Role codes that can see this material. Empty means visible to all."
+    )
     is_active = models.BooleanField(_("faol"), default=True)
 
     class Meta:
@@ -109,6 +117,10 @@ class Material(TimeStampedModel):
                 name="catalog_material_unit_valid",
             ),
         ]
+
+    @property
+    def is_integer_unit(self):
+        return self.unit in ("sheet", "piece")
 
     def __str__(self) -> str:
         parts = [self.name, self.color]
