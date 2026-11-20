@@ -326,6 +326,8 @@ def test_list_filters_and_newest_first(storekeeper, egger):
 
 
 def test_receive_service_directly(storekeeper_user, egger):
+    egger.unit = "kg"
+    egger.save(update_fields=["unit"])
     batch, balance = services.receive(
         material=egger,
         received_on=timezone.localdate(),

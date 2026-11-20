@@ -22,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 
 class ImmutableLedgerError(Exception):
     """Raised when attempting to modify an append-only ledger entry."""
+
     pass
 
 
@@ -31,6 +32,7 @@ class ImmutableLedgerQuerySet(models.QuerySet):
 
     def delete(self):
         raise ImmutableLedgerError("Ledger entries cannot be deleted.")
+
 
 QUANTITY = {"max_digits": 12, "decimal_places": 2}
 AMOUNT = {"max_digits": 14, "decimal_places": 2}
@@ -583,9 +585,7 @@ class LeftoverOffcut(models.Model):
         related_name="offcuts",
         verbose_name=_("material"),
     )
-    length_mm = models.DecimalField(
-        _("uzunligi, mm"), max_digits=10, decimal_places=2
-    )
+    length_mm = models.DecimalField(_("uzunligi, mm"), max_digits=10, decimal_places=2)
     width_mm = models.DecimalField(
         _("eni, mm"), max_digits=10, decimal_places=2, null=True, blank=True
     )

@@ -197,30 +197,42 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
         more={records.next ? records.more : undefined}
         lang={lang}
       />
-      {categoryEdit && (
-        <CategoryForm
-          category={categoryEdit === "new" ? undefined : categoryEdit}
-          lang={lang}
-          close={() => setCategoryEdit(null)}
-          saved={() => {
-            setCategoryEdit(null);
-            setRevision((n) => n + 1);
-          }}
-        />
-      )}
-      {editing && (
-        <MaterialForm
-          key={typeof editing === "string" ? "new" : editing.id}
-          material={editing === "new" ? undefined : editing}
-          lang={lang}
-          categories={categories.data}
-          close={() => setEditing(null)}
-          saved={() => {
-            setEditing(null);
-            setRevision((n) => n + 1);
-          }}
-        />
-      )}
+      {categoryEdit &&
+        can(
+          user,
+          categoryEdit === "new"
+            ? "catalog.add_category"
+            : "catalog.change_category",
+        ) && (
+          <CategoryForm
+            category={categoryEdit === "new" ? undefined : categoryEdit}
+            lang={lang}
+            close={() => setCategoryEdit(null)}
+            saved={() => {
+              setCategoryEdit(null);
+              setRevision((n) => n + 1);
+            }}
+          />
+        )}
+      {editing &&
+        can(
+          user,
+          editing === "new"
+            ? "catalog.add_material"
+            : "catalog.change_material",
+        ) && (
+          <MaterialForm
+            key={typeof editing === "string" ? "new" : editing.id}
+            material={editing === "new" ? undefined : editing}
+            lang={lang}
+            categories={categories.data}
+            close={() => setEditing(null)}
+            saved={() => {
+              setEditing(null);
+              setRevision((n) => n + 1);
+            }}
+          />
+        )}
     </>
   );
 }
@@ -309,10 +321,7 @@ function MaterialForm({
               </select>
             </Field>
             <Field label={t("unit")}>
-              <select
-                name="unit"
-                defaultValue={material?.unit || "sheet"}
-              >
+              <select name="unit" defaultValue={material?.unit || "sheet"}>
                 {["sheet", "piece", "kg", "liter", "meter", "m2"].map((u) => (
                   <option key={u} value={u}>
                     {unitLabel(u, lang)}

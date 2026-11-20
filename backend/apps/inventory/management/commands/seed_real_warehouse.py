@@ -1,7 +1,7 @@
 """PROFUR mebel ishlab chiqarish ombori uchun haqiqiy, boyitilgan ma'lumotlar bazasini to'ldiruvchi buyruq.
 
 Ushbu buyruq PostgreSQL (profur_db) bazasini quyidagilar bilan to'ldiradi:
-1. Rollar va foydalanuvchilar (admin, omborchi, usta, taminotchi, hisobchi).
+1. Rollar va foydalanuvchilar (admin, omborchi).
 2. Mebel xomashyo kategoriyalari (LDSP, MDF, Furnitura, Kromka, Yelim, Ko'zgular va h.k.).
 3. 35 dan ortiq real mebel materiallari (o'lchamlari sm da, ranglari va birliklari bilan).
 4. 50 dan ortiq kirim partiyalari (har xil sanalar, yetkazib beruvchilar va hujjat raqamlari).
@@ -11,30 +11,25 @@ Ushbu buyruq PostgreSQL (profur_db) bazasini quyidagilar bilan to'ldiradi:
 8. Turli xildagi qo'shimcha xarajatlar (loyiha va umumiy xarajatlar, bekor qilingan yozuvlar).
 """
 
+import random
 from datetime import date, timedelta
 from decimal import Decimal
-import random
 
+from accounts.models import Role, User
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from accounts.models import Role, User
 from apps.catalog.models import Category, Material, Unit
 from apps.expenses.models import Expense, ExpenseType
 from apps.inventory.models import (
     Batch,
     Currency,
-    MovementType,
-    RequestStatus,
     StockBalance,
     StockIssue,
-    StockIssueAllocation,
     StockMovement,
     StockNotification,
     StockReturn,
-    StockReturnAllocation,
     WriteOff,
-    WriteOffAllocation,
 )
 from apps.inventory.services import (
     Allocation,
@@ -61,7 +56,9 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE("Ombor ma'lumotlarini yaratish boshlandi..."))
+        self.stdout.write(
+            self.style.NOTICE("Ombor ma'lumotlarini yaratish boshlandi...")
+        )
 
         # ---------------------------------------------------------
         # 1. FOYDALANUVCHILAR VA ROLLAR
@@ -97,54 +94,6 @@ class Command(BaseCommand):
                 "is_system": True,
             },
         )
-        role_prod, _ = Role.objects.get_or_create(
-            code="PRODUCTION_SUPERVISOR",
-            defaults={
-                "name": "Ishlab chiqarish ustasi",
-                "description": "Sexda mebel ishlab chiqarish uchun material talab qilish va qaytarish",
-                "permissions": [
-                    "catalog.view_material",
-                    "inventory.view_stock",
-                    "inventory.add_issue",
-                    "inventory.add_return",
-                ],
-                "is_system": True,
-            },
-        )
-        role_acc, _ = Role.objects.get_or_create(
-            code="ACCOUNTANT",
-            defaults={
-                "name": "Bosh hisobchi",
-                "description": "Moliyaviy xarajatlar va ombor qiymatini nazorat qilish",
-                "permissions": [
-                    "catalog.view_material",
-                    "inventory.view_stock",
-                    "inventory.view_purchase_price",
-                    "expenses.view_expense",
-                    "expenses.add_expense",
-                    "expenses.reverse_expense",
-                    "expenses.view_expensetype",
-                ],
-                "is_system": True,
-            },
-        )
-        role_proc, _ = Role.objects.get_or_create(
-            code="PROCUREMENT",
-            defaults={
-                "name": "Ta'minotchi",
-                "description": "Yangi materiallar nomenklaturasi va kirim partiyalarini ro'yxatdan o'tkazish",
-                "permissions": [
-                    "catalog.view_material",
-                    "catalog.add_material",
-                    "catalog.change_material",
-                    "catalog.add_category",
-                    "inventory.view_stock",
-                    "inventory.add_receipt",
-                ],
-                "is_system": True,
-            },
-        )
-
         # Admin user
         admin_user, created = User.objects.get_or_create(
             username="admin",
@@ -158,12 +107,13 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        admin_user.set_password("admin123")
-        admin_user.save()
-        admin_user.roles.set([role_admin])
+        if created:
+            admin_user.set_password("admin123")
+            admin_user.save(update_fields=["password"])
+            admin_user.roles.add(role_admin)
 
         # Omborchi
-        omborchi_user, _ = User.objects.get_or_create(
+        omborchi_user, created = User.objects.get_or_create(
             username="omborchi",
             defaults={
                 "first_name": "Davronbek",
@@ -173,74 +123,70 @@ class Command(BaseCommand):
                 "is_active": True,
             },
         )
-        omborchi_user.set_password("ombor123")
-        omborchi_user.save()
-        omborchi_user.roles.set([role_wh])
-
-        # Ishlab chiqarish ustasi
-        usta_user, _ = User.objects.get_or_create(
-            username="usta",
-            defaults={
-                "first_name": "Rustam",
-                "last_name": "Yusupov",
-                "email": "rustam@profur.uz",
-                "phone": "+998 97 111-22-33",
-                "is_active": True,
-            },
-        )
-        usta_user.set_password("usta123")
-        usta_user.save()
-        usta_user.roles.set([role_prod])
-
-        # Hisobchi
-        hisobchi_user, _ = User.objects.get_or_create(
-            username="hisobchi",
-            defaults={
-                "first_name": "Nodira",
-                "last_name": "Karimova",
-                "email": "nodira@profur.uz",
-                "phone": "+998 90 777-88-99",
-                "is_active": True,
-            },
-        )
-        hisobchi_user.set_password("hisobchi123")
-        hisobchi_user.save()
-        hisobchi_user.roles.set([role_acc])
-
-        # Ta'minotchi
-        taminot_user, _ = User.objects.get_or_create(
-            username="taminotchi",
-            defaults={
-                "first_name": "Bobur",
-                "last_name": "Aliyev",
-                "email": "bobur@profur.uz",
-                "phone": "+998 99 444-55-66",
-                "is_active": True,
-            },
-        )
-        taminot_user.set_password("taminot123")
-        taminot_user.save()
-        taminot_user.roles.set([role_proc])
+        if created:
+            omborchi_user.set_password("ombor123")
+            omborchi_user.save(update_fields=["password"])
+            omborchi_user.roles.add(role_wh)
 
         # ---------------------------------------------------------
         # 2. XARAJAT TURLARI
         # ---------------------------------------------------------
         self.stdout.write("2. Xarajat turlari sozlanmoqda...")
         exp_types_data = [
-            ("soliq", "Soliq va majburiy to'lovlar", "Налоги и сборы", "Taxes and duties"),
-            ("stanok", "Stanok va asboblar ta'miri", "Ремонт станков", "Machine & Tool Maintenance"),
-            ("transport", "Transport va logistika", "Транспорт и доставка", "Transportation & Delivery"),
-            ("kommunal", "Kommunal to'lovlar (Elektr/Gaz)", "Коммунальные услуги", "Utilities"),
-            ("asboblar", "Mayda asboblar va fitinglar", "Расходные инструменты", "Consumables & Tools"),
-            ("ijara", "Ombor va sex binosi ijarasi", "Аренда склада и цеха", "Facility Rent"),
+            (
+                "soliq",
+                "Soliq va majburiy to'lovlar",
+                "Налоги и сборы",
+                "Taxes and duties",
+            ),
+            (
+                "stanok",
+                "Stanok va asboblar ta'miri",
+                "Ремонт станков",
+                "Machine & Tool Maintenance",
+            ),
+            (
+                "transport",
+                "Transport va logistika",
+                "Транспорт и доставка",
+                "Transportation & Delivery",
+            ),
+            (
+                "kommunal",
+                "Kommunal to'lovlar (Elektr/Gaz)",
+                "Коммунальные услуги",
+                "Utilities",
+            ),
+            (
+                "asboblar",
+                "Mayda asboblar va fitinglar",
+                "Расходные инструменты",
+                "Consumables & Tools",
+            ),
+            (
+                "ijara",
+                "Ombor va sex binosi ijarasi",
+                "Аренда склада и цеха",
+                "Facility Rent",
+            ),
             ("ovqat", "Sex xodimlari tushligi", "Питание сотрудников", "Staff Meals"),
-            ("paketlash", "Qadoqlash materiallari (Streych/Karton)", "Упаковочные материалы", "Packaging Materials"),
+            (
+                "paketlash",
+                "Qadoqlash materiallari (Streych/Karton)",
+                "Упаковочные материалы",
+                "Packaging Materials",
+            ),
         ]
         created_exp_types = {}
         for code, uz, ru, en in exp_types_data:
             obj, _ = ExpenseType.objects.get_or_create(
                 code=code,
-                defaults={"name_uz": uz, "name_ru": ru, "name_en": en, "is_active": True},
+                defaults={
+                    "name_uz": uz,
+                    "name_ru": ru,
+                    "name_en": en,
+                    "is_active": True,
+                },
             )
             created_exp_types[code] = obj
 
@@ -253,67 +199,415 @@ class Command(BaseCommand):
         cat_mdf, _ = Category.objects.get_or_create(name="MDF va Akril panellar")
         cat_kromka, _ = Category.objects.get_or_create(name="DSP kromka va qoplamalar")
         cat_furn, _ = Category.objects.get_or_create(name="Furnituralar va mexanizmlar")
-        cat_fastener, _ = Category.objects.get_or_create(name="Mahkamlagichlar va fitinglar")
+        cat_fastener, _ = Category.objects.get_or_create(
+            name="Mahkamlagichlar va fitinglar"
+        )
         cat_chem, _ = Category.objects.get_or_create(name="Yelim va kimyoviy vositalar")
         cat_glass, _ = Category.objects.get_or_create(name="Shisha va ko'zgular")
         cat_prof, _ = Category.objects.get_or_create(name="Profil va karkas tizimlari")
-        cat_tutqich, _ = Category.objects.get_or_create(name="Mebel tutqichlari va oyoqlar")
+        cat_tutqich, _ = Category.objects.get_or_create(
+            name="Mebel tutqichlari va oyoqlar"
+        )
 
         materials_spec = [
             # LDSP
-            (cat_ldsp, "LDSP Kronospan Oq Premium", "Oq", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("25.0")),
-            (cat_ldsp, "LDSP Kastamonu Dub Bardolino", "Dub", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("20.0")),
-            (cat_ldsp, "LDSP Egger Grafit Matt", "Grafit", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("15.0")),
-            (cat_ldsp, "LDSP Yulduz Yong'oq Venge", "Venge", Decimal("275.0"), Decimal("183.0"), Decimal("1.6"), Unit.SHEET, Decimal("15.0")),
-            (cat_ldsp, "LDSP Kronospan Qora Matt", "Qora", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("10.0")),
-            (cat_ldsp, "LDSP Kastamonu Krem Shokolad", "Krem", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("10.0")),
-            (cat_ldsp, "LDSP Egger Beton Chiqindi", "Kulrang", Decimal("280.0"), Decimal("207.0"), Decimal("1.8"), Unit.SHEET, Decimal("12.0")),
-            
+            (
+                cat_ldsp,
+                "LDSP Kronospan Oq Premium",
+                "Oq",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("25.0"),
+            ),
+            (
+                cat_ldsp,
+                "LDSP Kastamonu Dub Bardolino",
+                "Dub",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("20.0"),
+            ),
+            (
+                cat_ldsp,
+                "LDSP Egger Grafit Matt",
+                "Grafit",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("15.0"),
+            ),
+            (
+                cat_ldsp,
+                "LDSP Yulduz Yong'oq Venge",
+                "Venge",
+                Decimal("275.0"),
+                Decimal("183.0"),
+                Decimal("1.6"),
+                Unit.SHEET,
+                Decimal("15.0"),
+            ),
+            (
+                cat_ldsp,
+                "LDSP Kronospan Qora Matt",
+                "Qora",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("10.0"),
+            ),
+            (
+                cat_ldsp,
+                "LDSP Kastamonu Krem Shokolad",
+                "Krem",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("10.0"),
+            ),
+            (
+                cat_ldsp,
+                "LDSP Egger Beton Chiqindi",
+                "Kulrang",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("12.0"),
+            ),
             # MDF
-            (cat_mdf, "MDF AGT Oq Yaltiroq Gloss 601", "Oq Gloss", Decimal("280.0"), Decimal("122.0"), Decimal("1.8"), Unit.SHEET, Decimal("15.0")),
-            (cat_mdf, "MDF AGT Supramat Qora Qaymoq", "Qora Matt", Decimal("280.0"), Decimal("122.0"), Decimal("1.8"), Unit.SHEET, Decimal("10.0")),
-            (cat_mdf, "MDF Bo'yaladigan Shliflangan", "Xom", Decimal("280.0"), Decimal("207.0"), Decimal("1.6"), Unit.SHEET, Decimal("15.0")),
-            (cat_mdf, "MDF Akril Panel Oltin Jilo", "Oltin", Decimal("280.0"), Decimal("122.0"), Decimal("1.8"), Unit.SHEET, Decimal("8.0")),
-            (cat_mdf, "DVP Orqa devor Oq", "Oq", Decimal("280.0"), Decimal("207.0"), Decimal("0.3"), Unit.SHEET, Decimal("30.0")),
-            (cat_mdf, "DVP Orqa devor Venge", "Venge", Decimal("275.0"), Decimal("183.0"), Decimal("0.3"), Unit.SHEET, Decimal("25.0")),
-
+            (
+                cat_mdf,
+                "MDF AGT Oq Yaltiroq Gloss 601",
+                "Oq Gloss",
+                Decimal("280.0"),
+                Decimal("122.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("15.0"),
+            ),
+            (
+                cat_mdf,
+                "MDF AGT Supramat Qora Qaymoq",
+                "Qora Matt",
+                Decimal("280.0"),
+                Decimal("122.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("10.0"),
+            ),
+            (
+                cat_mdf,
+                "MDF Bo'yaladigan Shliflangan",
+                "Xom",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("1.6"),
+                Unit.SHEET,
+                Decimal("15.0"),
+            ),
+            (
+                cat_mdf,
+                "MDF Akril Panel Oltin Jilo",
+                "Oltin",
+                Decimal("280.0"),
+                Decimal("122.0"),
+                Decimal("1.8"),
+                Unit.SHEET,
+                Decimal("8.0"),
+            ),
+            (
+                cat_mdf,
+                "DVP Orqa devor Oq",
+                "Oq",
+                Decimal("280.0"),
+                Decimal("207.0"),
+                Decimal("0.3"),
+                Unit.SHEET,
+                Decimal("30.0"),
+            ),
+            (
+                cat_mdf,
+                "DVP Orqa devor Venge",
+                "Venge",
+                Decimal("275.0"),
+                Decimal("183.0"),
+                Decimal("0.3"),
+                Unit.SHEET,
+                Decimal("25.0"),
+            ),
             # KROMKA
-            (cat_kromka, "PVX Kromka 22×1 mm Oq", "Oq", Decimal("20000.0"), Decimal("2.2"), Decimal("0.1"), Unit.METER, Decimal("500.0")),
-            (cat_kromka, "PVX Kromka 22×2 mm Dub Bardolino", "Dub", Decimal("10000.0"), Decimal("2.2"), Decimal("0.2"), Unit.METER, Decimal("400.0")),
-            (cat_kromka, "PVX Kromka 22×2 mm Grafit", "Grafit", Decimal("10000.0"), Decimal("2.2"), Decimal("0.2"), Unit.METER, Decimal("300.0")),
-            (cat_kromka, "PVX Kromka 45×2 mm Qora Matt", "Qora", Decimal("10000.0"), Decimal("4.5"), Decimal("0.2"), Unit.METER, Decimal("200.0")),
-            (cat_kromka, "Melamin kromka yelimli 20mm Venge", "Venge", Decimal("5000.0"), Decimal("2.0"), Decimal("0.04"), Unit.METER, Decimal("150.0")),
-
+            (
+                cat_kromka,
+                "PVX Kromka 22×1 mm Oq",
+                "Oq",
+                Decimal("20000.0"),
+                Decimal("2.2"),
+                Decimal("0.1"),
+                Unit.METER,
+                Decimal("500.0"),
+            ),
+            (
+                cat_kromka,
+                "PVX Kromka 22×2 mm Dub Bardolino",
+                "Dub",
+                Decimal("10000.0"),
+                Decimal("2.2"),
+                Decimal("0.2"),
+                Unit.METER,
+                Decimal("400.0"),
+            ),
+            (
+                cat_kromka,
+                "PVX Kromka 22×2 mm Grafit",
+                "Grafit",
+                Decimal("10000.0"),
+                Decimal("2.2"),
+                Decimal("0.2"),
+                Unit.METER,
+                Decimal("300.0"),
+            ),
+            (
+                cat_kromka,
+                "PVX Kromka 45×2 mm Qora Matt",
+                "Qora",
+                Decimal("10000.0"),
+                Decimal("4.5"),
+                Decimal("0.2"),
+                Unit.METER,
+                Decimal("200.0"),
+            ),
+            (
+                cat_kromka,
+                "Melamin kromka yelimli 20mm Venge",
+                "Venge",
+                Decimal("5000.0"),
+                Decimal("2.0"),
+                Decimal("0.04"),
+                Unit.METER,
+                Decimal("150.0"),
+            ),
             # FURNITURA
-            (cat_furn, "Blum Movento 500mm yashirin tortma", "Kumush", None, None, None, Unit.PIECE, Decimal("40.0")),
-            (cat_furn, "Blum Clip-Top 110° dovodchikli petlya", "Nikel", None, None, None, Unit.PIECE, Decimal("120.0")),
-            (cat_furn, "Blum Aventos HF bukiluvchi fasad lifti", "Kulrang", None, None, None, Unit.PIECE, Decimal("10.0")),
-            (cat_furn, "Samet Star dovodchikli petlya 110°", "Nikel", None, None, None, Unit.PIECE, Decimal("150.0")),
-            (cat_furn, "GTV Teleskopik napravlyayushchiy 450mm", "Qora", None, None, None, Unit.PIECE, Decimal("80.0")),
-            (cat_furn, "Gazlift pnevmatik 100N", "Kumush", None, None, None, Unit.PIECE, Decimal("50.0")),
-
+            (
+                cat_furn,
+                "Blum Movento 500mm yashirin tortma",
+                "Kumush",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("40.0"),
+            ),
+            (
+                cat_furn,
+                "Blum Clip-Top 110° dovodchikli petlya",
+                "Nikel",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("120.0"),
+            ),
+            (
+                cat_furn,
+                "Blum Aventos HF bukiluvchi fasad lifti",
+                "Kulrang",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("10.0"),
+            ),
+            (
+                cat_furn,
+                "Samet Star dovodchikli petlya 110°",
+                "Nikel",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("150.0"),
+            ),
+            (
+                cat_furn,
+                "GTV Teleskopik napravlyayushchiy 450mm",
+                "Qora",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("80.0"),
+            ),
+            (
+                cat_furn,
+                "Gazlift pnevmatik 100N",
+                "Kumush",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("50.0"),
+            ),
             # FASTENERS
-            (cat_fastener, "Minifiks Rastex ekssentrik korpus + shtok", "Sink", None, None, None, Unit.PIECE, Decimal("500.0")),
-            (cat_fastener, "Konfirmat mebel vinti 7×50 mm", "Sink", None, None, None, Unit.PIECE, Decimal("1000.0")),
-            (cat_fastener, "Samorez o'yuvchi 4×16 mm sariq", "Sariq", None, None, None, Unit.PIECE, Decimal("2000.0")),
-            (cat_fastener, "Samorez mebel vinti 4×30 mm", "Qora", None, None, None, Unit.PIECE, Decimal("1500.0")),
-            (cat_fastener, "Yog'och shkant qayin 8×35 mm", "Yog'och", None, None, None, Unit.PIECE, Decimal("800.0")),
-
+            (
+                cat_fastener,
+                "Minifiks Rastex ekssentrik korpus + shtok",
+                "Sink",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("500.0"),
+            ),
+            (
+                cat_fastener,
+                "Konfirmat mebel vinti 7×50 mm",
+                "Sink",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("1000.0"),
+            ),
+            (
+                cat_fastener,
+                "Samorez o'yuvchi 4×16 mm sariq",
+                "Sariq",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("2000.0"),
+            ),
+            (
+                cat_fastener,
+                "Samorez mebel vinti 4×30 mm",
+                "Qora",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("1500.0"),
+            ),
+            (
+                cat_fastener,
+                "Yog'och shkant qayin 8×35 mm",
+                "Yog'och",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("800.0"),
+            ),
             # KIMYO VA YELIM
-            (cat_chem, "Termo-yelim Kleiberit 707.6 Oq", "Oq", None, None, None, Unit.KG, Decimal("50.0")),
-            (cat_chem, "Termo-yelim Kleiberit 707.9 Jigar", "Jigarrang", None, None, None, Unit.KG, Decimal("30.0")),
-            (cat_chem, "Kontakt yelim Cosmofen CA 12 tezyurar", "Shaffof", None, None, None, Unit.PIECE, Decimal("25.0")),
-            (cat_chem, "PVA Mebel yelimi D3 suvga chidamli", "Oq", None, None, None, Unit.LITER, Decimal("20.0")),
-
+            (
+                cat_chem,
+                "Termo-yelim Kleiberit 707.6 Oq",
+                "Oq",
+                None,
+                None,
+                None,
+                Unit.KG,
+                Decimal("50.0"),
+            ),
+            (
+                cat_chem,
+                "Termo-yelim Kleiberit 707.9 Jigar",
+                "Jigarrang",
+                None,
+                None,
+                None,
+                Unit.KG,
+                Decimal("30.0"),
+            ),
+            (
+                cat_chem,
+                "Kontakt yelim Cosmofen CA 12 tezyurar",
+                "Shaffof",
+                None,
+                None,
+                None,
+                Unit.PIECE,
+                Decimal("25.0"),
+            ),
+            (
+                cat_chem,
+                "PVA Mebel yelimi D3 suvga chidamli",
+                "Oq",
+                None,
+                None,
+                None,
+                Unit.LITER,
+                Decimal("20.0"),
+            ),
             # SHISHA VA KO'ZGU
-            (cat_glass, "Ko'zgu Kumush 4mm fasad uchun", "Kumush", Decimal("250.0"), Decimal("160.0"), Decimal("0.4"), Unit.SQUARE_METER, Decimal("15.0")),
-            (cat_glass, "Ko'zgu Bronza 4mm dekorativ", "Bronza", Decimal("250.0"), Decimal("160.0"), Decimal("0.4"), Unit.SQUARE_METER, Decimal("10.0")),
-
+            (
+                cat_glass,
+                "Ko'zgu Kumush 4mm fasad uchun",
+                "Kumush",
+                Decimal("250.0"),
+                Decimal("160.0"),
+                Decimal("0.4"),
+                Unit.SQUARE_METER,
+                Decimal("15.0"),
+            ),
+            (
+                cat_glass,
+                "Ko'zgu Bronza 4mm dekorativ",
+                "Bronza",
+                Decimal("250.0"),
+                Decimal("160.0"),
+                Decimal("0.4"),
+                Unit.SQUARE_METER,
+                Decimal("10.0"),
+            ),
             # PROFIL VA TUTQICHLAR
-            (cat_prof, "Alyuminiy G-profil tutqich 300 sm", "Qora Matt", Decimal("300.0"), Decimal("4.0"), Decimal("2.0"), Unit.METER, Decimal("40.0")),
-            (cat_prof, "Alyuminiy Shkaf-kupe relsi 300 sm", "Kumush", Decimal("300.0"), Decimal("8.0"), Decimal("4.5"), Unit.METER, Decimal("30.0")),
-            (cat_tutqich, "Mebel tutqichi qora chiziqli 160 mm", "Qora Matt", Decimal("19.2"), Decimal("1.2"), Decimal("2.8"), Unit.PIECE, Decimal("60.0")),
-            (cat_tutqich, "Mebel oyog'i metall xrom 100 mm sozlanuvchi", "Xrom", Decimal("10.0"), Decimal("5.0"), Decimal("5.0"), Unit.PIECE, Decimal("50.0")),
+            (
+                cat_prof,
+                "Alyuminiy G-profil tutqich 300 sm",
+                "Qora Matt",
+                Decimal("300.0"),
+                Decimal("4.0"),
+                Decimal("2.0"),
+                Unit.METER,
+                Decimal("40.0"),
+            ),
+            (
+                cat_prof,
+                "Alyuminiy Shkaf-kupe relsi 300 sm",
+                "Kumush",
+                Decimal("300.0"),
+                Decimal("8.0"),
+                Decimal("4.5"),
+                Unit.METER,
+                Decimal("30.0"),
+            ),
+            (
+                cat_tutqich,
+                "Mebel tutqichi qora chiziqli 160 mm",
+                "Qora Matt",
+                Decimal("19.2"),
+                Decimal("1.2"),
+                Decimal("2.8"),
+                Unit.PIECE,
+                Decimal("60.0"),
+            ),
+            (
+                cat_tutqich,
+                "Mebel oyog'i metall xrom 100 mm sozlanuvchi",
+                "Xrom",
+                Decimal("10.0"),
+                Decimal("5.0"),
+                Decimal("5.0"),
+                Unit.PIECE,
+                Decimal("50.0"),
+            ),
         ]
 
         created_materials = []
@@ -371,7 +665,7 @@ class Command(BaseCommand):
             for b_idx in range(num_batches):
                 days_ago = 55 - (b_idx * 16) - random.randint(0, 5)
                 received_date = today - timedelta(days=max(2, days_ago))
-                
+
                 # Partiya miqdori
                 qty_mult = {
                     Unit.SHEET: Decimal(random.randint(20, 60)),
@@ -435,7 +729,9 @@ class Command(BaseCommand):
 
             for mat, _ in sample_materials:
                 # Materialning mavjud partiyalarini topamiz
-                avail_batches = Batch.objects.filter(material=mat, quantity_remaining__gt=0).order_by("received_on")
+                avail_batches = Batch.objects.filter(
+                    material=mat, quantity_remaining__gt=0
+                ).order_by("received_on")
                 if not avail_batches.exists():
                     continue
 
@@ -461,7 +757,7 @@ class Command(BaseCommand):
                         note=f"{p_desc} uchun berildi",
                     )
                     created_issues.append((issue, b, take_qty))
-                except Exception as e:
+                except Exception:
                     # Qoldiq yetmagan bo'lsa davom etamiz
                     pass
 
@@ -483,18 +779,24 @@ class Command(BaseCommand):
                     issue=iss,
                     allocations=alloc,
                     returned_on=ret_date,
-                    user=usta_user,
+                    user=omborchi_user,
                     reason=f"Loyiha #{iss.project_id} da ortib qolgan material",
                 )
                 if r_idx < 2:
                     # Tasdiqlaymiz
-                    approve_return(return_id=st_return.id, user=admin_user, note="Qoldiq omborga qabul qilindi")
+                    approve_return(
+                        return_id=st_return.id,
+                        user=admin_user,
+                        note="Qoldiq omborga qabul qilindi",
+                    )
                 # 3-chisi kutilayotgan holatda qoladi
 
         # ---------------------------------------------------------
         # 7. HISOBDAN CHIQARISHLAR (WRITE-OFFS)
         # ---------------------------------------------------------
-        self.stdout.write("7. Hisobdan chiqarish (brak/shikastlanish) so'rovlari yaratilmoqda...")
+        self.stdout.write(
+            "7. Hisobdan chiqarish (brak/shikastlanish) so'rovlari yaratilmoqda..."
+        )
         # 2 ta tasdiqlangan, 1 ta kutilayotgan hisobdan chiqarish
         damage_specs = [
             ("Yuk tushirishda kran ilmog'i tegib cheti yorilgan", True),
@@ -504,7 +806,9 @@ class Command(BaseCommand):
 
         for d_idx, (reason, do_approve) in enumerate(damage_specs):
             target_mat, _ = created_materials[d_idx * 3]
-            avail = Batch.objects.filter(material=target_mat, quantity_remaining__gt=2).first()
+            avail = Batch.objects.filter(
+                material=target_mat, quantity_remaining__gt=2
+            ).first()
             if avail:
                 wo_qty = Decimal("1.00")
                 wo_alloc = [Allocation(batch_id=avail.id, quantity=wo_qty)]
@@ -515,28 +819,122 @@ class Command(BaseCommand):
                     user=omborchi_user,
                 )
                 if do_approve:
-                    approve_write_off(write_off_id=wo.id, user=admin_user, note="Komissiya xulosasi: yaroqsiz")
+                    approve_write_off(
+                        write_off_id=wo.id,
+                        user=admin_user,
+                        note="Komissiya xulosasi: yaroqsiz",
+                    )
 
         # ---------------------------------------------------------
         # 8. QO'SHIMCHA XARAJATLAR (EXPENSES)
         # ---------------------------------------------------------
         self.stdout.write("8. Qo'shimcha xarajatlar kiritilmoqda...")
         expenses_data = [
-            ("soliq", Decimal("850.00"), today - timedelta(days=45), None, "Oktyabr oyi daromad va ijtimoiy soliq to'lovi"),
-            ("soliq", Decimal("1240.00"), today - timedelta(days=15), None, "QQS va foyda solig'i oylik avansi"),
-            ("stanok", Decimal("180.00"), today - timedelta(days=40), 101, "Formatka pichog'i charxlash va yangi disk sotib olish"),
-            ("stanok", Decimal("320.00"), today - timedelta(days=22), 104, "Kromka stanogi teni va roliklarini almashtirish"),
-            ("transport", Decimal("220.00"), today - timedelta(days=38), 101, "Fura yuk tushirish va kran xizmati"),
-            ("transport", Decimal("150.00"), today - timedelta(days=25), 102, "Mebellarni Hilton mehmonxonasiga yetkazish logistikasi"),
-            ("transport", Decimal("95.00"), today - timedelta(days=10), 106, "Chilonzor kottejiga qismlarni eltish xarajati"),
-            ("kommunal", Decimal("410.00"), today - timedelta(days=32), None, "Sex va ombor elektr energiyasi to'lovi (sentyabr)"),
-            ("kommunal", Decimal("460.00"), today - timedelta(days=5), None, "Sex va ombor elektr energiyasi to'lovi (oktyabr)"),
-            ("asboblar", Decimal("135.00"), today - timedelta(days=28), 103, "Freza va spiral sverlolar to'plami"),
-            ("asboblar", Decimal("75.00"), today - timedelta(days=14), 105, "Pnevmatik pistolet va shlang ta'miri"),
-            ("ijara", Decimal("2200.00"), today - timedelta(days=30), None, "Asosiy ombor va ishlab chiqarish binosi oylik ijarasi"),
-            ("ovqat", Decimal("380.00"), today - timedelta(days=20), None, "Usta va yig'uvchilarning tushlik ovqati ta'minoti"),
-            ("paketlash", Decimal("190.00"), today - timedelta(days=18), 102, "Fasadlar uchun havoli plenka (puzirchataya) va karton"),
-            ("transport", Decimal("300.00"), today - timedelta(days=8), None, "Xomashyo olib kelish furasiga to'lov (bekor qilinadi)"),
+            (
+                "soliq",
+                Decimal("850.00"),
+                today - timedelta(days=45),
+                None,
+                "Oktyabr oyi daromad va ijtimoiy soliq to'lovi",
+            ),
+            (
+                "soliq",
+                Decimal("1240.00"),
+                today - timedelta(days=15),
+                None,
+                "QQS va foyda solig'i oylik avansi",
+            ),
+            (
+                "stanok",
+                Decimal("180.00"),
+                today - timedelta(days=40),
+                101,
+                "Formatka pichog'i charxlash va yangi disk sotib olish",
+            ),
+            (
+                "stanok",
+                Decimal("320.00"),
+                today - timedelta(days=22),
+                104,
+                "Kromka stanogi teni va roliklarini almashtirish",
+            ),
+            (
+                "transport",
+                Decimal("220.00"),
+                today - timedelta(days=38),
+                101,
+                "Fura yuk tushirish va kran xizmati",
+            ),
+            (
+                "transport",
+                Decimal("150.00"),
+                today - timedelta(days=25),
+                102,
+                "Mebellarni Hilton mehmonxonasiga yetkazish logistikasi",
+            ),
+            (
+                "transport",
+                Decimal("95.00"),
+                today - timedelta(days=10),
+                106,
+                "Chilonzor kottejiga qismlarni eltish xarajati",
+            ),
+            (
+                "kommunal",
+                Decimal("410.00"),
+                today - timedelta(days=32),
+                None,
+                "Sex va ombor elektr energiyasi to'lovi (sentyabr)",
+            ),
+            (
+                "kommunal",
+                Decimal("460.00"),
+                today - timedelta(days=5),
+                None,
+                "Sex va ombor elektr energiyasi to'lovi (oktyabr)",
+            ),
+            (
+                "asboblar",
+                Decimal("135.00"),
+                today - timedelta(days=28),
+                103,
+                "Freza va spiral sverlolar to'plami",
+            ),
+            (
+                "asboblar",
+                Decimal("75.00"),
+                today - timedelta(days=14),
+                105,
+                "Pnevmatik pistolet va shlang ta'miri",
+            ),
+            (
+                "ijara",
+                Decimal("2200.00"),
+                today - timedelta(days=30),
+                None,
+                "Asosiy ombor va ishlab chiqarish binosi oylik ijarasi",
+            ),
+            (
+                "ovqat",
+                Decimal("380.00"),
+                today - timedelta(days=20),
+                None,
+                "Usta va yig'uvchilarning tushlik ovqati ta'minoti",
+            ),
+            (
+                "paketlash",
+                Decimal("190.00"),
+                today - timedelta(days=18),
+                102,
+                "Fasadlar uchun havoli plenka (puzirchataya) va karton",
+            ),
+            (
+                "transport",
+                Decimal("300.00"),
+                today - timedelta(days=8),
+                None,
+                "Xomashyo olib kelish furasiga to'lov (bekor qilinadi)",
+            ),
         ]
 
         created_expenses = []
@@ -549,7 +947,7 @@ class Command(BaseCommand):
                     spent_on=dt,
                     project_id=prj,
                     note=note,
-                    created_by=hisobchi_user,
+                    created_by=admin_user,
                 )
                 created_expenses.append(exp)
 
@@ -562,7 +960,7 @@ class Command(BaseCommand):
                 spent_on=today - timedelta(days=7),
                 project_id=last_exp.project_id,
                 note=f"Hujjatdagi xato summa sababli bekor qilindi (Asl: #{last_exp.id})",
-                created_by=hisobchi_user,
+                created_by=admin_user,
                 reverses=last_exp,
             )
 
@@ -575,24 +973,46 @@ class Command(BaseCommand):
             sync_low_stock(bal)
 
         # Natijalar xulosasi
-        self.stdout.write(self.style.SUCCESS("\n========================================================"))
-        self.stdout.write(self.style.SUCCESS("✅ POSTGRESQL (profur_db) BAZASI MUVAFFAQIYATLI TO'LDIRILDI!"))
-        self.stdout.write(self.style.SUCCESS("========================================================"))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "\n========================================================"
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                "✅ POSTGRESQL (profur_db) BAZASI MUVAFFAQIYATLI TO'LDIRILDI!"
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                "========================================================"
+            )
+        )
         self.stdout.write(f"👥 Foydalanuvchilar: {User.objects.count()} ta")
         self.stdout.write(f"🏷 Kategoriyalar: {Category.objects.count()} ta")
         self.stdout.write(f"📦 Materiallar (Katalog): {Material.objects.count()} ta")
         self.stdout.write(f"🚚 Kirim partiyalari (Batches): {Batch.objects.count()} ta")
         self.stdout.write(f"📤 Chiqimlar (Issues): {StockIssue.objects.count()} ta")
-        self.stdout.write(f"🔄 Qaytarishlar (Returns): {StockReturn.objects.count()} ta")
-        self.stdout.write(f"🗑 Hisobdan chiqarishlar (Write-offs): {WriteOff.objects.count()} ta")
-        self.stdout.write(f"📊 Harakatlar tarixi (Movements): {StockMovement.objects.count()} ta")
-        self.stdout.write(f"🔔 Kam qoldiq xabarlari (Notifications): {StockNotification.objects.count()} ta")
-        self.stdout.write(f"💰 Qo'shimcha xarajatlar (Expenses): {Expense.objects.count()} ta")
-        self.stdout.write(self.style.SUCCESS("========================================================"))
+        self.stdout.write(
+            f"🔄 Qaytarishlar (Returns): {StockReturn.objects.count()} ta"
+        )
+        self.stdout.write(
+            f"🗑 Hisobdan chiqarishlar (Write-offs): {WriteOff.objects.count()} ta"
+        )
+        self.stdout.write(
+            f"📊 Harakatlar tarixi (Movements): {StockMovement.objects.count()} ta"
+        )
+        self.stdout.write(
+            f"🔔 Kam qoldiq xabarlari (Notifications): {StockNotification.objects.count()} ta"
+        )
+        self.stdout.write(
+            f"💰 Qo'shimcha xarajatlar (Expenses): {Expense.objects.count()} ta"
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                "========================================================"
+            )
+        )
         self.stdout.write("🔑 Kirish ma'lumotlari:")
         self.stdout.write("   • admin / admin123 (Administrator - Barcha huquqlar)")
         self.stdout.write("   • omborchi / ombor123 (Ombor mudiri)")
-        self.stdout.write("   • usta / usta123 (Ishlab chiqarish ustasi)")
-        self.stdout.write("   • hisobchi / hisobchi123 (Bosh hisobchi)")
-        self.stdout.write("   • taminotchi / taminot123 (Ta'minot mutaxassisi)")
-

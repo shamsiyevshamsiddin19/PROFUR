@@ -1,4 +1,15 @@
 export const uxMessages = {
+  reviewRequests: [
+    "So‘rovlarni ko‘rib chiqish",
+    "Рассмотрение заявок",
+    "Review requests",
+  ],
+  pendingReview: [
+    "Tasdiq kutilayotgan so‘rov",
+    "Заявка на рассмотрении",
+    "Pending request",
+  ],
+
   entryTable: ["Yangi yozuv kiritish", "Ввод новой записи", "New record entry"],
   quickSearch: ["Qidiruvga o‘tish", "Перейти к поиску", "Focus search"],
   tableData: ["Ma’lumotlar jadvali", "Таблица данных", "Data table"],

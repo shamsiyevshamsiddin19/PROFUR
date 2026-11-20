@@ -15,6 +15,11 @@ const messages = {
   materials: ["Materiallar", "Материалы", "Materials"],
   stock: ["Qoldiq", "Остатки", "Stock"],
   workspace: ["ISH MAYDONI", "РАБОЧЕЕ ПРОСТРАНСТВО", "WORKSPACE"],
+  noWorkAssigned: [
+    "Sizga hozircha ombor bo‘yicha amal biriktirilmagan. Kerak bo‘lsa, administratorga murojaat qiling.",
+    "Вам пока не назначены складские операции. При необходимости обратитесь к администратору.",
+    "No warehouse work is assigned to you yet. Contact your administrator if needed.",
+  ],
   warehouseOps: ["Ombor", "Склад", "Warehouse"],
   recordsNav: ["Hisobotlar", "Учёт и контроль", "Records"],
   managementNav: ["Boshqaruv", "Управление", "Management"],

@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { ApiError, request, write, type User, can } from "./api";
+import { screenAllowed } from "./access";
 import { errorKey } from "./format";
 import {
   initialLanguage,
@@ -63,9 +64,9 @@ const screens = {
   expenses: ReceiptText,
   history: HistoryIcon,
 };
-function currentScreen(): Screen {
+function currentScreen(): Screen | null {
   const hash = location.hash.slice(1);
-  return Object.hasOwn(screens, hash) ? (hash as Screen) : "receiving";
+  return Object.hasOwn(screens, hash) ? (hash as Screen) : null;
 }
 export function App() {
   const [appearance, setAppearance] = useState(initialAppearance);
@@ -95,7 +96,37 @@ export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [authError, setAuthError] = useState<MessageKey | null>(null);
-  const [screen, setScreen] = useState<Screen>(currentScreen);
+  const [requestedScreen, setScreen] = useState(currentScreen);
+  const allowed = (key: Screen) => user !== null && screenAllowed(user, key);
+  const defaultScreen: Screen =
+    (
+      [
+        "receiving",
+        "operations",
+        "stock",
+        "materials",
+        "expenses",
+        "expenseTypes",
+        "administration",
+        "settings",
+      ] as const
+    ).find(allowed) ?? "settings";
+  const screen =
+    requestedScreen && allowed(requestedScreen)
+      ? requestedScreen
+      : defaultScreen;
+  const canSeeNotifications = allowed("notifications");
+  useEffect(() => {
+    if (
+      user &&
+      screen !== requestedScreen &&
+      location.hash &&
+      currentScreen() === requestedScreen
+    ) {
+      history.replaceState(history.state, "", "#" + screen);
+      setScreen(screen);
+    }
+  }, [user, requestedScreen, screen]);
   const [unreadCount, setUnreadCount] = useState(0);
   const navRef = useRef<HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
@@ -145,6 +176,42 @@ export function App() {
       });
     return () => controller.abort();
   }, []);
+  const userId = user?.id;
+  useEffect(() => setUnreadCount(0), [userId]);
+  useEffect(() => {
+    if (!userId) return;
+    let controller: AbortController | undefined;
+    const refresh = () => {
+      if (document.hidden) return;
+      controller?.abort();
+      const current = new AbortController();
+      controller = current;
+      void request<User>("/api/auth/me/", lang, { signal: current.signal })
+        .then((updated) => {
+          if (!current.signal.aborted)
+            setUser((previous) =>
+              previous?.id === userId ? updated : previous,
+            );
+        })
+        .catch((error) => {
+          if (
+            !current.signal.aborted &&
+            error instanceof ApiError &&
+            (error.status === 401 || error.status === 403)
+          )
+            setUser((previous) => (previous?.id === userId ? null : previous));
+        });
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("hashchange", refresh);
+    const interval = window.setInterval(refresh, 60_000);
+    return () => {
+      controller?.abort();
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("hashchange", refresh);
+    };
+  }, [userId, lang]);
   useEffect(() => {
     const onHash = () => {
       setScreen(currentScreen());
@@ -163,7 +230,7 @@ export function App() {
   }, [drawer]);
 
   useEffect(() => {
-    if (!user || !can(user, "inventory.view_stock")) return;
+    if (!canSeeNotifications) return;
     const controller = new AbortController();
     const check = () =>
       request<{ count: number }>("/api/v1/notifications/?unread=true", lang, {
@@ -181,7 +248,7 @@ export function App() {
       controller.abort();
       clearInterval(interval);
     };
-  }, [user, lang, screen]);
+  }, [canSeeNotifications, userId, lang, screen]);
 
   useEffect(() => {
     const nav = navRef.current;
@@ -230,11 +297,13 @@ export function App() {
       value={lang}
       onChange={(e) => setLang(e.target.value as Language)}
     >
-      {Object.entries({ uz: "uz", ru: "ru", en: "eng" }).map(([code, label]) => (
-        <option key={code} value={code}>
-          {label}
-        </option>
-      ))}
+      {Object.entries({ uz: "uz", ru: "ru", en: "eng" }).map(
+        ([code, label]) => (
+          <option key={code} value={code}>
+            {label}
+          </option>
+        ),
+      )}
     </select>
   );
   if (checking)
@@ -258,21 +327,6 @@ export function App() {
       />
     );
 
-  const allowed = (key: Screen) =>
-    key === "settings"
-      ? true
-      : key === "administration"
-        ? user.is_superuser || user.role_codes.includes("ADMIN")
-        : can(
-            user,
-            key === "expenseTypes"
-              ? "expenses.view_expensetype"
-              : key === "materials"
-                ? "catalog.view_material"
-                : key === "expenses"
-                  ? "expenses.view_expense"
-                  : "inventory.view_stock",
-          );
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
@@ -306,9 +360,20 @@ export function App() {
             aria-label={t(collapsed ? "expandSidebar" : "collapseSidebar")}
             title={t(collapsed ? "expandSidebar" : "collapseSidebar")}
           >
-            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+            {collapsed ? (
+              <PanelLeftOpen size={18} />
+            ) : (
+              <PanelLeftClose size={18} />
+            )}
           </button>
-          <a className="brand" href="#receiving" onClick={() => setDrawer(false)}>
+          <a
+            className="brand"
+            href={"#" + defaultScreen}
+            onClick={() => {
+              setScreen(defaultScreen);
+              setDrawer(false);
+            }}
+          >
             <span className="brand-text">PROFUR</span>
           </a>
         </div>
@@ -322,11 +387,27 @@ export function App() {
         <nav ref={navRef} aria-label={t("workspace")}>
           {(
             [
-              ["warehouseOps", ["receiving", "operations", "stock"]],
+              [
+                "warehouseOps",
+                [
+                  "receiving",
+                  "operations",
+                  "stock",
+                  ...(!allowed("receiving") && allowed("materials")
+                    ? ["materials"]
+                    : []),
+                ],
+              ],
               ["recordsNav", ["expenses", "history"]],
               [
                 "managementNav",
-                ["administration", "settings"],
+                [
+                  ...(!allowed("expenses") && allowed("expenseTypes")
+                    ? ["expenseTypes"]
+                    : []),
+                  "administration",
+                  "settings",
+                ],
               ],
             ] as [MessageKey, Screen[]][]
           ).map(
@@ -409,7 +490,10 @@ export function App() {
                 href="#notifications"
                 className="icon-button topbar-notifications"
                 aria-label={t("notifications")}
-                onClick={() => { setScreen("notifications"); setDrawer(false); }}
+                onClick={() => {
+                  setScreen("notifications");
+                  setDrawer(false);
+                }}
               >
                 <Bell size={18} />
                 {unreadCount > 0 && (
@@ -447,7 +531,7 @@ export function App() {
                     )}
               </p>
             </div>
-            {screen === "receiving" && can(user, "catalog.view_material") && (
+            {screen === "receiving" && allowed("materials") && (
               <a
                 href="#materials"
                 className="page-action-button"
@@ -456,11 +540,17 @@ export function App() {
                   setDrawer(false);
                 }}
               >
-                <Plus size={16} />
-                <span>{t("newMaterial")}</span>
+                {can(user, "catalog.add_material") && <Plus size={16} />}
+                <span>
+                  {t(
+                    can(user, "catalog.add_material")
+                      ? "newMaterial"
+                      : "materials",
+                  )}
+                </span>
               </a>
             )}
-            {screen === "expenses" && can(user, "expenses.view_expensetype") && (
+            {screen === "expenses" && allowed("expenseTypes") && (
               <a
                 href="#expenseTypes"
                 className="page-action-button"
@@ -469,8 +559,14 @@ export function App() {
                   setDrawer(false);
                 }}
               >
-                <Plus size={16} />
-                <span>{t("addExpenseType")}</span>
+                {can(user, "expenses.add_expensetype") && <Plus size={16} />}
+                <span>
+                  {t(
+                    can(user, "expenses.add_expensetype")
+                      ? "addExpenseType"
+                      : "expenseTypes",
+                  )}
+                </span>
               </a>
             )}
           </div>
@@ -485,9 +581,10 @@ export function App() {
               </button>
             </div>
           )}
-          {!allowed(screen) ? (
-            <div className="notice">{t("noPermission")}</div>
-          ) : screen === "settings" ? (
+          {defaultScreen === "settings" && (
+            <p className="notice">{t("noWorkAssigned")}</p>
+          )}
+          {screen === "settings" ? (
             <Settings
               lang={lang}
               setLanguage={setLang}

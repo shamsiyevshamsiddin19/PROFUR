@@ -26,10 +26,10 @@ from apps.inventory.models import (
     StockMovement,
 )
 
-
 # ---------------------------------------------------------------------------
 # Yordamchi: oy qo'shish (python-dateutil talab qilinmaydi)
 # ---------------------------------------------------------------------------
+
 
 def _add_months(d: date, months: int) -> date:
     """Sanaga oy qo'shadi, oyning 1-kuniga qaytaradi."""
@@ -43,16 +43,13 @@ def _add_months(d: date, months: int) -> date:
 # Umumiy qiymat
 # ---------------------------------------------------------------------------
 
+
 def warehouse_valuation() -> Decimal:
     """Total warehouse value: SUM(batch.quantity_remaining * batch.unit_price) for open batches."""
-    result = (
-        Batch.objects
-        .filter(quantity_remaining__gt=0)
-        .aggregate(
-            total=Sum(
-                F("quantity_remaining") * F("unit_price"),
-                output_field=DecimalField(max_digits=18, decimal_places=2),
-            )
+    result = Batch.objects.filter(quantity_remaining__gt=0).aggregate(
+        total=Sum(
+            F("quantity_remaining") * F("unit_price"),
+            output_field=DecimalField(max_digits=18, decimal_places=2),
         )
     )
     return (result["total"] or Decimal("0")).quantize(MONEY_STEP)
@@ -62,11 +59,11 @@ def warehouse_valuation() -> Decimal:
 # Minimal qoldiqdan past materiallar
 # ---------------------------------------------------------------------------
 
+
 def low_stock_materials():
     """Materials where current stock is below minimum threshold."""
     return (
-        StockBalance.objects
-        .filter(
+        StockBalance.objects.filter(
             min_quantity__isnull=False,
             quantity_on_hand__lt=F("min_quantity"),
         )
@@ -78,6 +75,7 @@ def low_stock_materials():
 # ---------------------------------------------------------------------------
 # Oylik kirim/chiqim oqimi
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MonthFlow:
@@ -94,8 +92,7 @@ def recent_month_flows(months: int = 6) -> list[MonthFlow]:
     start = _add_months(today.replace(day=1), -(months - 1))
 
     movements = (
-        StockMovement.objects
-        .filter(created_at__date__gte=start)
+        StockMovement.objects.filter(created_at__date__gte=start)
         .annotate(month=TruncMonth("created_at"))
         .values("month")
         .annotate(
@@ -147,6 +144,7 @@ def recent_month_flows(months: int = 6) -> list[MonthFlow]:
 # Foydalanuvchiga ko'rinadigan materiallar
 # ---------------------------------------------------------------------------
 
+
 def visible_materials(user):
     """Filter materials by user's allowed roles. Admin/superuser sees all."""
     qs = Material.objects.filter(is_active=True).select_related("category")
@@ -157,14 +155,13 @@ def visible_materials(user):
         return qs.none()
     # Materials with empty allowed_roles are visible to all
     # Materials with specific roles are visible only to those roles
-    return qs.filter(
-        Q(allowed_roles=[]) | Q(allowed_roles__contained_by=user_roles)
-    )
+    return qs.filter(Q(allowed_roles=[]) | Q(allowed_roles__contained_by=user_roles))
 
 
 # ---------------------------------------------------------------------------
 # Qoldiq qidirish filtrlari
 # ---------------------------------------------------------------------------
+
 
 def stock_search(queryset, search="", category=None, below_min=None):
     """Apply common stock filters."""
@@ -188,22 +185,21 @@ def stock_search(queryset, search="", category=None, below_min=None):
 # Vaznli o'rtacha narx (weighted average cost)
 # ---------------------------------------------------------------------------
 
+
 def weighted_average_price(material) -> Decimal:
     """Materialning vaznli o'rtacha narxini hisoblaydi.
 
     Formulasi: SUM(batch.quantity_remaining * batch.unit_price)
                / SUM(batch.quantity_remaining)
     """
-    result = (
-        Batch.objects
-        .filter(material=material, quantity_remaining__gt=0)
-        .aggregate(
-            total_value=Sum(
-                F("quantity_remaining") * F("unit_price"),
-                output_field=DecimalField(max_digits=18, decimal_places=6),
-            ),
-            total_qty=Sum("quantity_remaining"),
-        )
+    result = Batch.objects.filter(
+        material=material, quantity_remaining__gt=0
+    ).aggregate(
+        total_value=Sum(
+            F("quantity_remaining") * F("unit_price"),
+            output_field=DecimalField(max_digits=18, decimal_places=6),
+        ),
+        total_qty=Sum("quantity_remaining"),
     )
     total_value = result["total_value"]
     total_qty = result["total_qty"]
@@ -216,12 +212,12 @@ def weighted_average_price(material) -> Decimal:
 # Material bo'yicha iste'mol
 # ---------------------------------------------------------------------------
 
+
 def consumption_by_material(months: int = 1):
     """Total quantity consumed (issued) per material in the last N months."""
     start = _add_months(date.today().replace(day=1), -(months - 1))
     return (
-        StockMovement.objects
-        .filter(
+        StockMovement.objects.filter(
             type="issue",
             created_at__date__gte=start,
         )

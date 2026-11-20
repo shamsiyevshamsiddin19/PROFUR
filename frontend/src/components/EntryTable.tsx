@@ -26,10 +26,7 @@ export function EntryTable({
     (child) => isValidElement<{ label: string }>(child) && child.type === Field,
   );
   return (
-    <TableViewport
-      lang={lang}
-      className={`entry-viewport ${className}`.trim()}
-    >
+    <TableViewport lang={lang} className="entry-viewport">
       <table
         className={`entry-table ${className}`.trim()}
         data-columns={columns.length}
@@ -40,11 +37,7 @@ export function EntryTable({
         <thead>
           <tr>
             {columns.map((column, index) => (
-              <th
-                scope="col"
-                key={index}
-                className={`entry-col-${index}`}
-              >
+              <th scope="col" key={index} className={`entry-col-${index}`}>
                 {isValidElement<{ label: string }>(column)
                   ? column.props.label
                   : ""}

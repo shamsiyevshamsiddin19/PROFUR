@@ -11,6 +11,7 @@ Bu yerda qoldiq faqat o'qiladi; o'zgartirish ``services`` orqali.
 """
 
 from accounts.permissions import HasPermissionCode
+from django.db import connection
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Q, QuerySet, Sum
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, viewsets
@@ -81,13 +82,25 @@ class StockViewSet(
             )
             .order_by("category__name", "name", "id")
         )
-        # Role-based material visibility
         user = self.request.user
-        if not (user.is_superuser or user.has_role("ADMIN")):
-            user_roles = user.role_codes
-            queryset = queryset.filter(
-                Q(allowed_roles=[]) | Q(allowed_roles__contained_by=user_roles)
-            )
+        if not user.is_admin_role:
+            roles = set(user.role_codes)
+            visible = Q(allowed_roles=[])
+            if connection.features.supports_json_field_contains:
+                for code in roles:
+                    visible |= Q(allowed_roles__contains=[code])
+            elif roles:
+                restricted = Material.objects.exclude(allowed_roles=[]).values_list(
+                    "pk", "allowed_roles"
+                )
+                visible |= Q(
+                    pk__in=[
+                        pk
+                        for pk, allowed in restricted.iterator()
+                        if roles.intersection(allowed)
+                    ]
+                )
+            queryset = queryset.filter(visible)
         if search := params.get("search", "").strip():
             queryset = queryset.filter(
                 Q(name__icontains=search) | Q(color__icontains=search)

@@ -62,6 +62,7 @@ export function WarehouseContent({
   user: User;
 }) {
   const t = useCallback((key: MessageKey) => translate(lang, key), [lang]);
+  const canSeePrices = can(user, "inventory.view_purchase_price");
   const [detail, setDetail] = useState<StockRow | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockRows, setStockRows] = useState<StockRow[]>([]);
@@ -335,7 +336,7 @@ export function WarehouseContent({
                   <th>{t("stock")}</th>
                   <th>{t("batches")}</th>
                   <th>{t("minLimit")}</th>
-                  <th>{t("stockValue")}</th>
+                  {canSeePrices && <th>{t("stockValue")}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -371,11 +372,13 @@ export function WarehouseContent({
                     <td data-label={t("minLimit")}>
                       {row.min_quantity ?? "—"}
                     </td>
-                    <td data-label={t("stockValue")}>
-                      {row.value_by_currency?.[0]?.amount
-                        ? money(row.value_by_currency[0].amount, lang)
-                        : "—"}
-                    </td>
+                    {canSeePrices && (
+                      <td data-label={t("stockValue")}>
+                        {row.value_by_currency?.[0]?.amount
+                          ? money(row.value_by_currency[0].amount, lang)
+                          : "—"}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -479,7 +482,14 @@ export function WarehouseContent({
     );
     return (
       <Field label={t(key)}>
-        {isMoney ? <div className="input-currency">{inp}<span className="currency-suffix">$</span></div> : inp}
+        {isMoney ? (
+          <div className="input-currency">
+            {inp}
+            <span className="currency-suffix">$</span>
+          </div>
+        ) : (
+          inp
+        )}
         {fields[field] && (
           <span className="field-error" id={"error-" + field}>
             {fields[field]}
@@ -617,8 +627,12 @@ export function WarehouseContent({
                   <th>{t("material")}</th>
                   <th>{t("date")}</th>
                   <th>{t("quantity")}</th>
-                  <th>{t("unitPrice")}</th>
-                  <th>{t("total")}</th>
+                  {canSeePrices && (
+                    <>
+                      <th>{t("unitPrice")}</th>
+                      <th>{t("total")}</th>
+                    </>
+                  )}
                   <th>{t("supplier")}</th>
                   <th>{t("document")}</th>
                   <th>{t("note")}</th>
@@ -627,29 +641,39 @@ export function WarehouseContent({
               <tbody>
                 {receipts.map((r) => (
                   <tr key={r.id}>
-                    <td title={r.material.display_name}>{r.material.display_name}</td>
+                    <td title={r.material.display_name}>
+                      {r.material.display_name}
+                    </td>
                     <td>{r.received_on}</td>
                     <td>
                       {r.quantity} {unitLabel(r.material.unit, lang)}
                     </td>
-                    <td>
-                      {r.unit_price
-                        ? money(r.unit_price, lang)
-                        : r.total_amount && Number(r.quantity)
-                          ? money(
-                              String(
-                                Number(r.total_amount) / Number(r.quantity),
-                              ),
-                              lang,
-                            )
-                          : "—"}
-                    </td>
-                    <td>
-                      {r.total_amount ? money(r.total_amount, lang) : "—"}
-                    </td>
+                    {canSeePrices && (
+                      <>
+                        <td>
+                          {r.unit_price
+                            ? money(r.unit_price, lang)
+                            : r.total_amount && Number(r.quantity)
+                              ? money(
+                                  String(
+                                    Number(r.total_amount) / Number(r.quantity),
+                                  ),
+                                  lang,
+                                )
+                              : "—"}
+                        </td>
+                        <td>
+                          {r.total_amount ? money(r.total_amount, lang) : "—"}
+                        </td>
+                      </>
+                    )}
                     <td title={r.supplier || undefined}>{r.supplier || "—"}</td>
-                    <td title={r.document_number || undefined}>{r.document_number || "—"}</td>
-                    <td className="wrap-cell" title={r.note || undefined}>{r.note || "—"}</td>
+                    <td title={r.document_number || undefined}>
+                      {r.document_number || "—"}
+                    </td>
+                    <td className="wrap-cell" title={r.note || undefined}>
+                      {r.note || "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -24,8 +24,11 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
     lang,
     revision,
   );
+  const canReadTypes = can(user, "expenses.view_expensetype");
+  const canAdd = canReadTypes && can(user, "expenses.add_expense");
+  const canReverse = can(user, "expenses.reverse_expense");
   const types = useRecords<ExpenseType>(
-    "/api/v1/expense-types/",
+    canReadTypes ? "/api/v1/expense-types/" : null,
     lang,
     revision,
   );
@@ -46,18 +49,23 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
   }
   return (
     <>
-      <Feedback error={error || types.error} lang={lang} />
+      <Feedback
+        error={
+          canAdd ? error || types.error : canReadTypes ? types.error : null
+        }
+        lang={lang}
+      />
       {success && (
         <div className="notice success" role="status">
           {t("savedChanges")}
         </div>
       )}
-      {pending && !busy && (
+      {canAdd && pending && !busy && (
         <div className="notice" role="alert">
           {t("locked")}
         </div>
       )}
-      {can(user, "expenses.add_expense") && (
+      {canAdd && (
         <section className="workflow-panel">
           <h2>{t("expenses")}</h2>
           <form onSubmit={submit}>
@@ -92,22 +100,24 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
         </section>
       )}
       <div className="workflow-toolbar recent">
-        <select
-          aria-label={t("expenseType")}
-          value={filters.expense_type}
-          onChange={(e) =>
-            setFilters((f) => ({ ...f, expense_type: e.target.value }))
-          }
-        >
-          <option value="">
-            {t("expenseType")}: {t("all")}
-          </option>
-          {types.data.map((type) => (
-            <option key={type.code} value={type.code}>
-              {type.name}
+        {canReadTypes && (
+          <select
+            aria-label={t("expenseType")}
+            value={filters.expense_type}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, expense_type: e.target.value }))
+            }
+          >
+            <option value="">
+              {t("expenseType")}: {t("all")}
             </option>
-          ))}
-        </select>
+            {types.data.map((type) => (
+              <option key={type.code} value={type.code}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+        )}
         <input
           aria-label={t("projectId")}
           placeholder={t("projectId")}
@@ -168,16 +178,14 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
                       : "—"}
                 </td>
                 <td>
-                  {!row.reversal &&
-                    !row.reverses &&
-                    can(user, "expenses.reverse_expense") && (
-                      <button
-                        className="text-button danger-text"
-                        onClick={() => setReverse(row)}
-                      >
-                        {t("reverse")}
-                      </button>
-                    )}
+                  {!row.reversal && !row.reverses && canReverse && (
+                    <button
+                      className="text-button danger-text"
+                      onClick={() => setReverse(row)}
+                    >
+                      {t("reverse")}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -208,17 +216,17 @@ export function Expenses({ lang, user }: { lang: Language; user: User }) {
         more={records.next ? records.more : undefined}
         lang={lang}
       />
-      {types.next && (
+      {canReadTypes && types.next && (
         <button className="text-button" onClick={types.more}>
           {t("more")} · {t("expenseType")}
         </button>
       )}
-      {reverse && (
+      {reverse && canReverse && (
         <ReverseExpense
           row={reverse}
           userId={user.id}
           lang={lang}
-          types={types.data}
+          types={canReadTypes ? types.data : []}
           close={() => setReverse(null)}
           saved={() => {
             setReverse(null);
@@ -358,14 +366,16 @@ function ReverseExpense({
           <Field label={t("reason")}>
             <input name="reason" required maxLength={1000} />
           </Field>
-          <label className="check-label">
-            <input
-              type="checkbox"
-              checked={correction}
-              onChange={(e) => setCorrection(e.target.checked)}
-            />
-            {t("correction")}
-          </label>
+          {types.some((type) => type.is_active) && (
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={correction}
+                onChange={(e) => setCorrection(e.target.checked)}
+              />
+              {t("correction")}
+            </label>
+          )}
           {correction && <ExpenseFields lang={lang} types={types} row={row} />}
         </fieldset>
         <div className="dialog-actions">
