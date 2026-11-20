@@ -158,6 +158,15 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     page.getByText("Request saved. Awaiting approval.", { exact: true }),
   ).toBeVisible();
   await openApproval();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    )
+    .toBe(true);
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Approve", exact: true })

@@ -1215,6 +1215,12 @@ input[type="number"],
   display: none;
 }
 @media (max-width: 650px) {
+  .workspace {
+    overflow-x: clip;
+  }
+  .workflow-dialog {
+    max-width: calc(100vw - 28px);
+  }
   .mobile-decision-toolbar {
     display: flex;
     flex-wrap: wrap;
