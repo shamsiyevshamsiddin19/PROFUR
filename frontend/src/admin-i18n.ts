@@ -56,7 +56,7 @@ export const adminMessages = {
     "Stock at notification time / minimum",
   ],
   addExpenseType: [
-    "Xarajat turi qo‘shish",
+    "Xarajat turini qo‘shish",
     "Добавить вид расхода",
     "Add expense type",
   ],

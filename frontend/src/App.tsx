@@ -326,7 +326,7 @@ export function App() {
               ["recordsNav", ["expenses", "history"]],
               [
                 "managementNav",
-                ["expenseTypes", "administration", "settings"],
+                ["administration", "settings"],
               ],
             ] as [MessageKey, Screen[]][]
           ).map(
@@ -458,6 +458,19 @@ export function App() {
               >
                 <Plus size={16} />
                 <span>{t("newMaterial")}</span>
+              </a>
+            )}
+            {screen === "expenses" && can(user, "expenses.view_expensetype") && (
+              <a
+                href="#expenseTypes"
+                className="page-action-button"
+                onClick={() => {
+                  setScreen("expenseTypes");
+                  setDrawer(false);
+                }}
+              >
+                <Plus size={16} />
+                <span>{t("addExpenseType")}</span>
               </a>
             )}
           </div>
