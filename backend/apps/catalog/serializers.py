@@ -68,6 +68,8 @@ class MaterialSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not request.user.is_admin_role:
             data.pop("allowed_roles", None)
+        if data.get("container_size") is None:
+            data.pop("container_size", None)
         return data
 
     class Meta:

@@ -278,3 +278,20 @@ def test_opening_balance_increases_stock_without_inflating_monthly_purchases(war
     )
     assert late.status_code == 400
     assert Batch.objects.filter(material=sheet).count() == 2
+
+
+def test_same_paint_can_have_two_independently_named_bucket_sizes(warehouse):
+    admin, *_ = warehouse
+    category = Category.objects.get(name="Kraska")
+    for capacity in ("12", "25"):
+        response = admin.post(
+            "/api/v1/materials/",
+            {
+                "name": "White paint",
+                "category_id": category.pk,
+                "unit": "piece",
+                "container_size": capacity,
+            },
+        )
+        assert response.status_code == 201, response.data
+        assert response.data["display_name"] == f"White paint · {capacity} L"
