@@ -18,6 +18,7 @@ import {
   History as HistoryIcon,
   PanelLeftClose,
   PanelLeftOpen,
+  Plus,
   ReceiptText,
   X,
 } from "lucide-react";
@@ -325,7 +326,7 @@ export function App() {
               ["recordsNav", ["expenses", "history"]],
               [
                 "managementNav",
-                ["materials", "expenseTypes", "administration", "settings"],
+                ["expenseTypes", "administration", "settings"],
               ],
             ] as [MessageKey, Screen[]][]
           ).map(
@@ -446,6 +447,19 @@ export function App() {
                     )}
               </p>
             </div>
+            {screen === "receiving" && can(user, "catalog.view_material") && (
+              <a
+                href="#materials"
+                className="page-action-button"
+                onClick={() => {
+                  setScreen("materials");
+                  setDrawer(false);
+                }}
+              >
+                <Plus size={16} />
+                <span>{t("newMaterial")}</span>
+              </a>
+            )}
           </div>
           {authError && (
             <div className="notice error" role="alert">
