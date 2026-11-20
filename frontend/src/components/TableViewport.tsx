@@ -1,12 +1,98 @@
 import {
+  Children,
+  Fragment,
+  cloneElement,
+  isValidElement,
   useCallback,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
+  type HTMLAttributes,
+  type ReactElement,
   type ReactNode,
 } from "react";
 import { MoveHorizontal } from "lucide-react";
 import { translate, type Language } from "../i18n";
+
+type TableElement = ReactElement<HTMLAttributes<HTMLElement>, string>;
+
+// Conditional columns can be grouped in fragments, for example prices.
+function tableChildren(children: ReactNode): ReactNode[] {
+  return Children.toArray(children).flatMap((child) =>
+    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+      ? tableChildren(child.props.children)
+      : [child],
+  );
+}
+
+function isTag(node: ReactNode, tag: string): node is TableElement {
+  return isValidElement(node) && node.type === tag;
+}
+
+function mapCells(
+  children: ReactNode,
+  render: (cell: ReactNode) => ReactNode,
+): ReactNode {
+  return Children.map(children, (cell) =>
+    isValidElement<{ children?: ReactNode }>(cell) && cell.type === Fragment
+      ? cloneElement(cell, {}, mapCells(cell.props.children, render))
+      : render(cell),
+  );
+}
+
+function labelTable(table: ReactNode, entry: boolean): ReactNode {
+  if (!isTag(table, "table")) return table;
+  const groups = tableChildren(table.props.children);
+  const header = groups.find((group) => isTag(group, "thead"));
+  const headings = header
+    ? tableChildren(header.props.children).flatMap((row) =>
+        isTag(row, "tr")
+          ? tableChildren(row.props.children).filter((cell) =>
+              isTag(cell, "th"),
+            )
+          : [],
+      )
+    : [];
+
+  // Explicit roles preserve table semantics when CSS reflows the rows.
+  return cloneElement(
+    table,
+    { role: "table" },
+    groups.map((group) => {
+      if (!isTag(group, "thead") && !isTag(group, "tbody")) return group;
+      return cloneElement(
+        group,
+        { role: "rowgroup" },
+        tableChildren(group.props.children).map((row) => {
+          if (!isTag(row, "tr")) return row;
+          let column = 0;
+          return cloneElement(
+            row,
+            { role: "row" },
+            mapCells(row.props.children, (cell) => {
+              if (isTag(cell, "th")) {
+                return cloneElement(cell, { role: "columnheader" });
+              }
+              if (!isTag(cell, "td")) return cell;
+              const label = headings[column++]?.props.children;
+              return cloneElement(
+                cell,
+                { role: "cell" },
+                !entry && label && (
+                  <span className="mobile-cell-label" aria-hidden="true">
+                    {label}
+                  </span>
+                ),
+                cell.props.children,
+              );
+            }),
+          );
+        }),
+      );
+    }),
+  );
+}
 
 /** Shadows describe actual overflow; native keyboard and touch scrolling are preserved. */
 export function TableViewport({
@@ -18,6 +104,13 @@ export function TableViewport({
   lang: Language;
   className?: string;
 }) {
+  const table = useMemo(
+    () =>
+      Children.map(children, (child) =>
+        labelTable(child, className === "entry-viewport"),
+      ),
+    [children, className],
+  );
   const ref = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({
     left: false,
@@ -72,7 +165,7 @@ export function TableViewport({
         role={scrollable ? "region" : undefined}
         aria-label={scrollable ? translate(lang, "tableData") : undefined}
       >
-        {children}
+        {table}
       </div>
       {(edges.left || edges.right) && (
         <div className="table-scroll-hint">
