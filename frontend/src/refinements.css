@@ -1253,3 +1253,262 @@ input[type="number"],
 .report-summary dd { margin: 6px 0 0; font-weight: 700; font-size: 18px; }
 .worker-registration .registration-fields { display: grid; gap: 12px; }
 .worker-registration input[type=checkbox] { width: auto; min-height: 18px; }
+
+/* Enhanced Monthly Report Styles */
+.report-header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.report-period-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.report-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.report-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 16px 0 24px;
+}
+.report-kpi-card {
+  background: var(--surface-raised, #162420);
+  border: 1px solid var(--line, #283e36);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.report-kpi-card:hover {
+  border-color: var(--accent, #4ade80);
+}
+.report-kpi-card .kpi-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted, #94a3b8);
+  margin-bottom: 6px;
+}
+.report-kpi-card .kpi-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text, #f8fafc);
+  letter-spacing: -0.5px;
+}
+.report-kpi-card .kpi-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted, #94a3b8);
+}
+.report-kpi-card.highlight {
+  border-color: rgba(74, 222, 128, 0.4);
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.08), rgba(22, 36, 32, 0.95));
+}
+
+.report-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--line, #283e36);
+  margin: 20px 0 16px;
+  overflow-x: auto;
+}
+.report-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted, #94a3b8);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.report-tab-btn:hover {
+  color: var(--text, #f8fafc);
+}
+.report-tab-btn.active {
+  color: var(--accent, #4ade80);
+  border-bottom-color: var(--accent, #4ade80);
+}
+
+.report-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  background: var(--surface, #0f1916);
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--line, #283e36);
+}
+.report-search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--line, #283e36);
+  border-radius: 6px;
+  background: var(--surface-raised, #162420);
+  color: var(--text, #f8fafc);
+  font-size: 13px;
+}
+.report-filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--line, #283e36);
+  border-radius: 6px;
+  background: var(--surface-raised, #162420);
+  color: var(--text, #f8fafc);
+  font-size: 13px;
+}
+.report-filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted, #94a3b8);
+  cursor: pointer;
+}
+
+.report-top-consumed {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.report-top-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line, #283e36);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.report-top-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text, #f8fafc);
+}
+.report-top-meta {
+  font-size: 12px;
+  color: var(--muted, #94a3b8);
+  display: flex;
+  justify-content: space-between;
+}
+
+.report-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.report-progress-fill {
+  height: 100%;
+  background: var(--accent, #4ade80);
+  border-radius: 3px;
+}
+
+.category-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.category-card {
+  background: var(--surface-raised, #162420);
+  border: 1px solid var(--line, #283e36);
+  border-radius: 8px;
+  padding: 16px;
+}
+.category-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line, #283e36);
+}
+.category-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text, #f8fafc);
+}
+.category-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  font-size: 13px;
+}
+.category-metric-val {
+  font-weight: 600;
+  color: var(--text, #f8fafc);
+  margin-top: 2px;
+}
+
+.btn-report-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--surface-raised, #162420);
+  border: 1px solid var(--line, #283e36);
+  color: var(--text, #f8fafc);
+  transition: all 0.15s ease;
+}
+.btn-report-action:hover {
+  background: var(--line, #283e36);
+  border-color: var(--accent, #4ade80);
+}
+.btn-report-action.primary {
+  background: var(--accent, #4ade80);
+  color: #0b1512;
+  border-color: var(--accent, #4ade80);
+}
+.btn-report-action.primary:hover {
+  opacity: 0.9;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .sidebar, .workflow-toolbar, .report-header-controls, .report-tabs, .report-filters-bar, .btn-report-action {
+    display: none !important;
+  }
+  .report-kpi-card, .category-card {
+    border: 1px solid #ccc !important;
+    background: #f9f9f9 !important;
+    color: #000 !important;
+  }
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    color: #000 !important;
+  }
+  th, td {
+    border: 1px solid #ddd !important;
+    color: #000 !important;
+  }
+}
+
