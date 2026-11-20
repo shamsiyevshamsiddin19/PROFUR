@@ -1,7 +1,7 @@
 """Ombor API'si uchun so'rov va javob shakllari (shartnoma, 4- va 5-bo'lim)."""
 
 from copy import deepcopy
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
@@ -77,6 +77,7 @@ class ReceiptCreateSerializer(serializers.Serializer):
 
     material_id = ActiveMaterialField(queryset=Material.objects.all())
     received_on = serializers.DateField()
+    is_opening = serializers.BooleanField(required=False, default=False)
     quantity = serializers.DecimalField(**QUANTITY, min_value=Decimal("0.01"))
     total_amount = serializers.DecimalField(
         **AMOUNT, min_value=Decimal("0.01"), required=False, allow_null=True
@@ -123,9 +124,10 @@ class ReceiptCreateSerializer(serializers.Serializer):
                 _("total_amount yoki unit_price dan bittasi majburiy.")
             )
         if unit and not total:
-            data["total_amount"] = (unit * quantity).quantize(Decimal("0.01"))
-        # unit_price is computed by the service layer, remove from data
-        data.pop("unit_price", None)
+            amount = (unit * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            data["total_amount"] = self.fields["total_amount"].run_validation(
+                str(amount)
+            )
         return data
 
 
@@ -141,6 +143,7 @@ class ReceiptSerializer(HidePricesMixin, serializers.ModelSerializer):
             "id",
             "material",
             "received_on",
+            "is_opening",
             "quantity",
             "quantity_remaining",
             *PRICE_FIELDS,

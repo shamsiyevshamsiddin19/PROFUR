@@ -1,3 +1,4 @@
+import { warehouseMessages } from "./warehouse-i18n";
 import { uxMessages } from "./ux-i18n";
 import { appearanceMessages } from "./appearance-i18n";
 import { adminMessages } from "./admin-i18n";
@@ -6,6 +7,7 @@ export const languages = { uz: "O‘zbekcha", ru: "Русский", en: "English
 export type Language = keyof typeof languages;
 
 const messages = {
+  ...warehouseMessages,
   ...workflowMessages,
   ...uxMessages,
   ...appearanceMessages,

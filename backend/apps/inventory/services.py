@@ -22,9 +22,11 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from typing import NamedTuple
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.catalog.models import Material
 
@@ -49,8 +51,6 @@ UNIT_PRICE_STEP = Decimal("0.000001")
 def _enforce_integer_unit(material: Material, quantity: Decimal) -> None:
     """Raise if material uses integer units but quantity is fractional."""
     if material.unit in ("sheet", "piece") and quantity != quantity.to_integral_value():
-        from django.core.exceptions import ValidationError
-
         raise ValidationError(
             f"Material uses integer units ({material.unit}). "
             f"Fractional quantity {quantity} is not allowed."
@@ -141,6 +141,8 @@ def receive(
     supplier: str = "",
     document_number: str = "",
     note: str = "",
+    is_opening: bool = False,
+    unit_price: Decimal | None = None,
 ) -> tuple[Batch, StockBalance]:
     """Kirimni yozadi: yangi partiya, ``receipt`` harakati va oshgan qoldiq.
 
@@ -150,13 +152,23 @@ def receive(
     """
     _enforce_integer_unit(material, quantity)
     balance = locked_balance(material)
+    if (
+        is_opening
+        and Batch.objects.filter(material=material, is_opening=False).exists()
+    ):
+        raise ValidationError(
+            _("Boshlang‘ich qoldiq birinchi xarid kirimidan oldin kiritiladi.")
+        )
     batch = Batch.objects.create(
         material=material,
         received_on=received_on,
         quantity=quantity,
         quantity_remaining=quantity,
         total_amount=total_amount,
-        unit_price=calculate_unit_price(total_amount, quantity),
+        unit_price=unit_price
+        if unit_price is not None
+        else calculate_unit_price(total_amount, quantity),
+        is_opening=is_opening,
         currency=currency,
         supplier=supplier,
         document_number=document_number,
@@ -172,7 +184,7 @@ def receive(
         batch=batch,
         quantity=quantity,
         quantity_on_hand_after=balance.quantity_on_hand,
-        reference_kind="receipt",
+        reference_kind="opening" if is_opening else "receipt",
         reference_id=batch.pk,
         created_by=user,
     )
@@ -306,6 +318,38 @@ def issue_stock(
 # --- Qaytarish va hisobdan chiqarish -------------------------------------------
 
 
+@transaction.atomic
+def worker_issue(*, material, quantity, user, project_id, note):
+    """Allocate from the oldest available receipts while holding the balance lock."""
+    _enforce_integer_unit(material, quantity)
+    balance = locked_balance(material)
+    if quantity > balance.quantity_on_hand:
+        raise InsufficientStockError(balance.quantity_on_hand, quantity)
+    remaining = quantity
+    allocations = []
+    for batch in (
+        Batch.objects.filter(material=material, quantity_remaining__gt=0)
+        .order_by("received_on", "id")
+        .iterator(chunk_size=100)
+    ):
+        take = min(remaining, batch.quantity_remaining)
+        allocations.append(Allocation(batch.pk, take))
+        remaining -= take
+        if remaining == 0:
+            break
+    if remaining:
+        raise InsufficientStockError(quantity - remaining, quantity)
+    return issue_stock(
+        material=material,
+        allocations=allocations,
+        user=user,
+        project_id=project_id,
+        issued_on=timezone.localdate(),
+        recipient_name=(user.get_full_name() or user.username)[:200],
+        note=note,
+    )
+
+
 class ReturnLimitError(Exception):
     """Qaytarish asl chiqimning shu partiyadan olingan qolgan qismidan oshadi.
 
@@ -436,7 +480,17 @@ def request_return(
     Partiya chiqimda bo'lmasa yoki limit oshsa — ``ReturnLimitError``.
     """
     issue = StockIssue.objects.select_for_update().get(pk=issue.pk)
-    ensure_returnable(returnable_by_batch(issue, include_pending=True), allocations)
+    returnable = returnable_by_batch(issue, include_pending=True)
+    ensure_returnable(returnable, allocations)
+    from .offcut_services import registered_measure, source_measure
+
+    measure = registered_measure(issue)
+    if measure:
+        available = sum(returnable.values()) - total_of(allocations)
+        if measure > available * source_measure(issue.material):
+            part = allocations[0]
+            raise ReturnLimitError(part.batch_id, Decimal("0"), part.quantity)
+
     stock_return = StockReturn.objects.create(
         issue=issue,
         quantity=total_of(allocations),

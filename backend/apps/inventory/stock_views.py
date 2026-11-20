@@ -11,7 +11,6 @@ Bu yerda qoldiq faqat o'qiladi; o'zgartirish ``services`` orqali.
 """
 
 from accounts.permissions import HasPermissionCode
-from django.db import connection
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Q, QuerySet, Sum
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, viewsets
@@ -20,6 +19,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.catalog.access import is_shop_worker, visible_materials
 from apps.catalog.models import Material
 
 from . import services
@@ -75,32 +75,14 @@ class StockViewSet(
             output_field=DecimalField(max_digits=32, decimal_places=8),
         )
         queryset = (
-            Material.objects.select_related("category", "stock")
+            visible_materials(self.request.user)
+            .select_related("category", "stock")
             .annotate(
                 open_batches=Count("batches", filter=OPEN_BATCH),
                 stock_value=Sum(stock_value, filter=OPEN_BATCH),
             )
             .order_by("category__name", "name", "id")
         )
-        user = self.request.user
-        if not user.is_admin_role:
-            roles = set(user.role_codes)
-            visible = Q(allowed_roles=[])
-            if connection.features.supports_json_field_contains:
-                for code in roles:
-                    visible |= Q(allowed_roles__contains=[code])
-            elif roles:
-                restricted = Material.objects.exclude(allowed_roles=[]).values_list(
-                    "pk", "allowed_roles"
-                )
-                visible |= Q(
-                    pk__in=[
-                        pk
-                        for pk, allowed in restricted.iterator()
-                        if roles.intersection(allowed)
-                    ]
-                )
-            queryset = queryset.filter(visible)
         if search := params.get("search", "").strip():
             queryset = queryset.filter(
                 Q(name__icontains=search) | Q(color__icontains=search)
@@ -152,7 +134,12 @@ class MovementViewSet(
 
     def get_queryset(self) -> QuerySet[StockMovement]:
         params = self.request.query_params
-        queryset = StockMovement.objects.select_related("material", "created_by")
+        user = self.request.user
+        queryset = StockMovement.objects.select_related(
+            "material", "created_by"
+        ).filter(material__in=visible_materials(user))
+        if is_shop_worker(user):
+            queryset = queryset.filter(created_by=user)
         if (material := int_param(self.request, "material")) is not None:
             queryset = queryset.filter(material_id=material)
         if movement_type := params.get("type"):

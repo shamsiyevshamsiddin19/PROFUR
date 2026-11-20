@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from apps.catalog.access import visible_materials
 from apps.catalog.models import Material
 
 from .models import QUANTITY, Batch, Currency, StockIssue
@@ -108,6 +109,16 @@ class IssueCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs: dict) -> dict:
         """Partiyalarni tekshiradi, sana va oluvchi ismini tartibga keltiradi."""
+        request = self.context.get("request")
+        if (
+            request
+            and not visible_materials(request.user)
+            .filter(pk=attrs["material_id"].pk)
+            .exists()
+        ):
+            raise serializers.ValidationError(
+                {"material_id": _("Material mavjud emas.")}
+            )
         ensure_batches_of_material(attrs["material_id"], attrs["allocations"])
         attrs.setdefault("issued_on", timezone.localdate())
         attrs["recipient_name"] = attrs["recipient_name"].strip()
@@ -124,6 +135,24 @@ class IssueCreateSerializer(serializers.Serializer):
             "project_id": data.get("project_id"),
             "note": data["note"],
         }
+
+
+class WorkerIssueSerializer(serializers.Serializer):
+    material_id = serializers.PrimaryKeyRelatedField(queryset=Material.objects.all())
+    quantity = serializers.DecimalField(**QUANTITY, min_value=Decimal("0.01"))
+    project_id = serializers.IntegerField(min_value=1)
+    note = serializers.CharField(
+        max_length=500, required=False, allow_blank=True, default=""
+    )
+
+    def validate_material_id(self, material):
+        if (
+            not visible_materials(self.context["request"].user)
+            .filter(pk=material.pk)
+            .exists()
+        ):
+            raise serializers.ValidationError(_("Material mavjud emas."))
+        return material
 
 
 class CostedAllocationsMixin(serializers.Serializer):

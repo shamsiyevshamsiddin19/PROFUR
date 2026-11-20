@@ -16,6 +16,8 @@ export type Material = {
   unit: string;
   category: { id: number; name: string };
   color?: string;
+  container_size?: string | null;
+  allowed_roles?: string[];
   length_cm?: string | null;
   width_cm?: string | null;
   thickness_cm?: string | null;
@@ -56,6 +58,7 @@ export type StockMovement = {
   created_at: string;
 };
 export type Receipt = {
+  is_opening?: boolean;
   id: number;
   received_on: string;
   quantity: string;
@@ -73,10 +76,12 @@ export type Receipt = {
 };
 export type Page<T> = { count: number; next: string | null; results: T[] };
 export type ReceiptInput = {
+  is_opening?: boolean;
   material_id: number;
   received_on: string;
   quantity: string;
-  total_amount: string;
+  total_amount?: string;
+  unit_price?: string;
   currency: "USD";
   supplier: string;
   document_number: string;
@@ -173,6 +178,7 @@ export type Allocation = {
   batch_id: number;
   quantity: string;
   unit_price?: string;
+  returnable_quantity?: string;
   received_on: string;
 };
 export type Operation = {

@@ -100,6 +100,7 @@ class Material(TimeStampedModel):
                     "width_cm",
                     "thickness_cm",
                     "unit",
+                    "container_size",
                 ],
                 nulls_distinct=False,
                 name="catalog_material_unique_nomenclature",

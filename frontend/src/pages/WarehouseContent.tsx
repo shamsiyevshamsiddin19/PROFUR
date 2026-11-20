@@ -1,3 +1,5 @@
+import { adminAccess } from "../access";
+import Decimal from "decimal.js";
 import { EntryTable } from "../components/EntryTable";
 import { Field } from "../components/WorkflowUI";
 import { receiptKeyboard } from "../keyboard";
@@ -19,6 +21,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import {
+  allPages,
   ApiError,
   fieldErrors,
   request,
@@ -44,6 +47,7 @@ function newDraft() {
     received_on: localDate(),
     quantity: "",
     total_amount: "",
+    unit_price: "",
     supplier: "",
     document_number: "",
     note: "",
@@ -98,8 +102,18 @@ export function WarehouseContent({
   );
   const [draft, setDraft] = useState(() =>
     restored
-      ? { ...restored.body, material_id: String(restored.body.material_id) }
+      ? {
+          ...newDraft(),
+          ...restored.body,
+          material_id: String(restored.body.material_id),
+        }
       : newDraft(),
+  );
+  const [isOpening, setIsOpening] = useState(
+    Boolean(restored?.body.is_opening),
+  );
+  const [priceMode, setPriceMode] = useState<"total_amount" | "unit_price">(
+    restored?.body.unit_price ? "unit_price" : "total_amount",
   );
   const [saving, setSaving] = useState(false);
   const [uncertain, setUncertain] = useState(Boolean(restored));
@@ -131,17 +145,13 @@ export function WarehouseContent({
           setStockRows(page.results);
           setNext(page.next);
         } else {
-          const pageSize = screen === "receiving" ? "&page_size=250" : "";
-          const page = await request<Page<Material>>(
-            "/api/v1/materials/?is_active=true" +
-              pageSize +
-              "&search=" +
-              encodeURIComponent(search),
-            lang,
-            { signal: controller.signal },
-          );
-          setMaterials(page.results);
-          setNext(page.next);
+          const path =
+            "/api/v1/materials/?is_active=true&search=" +
+            encodeURIComponent(search);
+          const items = await allPages<Material>(path, lang, controller.signal);
+          if (controller.signal.aborted) return;
+          setMaterials(items);
+          setNext(null);
           if (screen === "receiving") {
             const receipts = await request<Page<Receipt>>(
               "/api/v1/receipts/",
@@ -210,10 +220,13 @@ export function WarehouseContent({
         setSaveError("invalid");
         return;
       }
+      const { total_amount, unit_price, ...fields } = draft;
       pending.current = {
         key: crypto.randomUUID(),
         body: {
-          ...draft,
+          ...fields,
+          ...(isOpening && adminAccess(user) ? { is_opening: true } : {}),
+          ...(priceMode === "total_amount" ? { total_amount } : { unit_price }),
           material_id: selected.id,
           currency: "USD",
         },
@@ -236,6 +249,7 @@ export function WarehouseContent({
       pending.current = null;
       setUncertain(false);
       setDraft(newDraft());
+      setIsOpening(false);
       setRevision((n) => n + 1);
     } catch (error) {
       const unknownResult = !(error instanceof ApiError) || error.status >= 500;
@@ -448,7 +462,29 @@ export function WarehouseContent({
       </>
     );
 
-  const moneyFields = ["total_amount"];
+  const moneyFields = ["total_amount", "unit_price"];
+  function calculatedPrice() {
+    const quantity = Number(draft.quantity);
+    const price = Number(draft[priceMode]);
+    if (
+      !Number.isFinite(quantity) ||
+      !Number.isFinite(price) ||
+      quantity <= 0 ||
+      price <= 0
+    )
+      return "—";
+    const value = new Decimal(draft[priceMode]);
+    return priceMode === "total_amount"
+      ? "$ " +
+          value
+            .div(draft.quantity)
+            .toDecimalPlaces(6, Decimal.ROUND_HALF_UP)
+            .toString()
+      : money(
+          value.times(draft.quantity).toFixed(2, Decimal.ROUND_HALF_UP),
+          lang,
+        );
+  }
   function input(
     field: keyof typeof draft,
     key: MessageKey,
@@ -464,8 +500,20 @@ export function WarehouseContent({
         required={!optional}
         onChange={(e) => change(field, e.target.value)}
         placeholder={optional ? t("optional") : undefined}
-        step={type === "number" ? "0.01" : undefined}
-        min={type === "number" ? "0.01" : undefined}
+        step={
+          field === "unit_price"
+            ? "0.000001"
+            : type === "number"
+              ? "0.01"
+              : undefined
+        }
+        min={
+          field === "unit_price"
+            ? "0.000001"
+            : type === "number"
+              ? "0.01"
+              : undefined
+        }
         max={type === "date" ? localDate() : undefined}
         maxLength={
           field === "supplier"
@@ -510,6 +558,41 @@ export function WarehouseContent({
           </span>
         </div>
       )}
+      <div className="workflow-toolbar">
+        <Field label={t("priceInput")}>
+          <select
+            value={priceMode}
+            disabled={locked}
+            onChange={(event) => {
+              setPriceMode(event.target.value as typeof priceMode);
+              setSaveError(null);
+              setFields({});
+            }}
+          >
+            <option value="total_amount">{t("total")}</option>
+            <option value="unit_price">{t("unitPrice")}</option>
+          </select>
+        </Field>
+        {adminAccess(user) && (
+          <label className="check-label">
+            <input
+              type="checkbox"
+              disabled={locked}
+              checked={isOpening}
+              onChange={(event) => {
+                setIsOpening(event.target.checked);
+                setSaveError(null);
+                setFields({});
+              }}
+            />
+            {t("openingBalance")}
+          </label>
+        )}
+        <output aria-live="polite">
+          {t(priceMode === "total_amount" ? "unitPrice" : "total")} ·{" "}
+          {calculatedPrice()}
+        </output>
+      </div>
       <div className="receipt-layout tabular-receipt">
         <form
           className="receipt-form"
@@ -561,7 +644,12 @@ export function WarehouseContent({
               </div>
             </Field>
             {input("quantity", "quantity", false, "number")}
-            {input("total_amount", "total", false, "number")}
+            {input(
+              priceMode,
+              priceMode === "total_amount" ? "total" : "unitPrice",
+              false,
+              "number",
+            )}
 
             {input("supplier", "supplier", true)}
             {input("document_number", "document", true)}
@@ -643,6 +731,11 @@ export function WarehouseContent({
                   <tr key={r.id}>
                     <td title={r.material.display_name}>
                       {r.material.display_name}
+                      {r.is_opening && (
+                        <small className="review-detail">
+                          {t("openingBalance")}
+                        </small>
+                      )}
                     </td>
                     <td>{r.received_on}</td>
                     <td>

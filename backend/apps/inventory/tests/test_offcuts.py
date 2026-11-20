@@ -101,9 +101,11 @@ class OffcutWithdrawalTest(TestCase):
         self.offcut.refresh_from_db()
         self.assertEqual(self.offcut.quantity, Decimal("3"))
 
-    def test_full_withdrawal_deletes(self):
+    def test_full_withdrawal_preserves_history(self):
         withdraw_offcut(self.offcut.id, Decimal("5"), self.user)
-        self.assertFalse(LeftoverOffcut.objects.filter(pk=self.offcut.id).exists())
+        self.assertEqual(
+            LeftoverOffcut.objects.get(pk=self.offcut.id).quantity, Decimal("0")
+        )
 
     def test_over_withdrawal_fails(self):
         with self.assertRaises(ValidationError):

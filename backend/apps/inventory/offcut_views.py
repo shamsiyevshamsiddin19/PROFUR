@@ -1,18 +1,24 @@
-"""Qoldiq materiallar API: ro'yxat, qayd etish va ishlatish."""
+"""Separate stock of reusable cut pieces."""
 
-from rest_framework import serializers, status
+from decimal import Decimal
+
+from accounts.permissions import HasPermissionCode
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.shortcuts import get_object_or_404
+from rest_framework import mixins, serializers, viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
 
-from apps.accounts.permissions import HasPermissionCode
-from apps.catalog.models import Material
-from apps.inventory import offcut_services
-from apps.inventory.models import LeftoverOffcut
+from apps.catalog.access import is_shop_worker, visible_materials
+
+from . import offcut_services
+from .issue_views import IdempotentCreateMixin
+from .models import LeftoverOffcut, StockIssue
+
+DIMENSION = {"max_digits": 10, "decimal_places": 2, "min_value": Decimal("0.01")}
 
 
 class OffcutSerializer(serializers.ModelSerializer):
-    material_name = serializers.CharField(source="material.__str__", read_only=True)
+    material_name = serializers.CharField(source="material.__str__")
     registered_by_name = serializers.SerializerMethodField()
 
     class Meta:
@@ -24,122 +30,108 @@ class OffcutSerializer(serializers.ModelSerializer):
             "length_mm",
             "width_mm",
             "quantity",
+            "source_issue",
             "note",
-            "registered_by",
             "registered_by_name",
             "created_at",
         ]
-        read_only_fields = ["id", "registered_by", "created_at"]
 
     def get_registered_by_name(self, obj):
-        u = obj.registered_by
-        return f"{u.first_name} {u.last_name}".strip() or u.username
+        return obj.registered_by.get_full_name() or obj.registered_by.username
 
 
 class OffcutCreateSerializer(serializers.Serializer):
-    material_id = serializers.IntegerField()
-    length_mm = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        min_value=0.01,
+    issue_id = serializers.IntegerField(min_value=1)
+    length_mm = serializers.DecimalField(**DIMENSION)
+    width_mm = serializers.DecimalField(**DIMENSION, required=False, allow_null=True)
+    quantity = serializers.IntegerField(min_value=1, max_value=999_999_999)
+    note = serializers.CharField(
+        max_length=500, required=False, allow_blank=True, default=""
     )
-    width_mm = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        min_value=0.01,
-        required=False,
-        allow_null=True,
-    )
-    quantity = serializers.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        min_value=0.01,
-        default=1,
-    )
-    note = serializers.CharField(max_length=500, required=False, default="")
 
 
 class OffcutWithdrawSerializer(serializers.Serializer):
-    quantity = serializers.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        min_value=0.01,
+    quantity = serializers.IntegerField(min_value=1, max_value=999_999_999)
+    reason = serializers.CharField(
+        max_length=500, required=False, allow_blank=True, default=""
     )
-    reason = serializers.CharField(max_length=500, required=False, default="")
 
 
-class OffcutViewSet(ModelViewSet):
+class OffcutViewSet(
+    IdempotentCreateMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = OffcutSerializer
     permission_classes = [HasPermissionCode]
-    permission_code = "inventory.view_stock"
     http_method_names = ["get", "post", "head", "options"]
+    idempotency_endpoint = "offcuts:create"
+
+    @property
+    def required_permission(self):
+        return {
+            "create": "inventory.add_offcut",
+            "withdraw": "inventory.use_offcut",
+        }.get(self.action, "inventory.view_offcut")
 
     def get_queryset(self):
-        qs = LeftoverOffcut.objects.select_related(
-            "material", "material__category", "registered_by"
+        qs = LeftoverOffcut.objects.select_related("material", "registered_by").filter(
+            material__in=visible_materials(self.request.user)
         )
-        material = self.request.query_params.get("material")
-        if material:
-            qs = qs.filter(material_id=material)
+        if self.action == "list":
+            qs = qs.filter(quantity__gt=0)
+            if search := self.request.query_params.get("search", "").strip():
+                qs = qs.filter(material__name__icontains=search)
         return qs
 
     def create(self, request, *args, **kwargs):
-        ser = OffcutCreateSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        d = ser.validated_data
-
-        try:
-            material = Material.objects.get(pk=d["material_id"], is_active=True)
-        except Material.DoesNotExist:
-            return Response(
-                {"material_id": ["Material not found or inactive."]},
-                status=status.HTTP_400_BAD_REQUEST,
+        def perform():
+            form = OffcutCreateSerializer(data=request.data)
+            form.is_valid(raise_exception=True)
+            data = dict(form.validated_data)
+            issues = StockIssue.objects.filter(
+                material__in=visible_materials(request.user)
             )
+            if is_shop_worker(request.user):
+                issues = issues.filter(created_by=request.user)
+            issue = get_object_or_404(issues, pk=data.pop("issue_id"))
+            try:
+                offcut = offcut_services.register_offcut(
+                    material=issue.material,
+                    source_issue=issue,
+                    user=request.user,
+                    **{"width_mm": None, **data},
+                )
+            except (
+                offcut_services.OffcutDimensionError,
+                offcut_services.OffcutUnitError,
+            ) as error:
+                raise serializers.ValidationError({"detail": str(error)}) from error
+            return self.get_serializer(offcut).data
 
-        try:
-            offcut = offcut_services.register_offcut(
-                material=material,
-                length_mm=d["length_mm"],
-                width_mm=d.get("width_mm"),
-                quantity=d["quantity"],
-                user=request.user,
-                note=d.get("note", ""),
-            )
-        except (
-            offcut_services.OffcutDimensionError,
-            offcut_services.OffcutUnitError,
-        ) as e:
-            return Response(
-                {"detail": e.message},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        return self.idempotent_create(request, perform)
 
-        return Response(
-            OffcutSerializer(offcut).data,
-            status=status.HTTP_201_CREATED,
-        )
-
-    @action(detail=True, methods=["post"], url_path="withdraw")
+    @action(detail=True, methods=["post"])
     def withdraw(self, request, pk=None):
-        ser = OffcutWithdrawSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
+        self.idempotency_endpoint = f"offcuts:{pk}:withdraw"
 
-        try:
-            offcut_services.withdraw_offcut(
-                offcut_id=pk,
-                quantity=ser.validated_data["quantity"],
-                user=request.user,
-                reason=ser.validated_data.get("reason", ""),
-            )
-        except LeftoverOffcut.DoesNotExist:
-            return Response(
-                {"detail": "Offcut not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        except Exception as e:
-            return Response(
-                {"detail": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        def perform():
+            offcut = self.get_object()
+            form = OffcutWithdrawSerializer(data=request.data)
+            form.is_valid(raise_exception=True)
+            try:
+                result = offcut_services.withdraw_offcut(
+                    offcut.pk, user=request.user, **form.validated_data
+                )
+            except DjangoValidationError as error:
+                raise serializers.ValidationError(
+                    {"quantity": error.messages}
+                ) from error
+            return self.get_serializer(result).data
 
-        return Response({"detail": "Withdrawn successfully."})
+        return self.idempotent_create(request, perform)
+
+    def replay_body(self, body, user):
+        get_object_or_404(self.get_queryset(), pk=body["id"])
+        return body

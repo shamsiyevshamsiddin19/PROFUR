@@ -9,10 +9,5 @@ User = get_user_model()
 class ApprovedUserBackend(ModelBackend):
     """Only allow login for approved users."""
 
-    def authenticate(self, request, username=None, password=None, **kwargs):
-        user = super().authenticate(
-            request, username=username, password=password, **kwargs
-        )
-        if user and not user.is_approved:
-            return None
-        return user
+    def user_can_authenticate(self, user):
+        return super().user_can_authenticate(user) and user.is_approved

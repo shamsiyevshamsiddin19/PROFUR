@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from apps.catalog.access import is_shop_worker, visible_materials
 from apps.catalog.models import Material
 
 from .issue_serializers import (
@@ -57,6 +58,14 @@ class ReturnCreateSerializer(serializers.Serializer):
     def validate(self, attrs: dict) -> dict:
         """Partiyalar asl chiqimda borligini va sana chiqimdan oldin emasligini tekshiradi."""
         issue = attrs["issue_id"]
+        if request := self.context.get("request"):
+            user = request.user
+            if not visible_materials(user).filter(pk=issue.material_id).exists() or (
+                is_shop_worker(user) and issue.created_by_id != user.pk
+            ):
+                raise serializers.ValidationError(
+                    {"issue_id": _("Chiqim mavjud emas.")}
+                )
         batch_ids = reject_duplicate_batches(attrs["allocations"])
         issued = {part.batch_id for part in issue.allocations.all()}
         if foreign := sorted(set(batch_ids) - issued):
@@ -101,6 +110,15 @@ class WriteOffCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs: dict) -> dict:
         """Partiyalar shu materialniki ekanini tekshiradi va sababni tozalaydi."""
+        if request := self.context.get("request"):
+            if (
+                not visible_materials(request.user)
+                .filter(pk=attrs["material_id"].pk)
+                .exists()
+            ):
+                raise serializers.ValidationError(
+                    {"material_id": _("Material mavjud emas.")}
+                )
         ensure_batches_of_material(attrs["material_id"], attrs["allocations"])
         attrs["reason"] = attrs["reason"].strip()
         return attrs

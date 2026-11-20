@@ -13,13 +13,20 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, ErrorDetail, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.catalog.access import is_shop_worker, visible_materials
+
 from . import services
-from .issue_serializers import IssueCreateSerializer, IssueSerializer
-from .models import IdempotencyKey, StockIssue
+from .issue_serializers import (
+    IssueCreateSerializer,
+    IssueSerializer,
+    WorkerIssueSerializer,
+)
+from .models import IdempotencyKey, StockIssue, WarehouseReview
 from .serializers import replay_body_for_user
 from .views import (
     IDEMPOTENCY_TTL,
@@ -193,6 +200,10 @@ class StockIssueViewSet(
         queryset = StockIssue.objects.select_related(
             "material", "created_by"
         ).prefetch_related("allocations__batch")
+        user = self.request.user
+        queryset = queryset.filter(material__in=visible_materials(user))
+        if is_shop_worker(user):
+            queryset = queryset.filter(created_by=user)
         if material := int_query_param(self.request, "material"):
             queryset = queryset.filter(material_id=material)
         if project := int_query_param(self.request, "project_id"):
@@ -205,20 +216,47 @@ class StockIssueViewSet(
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         """Chiqim yozadi. Qoldiq yoki partiya yetmasa 409, hech narsa saqlanmaydi."""
-        serializer = IssueCreateSerializer(data=request.data)
+        worker = is_shop_worker(request.user)
+        form = WorkerIssueSerializer if worker else IssueCreateSerializer
+        serializer = form(data=request.data, context={"request": request})
 
         def perform() -> dict:
             """Ma'lumotni tekshiradi, chiqimni saqlaydi va javob tanasini qaytaradi."""
             serializer.is_valid(raise_exception=True)
             try:
-                issue, on_hand = services.issue_stock(
-                    user=request.user, **serializer.service_kwargs()
-                )
+                if worker:
+                    data = dict(serializer.validated_data)
+                    material = data.pop("material_id")
+                    issue, on_hand = services.worker_issue(
+                        material=material, user=request.user, **data
+                    )
+                else:
+                    issue, on_hand = services.issue_stock(
+                        user=request.user, **serializer.service_kwargs()
+                    )
             except CONFLICT_ERRORS as error:
                 raise conflict_from(error) from error
+            if worker:
+                WarehouseReview.objects.create(
+                    kind=WarehouseReview.Kind.ISSUE,
+                    material=issue.material,
+                    issue=issue,
+                    quantity=issue.quantity,
+                    actor=request.user,
+                    note=issue.note,
+                )
             return {
                 **IssueSerializer(issue, context={"request": request}).data,
                 "quantity_on_hand_after": str(on_hand),
             }
 
         return self.idempotent_create(request, perform)
+
+    @action(detail=True, methods=["get"])
+    def returnable(self, request, pk=None):
+        issue = self.get_object()
+        limits = services.returnable_by_batch(issue, include_pending=True)
+        rows = self.get_serializer(issue).data["allocations"]
+        for row in rows:
+            row["returnable_quantity"] = str(limits.get(row["batch_id"], 0))
+        return Response({"allocations": rows})

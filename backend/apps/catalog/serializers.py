@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+from accounts.models import Role
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -12,7 +13,14 @@ DIMENSION_FIELDS = ("length_cm", "width_cm", "thickness_cm")
 
 # Bir kategoriyada takrorlanmasligi kerak bo'lgan maydonlar (PR #11 dagi
 # catalog_material_unique_nomenclature cheklovi bilan bir xil).
-NOMENCLATURE_FIELDS = ("category", "name", "color", *DIMENSION_FIELDS, "unit")
+NOMENCLATURE_FIELDS = (
+    "category",
+    "name",
+    "color",
+    *DIMENSION_FIELDS,
+    "unit",
+    "container_size",
+)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -40,6 +48,27 @@ class MaterialSerializer(serializers.ModelSerializer):
     )
     display_name = serializers.SerializerMethodField()
     quantity_on_hand = serializers.SerializerMethodField()
+    allowed_roles = serializers.ListField(
+        child=serializers.CharField(max_length=50), max_length=100, required=False
+    )
+
+    def validate_allowed_roles(self, values):
+        request = self.context.get("request")
+        if not request or not request.user.is_admin_role:
+            raise serializers.ValidationError(
+                _("Material vakolatlarini administrator belgilaydi.")
+            )
+        known = set(Role.objects.filter(code__in=values).values_list("code", flat=True))
+        if set(values) != known:
+            raise serializers.ValidationError(_("Tanlangan rol mavjud emas."))
+        return list(dict.fromkeys(values))
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        if not request or not request.user.is_admin_role:
+            data.pop("allowed_roles", None)
+        return data
 
     class Meta:
         model = Material
@@ -51,12 +80,15 @@ class MaterialSerializer(serializers.ModelSerializer):
             "color",
             *DIMENSION_FIELDS,
             "unit",
+            "container_size",
+            "allowed_roles",
             "display_name",
             "is_active",
             "quantity_on_hand",
         ]
         extra_kwargs = {
-            field: {"min_value": Decimal("0.01")} for field in DIMENSION_FIELDS
+            field: {"min_value": Decimal("0.01")}
+            for field in (*DIMENSION_FIELDS, "container_size")
         }
         # Noyoblik view'da tekshiriladi: javobda mavjud material identifikatori
         # qaytishi kerak, DRF'ning avtomatik validatori esa bo'sh o'lchamlarni

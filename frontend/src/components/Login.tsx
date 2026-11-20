@@ -4,6 +4,8 @@ import { ApiError, write, type User } from "../api";
 import { errorKey } from "../format";
 import { translate, type Language, type MessageKey } from "../i18n";
 
+import { WorkerRegistration } from "./WorkerRegistration";
+
 export function Login({
   lang,
   languagePicker,
@@ -17,6 +19,7 @@ export function Login({
 }) {
   const t = (key: MessageKey) => translate(lang, key);
   const [error, setError] = useState<MessageKey | null>(initialError);
+  const [register, setRegister] = useState(false);
   const [busy, setBusy] = useState(false);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,39 +53,51 @@ export function Login({
         {languagePicker}
       </header>
       <div className="login-content">
-        <form className="login-form" onSubmit={submit}>
-          <span className="eyebrow">{t("warehouse")}</span>
-          <h1>{t("loginTitle")}</h1>
-          <p>{t("loginHint")}</p>
-          <label>
-            {t("username")}
-            <input
-              name="username"
-              autoComplete="username"
-              required
+        {register ? (
+          <WorkerRegistration lang={lang} close={() => setRegister(false)} />
+        ) : (
+          <form className="login-form" onSubmit={submit}>
+            <span className="eyebrow">{t("warehouse")}</span>
+            <h1>{t("loginTitle")}</h1>
+            <p>{t("loginHint")}</p>
+            <label>
+              {t("username")}
+              <input
+                name="username"
+                autoComplete="username"
+                required
+                disabled={busy}
+              />
+            </label>
+            <label>
+              {t("password")}
+              <input
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                disabled={busy}
+              />
+            </label>
+            {error && (
+              <div className="notice error" role="alert">
+                {t(error)}
+              </div>
+            )}
+            <button className="primary" disabled={busy}>
+              {t(busy ? "loading" : "login")}
+              <ArrowRight size={18} />
+            </button>
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => setRegister(true)}
               disabled={busy}
-            />
-          </label>
-          <label>
-            {t("password")}
-            <input
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              disabled={busy}
-            />
-          </label>
-          {error && (
-            <div className="notice error" role="alert">
-              {t(error)}
-            </div>
-          )}
-          <button className="primary" disabled={busy}>
-            {t(busy ? "loading" : "login")}
-            <ArrowRight size={18} />
-          </button>
-        </form>
+            >
+              {t("registerWorker")}
+            </button>
+          </form>
+        )}
       </div>
       <footer>
         <span>PROFUR</span>

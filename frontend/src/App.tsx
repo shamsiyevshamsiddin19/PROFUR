@@ -23,7 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { ApiError, request, write, type User, can } from "./api";
-import { screenAllowed } from "./access";
+import { screenAllowed, workerAccess } from "./access";
 import { errorKey } from "./format";
 import {
   initialLanguage,
@@ -41,6 +41,9 @@ import { Catalog } from "./pages/Catalog";
 import { Operations } from "./pages/Operations";
 import { Expenses } from "./pages/Expenses";
 import { History } from "./pages/History";
+import { Offcuts } from "./pages/Offcuts";
+import { MonthlyReport } from "./pages/MonthlyReport";
+import { WarehouseReview } from "./pages/WarehouseReview";
 type Screen =
   | "settings"
   | "receiving"
@@ -51,7 +54,10 @@ type Screen =
   | "history"
   | "expenseTypes"
   | "administration"
-  | "notifications";
+  | "notifications"
+  | "offcuts"
+  | "report"
+  | "reviews";
 const screens = {
   settings: Settings2,
   expenseTypes: Tags,
@@ -63,9 +69,17 @@ const screens = {
   operations: ArrowUpRight,
   expenses: ReceiptText,
   history: HistoryIcon,
+  offcuts: Box,
+  report: Layers3,
+  reviews: Bell,
+};
+const screenLabels: Partial<Record<Screen, MessageKey>> = {
+  offcuts: "offcutStock",
+  report: "monthlyReport",
+  reviews: "reviewQueue",
 };
 function currentScreen(): Screen | null {
-  const hash = location.hash.slice(1);
+  const hash = location.hash.slice(1).split("?")[0];
   return Object.hasOwn(screens, hash) ? (hash as Screen) : null;
 }
 export function App() {
@@ -103,8 +117,11 @@ export function App() {
       [
         "receiving",
         "operations",
+        "offcuts",
         "stock",
         "materials",
+        "report",
+        "reviews",
         "expenses",
         "expenseTypes",
         "administration",
@@ -128,6 +145,35 @@ export function App() {
     }
   }, [user, requestedScreen, screen]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [reviewRevision, setReviewRevision] = useState(0);
+  const canReview = allowed("reviews");
+  useEffect(() => {
+    if (!canReview) {
+      setReviewCount(0);
+      return;
+    }
+    const controller = new AbortController();
+    function load() {
+      void request<{ count: number }>(
+        "/api/v1/warehouse-reviews/?pending=true",
+        lang,
+        { signal: controller.signal },
+      )
+        .then(({ count }) => {
+          if (!controller.signal.aborted) setReviewCount(count);
+        })
+        .catch(() => {
+          /* The review screen offers a retry. */
+        });
+    }
+    load();
+    const timer = window.setInterval(load, 15000);
+    return () => {
+      controller.abort();
+      window.clearInterval(timer);
+    };
+  }, [canReview, lang, screen, reviewRevision]);
   const navRef = useRef<HTMLElement>(null);
   const [drawer, setDrawer] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
@@ -327,6 +373,12 @@ export function App() {
       />
     );
 
+  const screenLabel = (key: Screen) =>
+    t(
+      key === "operations" && workerAccess(user)
+        ? "tookStock"
+        : (screenLabels[key] ?? (key as MessageKey)),
+    );
   const name =
     [user.first_name, user.last_name].filter(Boolean).join(" ") ||
     user.username;
@@ -393,18 +445,20 @@ export function App() {
                   "receiving",
                   "operations",
                   "stock",
+                  "offcuts",
                   ...(!allowed("receiving") && allowed("materials")
                     ? ["materials"]
                     : []),
                 ],
               ],
-              ["recordsNav", ["expenses", "history"]],
+              ["recordsNav", ["expenses", "history", "report"]],
               [
                 "managementNav",
                 [
                   ...(!allowed("expenses") && allowed("expenseTypes")
                     ? ["expenseTypes"]
                     : []),
+                  "reviews",
                   "administration",
                   "settings",
                 ],
@@ -429,12 +483,17 @@ export function App() {
                           setDrawer(false);
                         }}
                         aria-current={key === screen ? "page" : undefined}
-                        title={collapsed ? t(key) : undefined}
+                        title={collapsed ? screenLabel(key) : undefined}
                       >
                         <span className="nav-icon">
                           <Icon size={18} />
                         </span>
-                        <span className="nav-text">{t(key)}</span>
+                        <span className="nav-text">{screenLabel(key)}</span>
+                        {key === "reviews" && reviewCount > 0 && (
+                          <span className="notification-count">
+                            {reviewCount}
+                          </span>
+                        )}
                         {key === "notifications" && unreadCount > 0 && (
                           <span className="notification-count">
                             {unreadCount}
@@ -481,7 +540,7 @@ export function App() {
             <Warehouse size={15} />
             <span>{t("warehouse")}</span>
             <ChevronRight size={14} />
-            <strong>{t(screen)}</strong>
+            <strong>{screenLabel(screen)}</strong>
           </div>
           <div className="topbar-actions">
             {languagePicker}
@@ -506,29 +565,33 @@ export function App() {
         <main>
           <div className="page-heading">
             <div>
-              <h1>{t(screen)}</h1>
+              <h1>{screenLabel(screen)}</h1>
               <p>
-                {screen === "receiving"
-                  ? t("intro")
-                  : t(
-                      screen === "settings"
-                        ? "settingsHint"
-                        : screen === "expenseTypes"
-                          ? "expenseTypesHint"
-                          : screen === "administration"
-                            ? "administrationHint"
-                            : screen === "notifications"
-                              ? "notificationsHint"
-                              : screen === "materials"
-                                ? "catalogueHint"
-                                : screen === "operations"
-                                  ? "operationsHint"
-                                  : screen === "expenses"
-                                    ? "expenseHint"
-                                    : screen === "history"
-                                      ? "historyHint"
-                                      : "stockHint",
-                    )}
+                {screen === "reviews"
+                  ? t("reviewHint")
+                  : screen === "report" || screen === "offcuts"
+                    ? null
+                    : screen === "receiving"
+                      ? t("intro")
+                      : t(
+                          screen === "settings"
+                            ? "settingsHint"
+                            : screen === "expenseTypes"
+                              ? "expenseTypesHint"
+                              : screen === "administration"
+                                ? "administrationHint"
+                                : screen === "notifications"
+                                  ? "notificationsHint"
+                                  : screen === "materials"
+                                    ? "catalogueHint"
+                                    : screen === "operations"
+                                      ? "operationsHint"
+                                      : screen === "expenses"
+                                        ? "expenseHint"
+                                        : screen === "history"
+                                          ? "historyHint"
+                                          : "stockHint",
+                        )}
               </p>
             </div>
             {screen === "receiving" && allowed("materials") && (
@@ -607,6 +670,15 @@ export function App() {
               lang={lang}
               onRead={() => setUnreadCount((n) => Math.max(0, n - 1))}
             />
+          ) : screen === "reviews" ? (
+            <WarehouseReview
+              lang={lang}
+              onUpdate={() => setReviewRevision((n) => n + 1)}
+            />
+          ) : screen === "report" ? (
+            <MonthlyReport lang={lang} />
+          ) : screen === "offcuts" ? (
+            <Offcuts lang={lang} user={user} />
           ) : screen === "materials" ? (
             <Catalog lang={lang} user={user} />
           ) : screen === "operations" ? (

@@ -1,5 +1,19 @@
 import { can, type User } from "./api";
 
+export function adminAccess(user: User) {
+  return Boolean(user.is_superuser || user.role_codes.includes("ADMIN"));
+}
+
+export function workerAccess(user: User) {
+  return (
+    !adminAccess(user) &&
+    user.roles.some(
+      (role) =>
+        role.code === "WORKER" || role.permissions.includes("inventory.worker"),
+    )
+  );
+}
+
 export const operationAccess = {
   issues: { create: "inventory.add_issue", approve: null },
   returns: {
@@ -27,7 +41,13 @@ export function screenAllowed(user: User, screen: string): boolean {
     case "settings":
       return true;
     case "administration":
-      return Boolean(user.is_superuser || user.role_codes.includes("ADMIN"));
+      return adminAccess(user);
+    case "reviews":
+      return adminAccess(user);
+    case "report":
+      return can(user, "inventory.view_report");
+    case "offcuts":
+      return can(user, "inventory.view_offcut");
     case "receiving":
       return (
         can(user, "inventory.view_stock") &&

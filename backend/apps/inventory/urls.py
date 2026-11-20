@@ -8,6 +8,7 @@ from .dashboard_views import DashboardView, ExportMovementsView
 from .issue_views import StockIssueViewSet
 from .notification_views import NotificationViewSet
 from .offcut_views import OffcutViewSet
+from .review_views import WarehouseReviewViewSet
 from .stock_views import MovementViewSet, StockViewSet
 from .views import ReceiptViewSet
 
@@ -22,6 +23,10 @@ router.register("write-offs", WriteOffViewSet, basename="write-off")
 router.register("stock", StockViewSet, basename="stock")
 router.register("movements", MovementViewSet, basename="movement")
 router.register("offcuts", OffcutViewSet, basename="offcut")
+
+router.register(
+    "warehouse-reviews", WarehouseReviewViewSet, basename="warehouse-review"
+)
 
 urlpatterns = [
     path("dashboard/", DashboardView.as_view(), name="dashboard"),

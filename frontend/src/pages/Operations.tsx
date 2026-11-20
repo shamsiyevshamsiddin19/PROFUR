@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import Decimal from "decimal.js";
 import {
   allPages,
+  request,
   can,
   write,
   type User,
@@ -26,6 +27,7 @@ import {
 
 import {
   availableOperations,
+  workerAccess,
   operationAccess,
   type OperationKind as Kind,
 } from "../access";
@@ -37,7 +39,14 @@ const labels = {
 export function Operations({ lang, user }: { lang: Language; user: User }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
   const allowed = availableOperations(user);
-  const [selected, setKind] = useState<Kind | null>(null);
+  const names = workerAccess(user)
+    ? { ...labels, issues: "tookStock" as const }
+    : labels;
+  const [selected, setKind] = useState<Kind | null>(() =>
+    new URLSearchParams(location.hash.split("?")[1]).has("return")
+      ? "returns"
+      : null,
+  );
   const kind = selected && allowed.includes(selected) ? selected : allowed[0];
   const [status, setStatus] = useState("");
   const [selection, setSelection] = useState<{ kind: Kind; id: string } | null>(
@@ -82,7 +91,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 setStatus("");
               }}
             >
-              {t(labels[k])}
+              {t(names[k])}
             </button>
           ))}
         </div>
@@ -115,7 +124,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
       )}
       <section className="recent">
         <div className="section-heading">
-          <h2>{t(labels[kind])}</h2>
+          <h2>{t(names[kind])}</h2>
           <button className="text-button" onClick={records.reload}>
             {t("refresh")}
           </button>
@@ -173,6 +182,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 <th>{t("quantity")}</th>
                 <th>{t("operationDate")}</th>
                 <th>{t("recipient")}</th>
+                {kind === "issues" && <th>{t("projectId")}</th>}
                 <th>{t("status")}</th>
                 <th>{t("createdBy")}</th>
                 {canApprove && (
@@ -194,6 +204,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                   <td>
                     {row.recipient_name || row.issue?.recipient_name || "—"}
                   </td>
+                  {kind === "issues" && <td>{row.project_id ?? "—"}</td>}
                   <td>
                     <Status value={row.status} lang={lang} />
                     {!row.status && "—"}
@@ -262,16 +273,26 @@ function OperationForm({
   saved: () => void;
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
+  const workerIssue = kind === "issues" && workerAccess(user);
   const stocks = useRecords<StockRow>(
     kind === "returns" ? null : "/api/v1/stock/",
     lang,
+    0,
+    true,
   );
   const issues = useRecords<Operation>(
     kind === "returns" ? "/api/v1/issues/" : null,
     lang,
+    0,
+    true,
   );
+  const [workerQuantity, setWorkerQuantity] = useState("");
   const [material, setMaterial] = useState("");
-  const [issueId, setIssueId] = useState("");
+  const [issueId, setIssueId] = useState(() =>
+    kind === "returns"
+      ? new URLSearchParams(location.hash.split("?")[1]).get("return") || ""
+      : "",
+  );
   const [parts, setParts] = useState<StockBatch[]>([]);
   const [issueParts, setIssueParts] = useState<Allocation[]>([]);
   const [quantities, setQuantities] = useState<Record<number, string>>({});
@@ -286,21 +307,29 @@ function OperationForm({
     setPartError(null);
     setParts([]);
     setIssueParts([]);
-    if (kind === "returns") {
-      setIssueParts(selectedIssue?.allocations || []);
+    if (workerIssue || (kind === "returns" ? !selectedIssue : !material)) {
+      setPartLoading(false);
       return;
     }
-    if (!material) return;
     const controller = new AbortController();
     setPartLoading(true);
-    allPages<StockBatch>(
-      `/api/v1/stock/${material}/batches/`,
-      lang,
-      controller.signal,
-    )
-      .then((rows) => {
-        if (!controller.signal.aborted) setParts(rows);
-      })
+    const loaded =
+      kind === "returns"
+        ? request<{ allocations: Allocation[] }>(
+            `/api/v1/issues/${selectedIssue!.id}/returnable/`,
+            lang,
+            { signal: controller.signal },
+          ).then((response) => {
+            if (!controller.signal.aborted) setIssueParts(response.allocations);
+          })
+        : allPages<StockBatch>(
+            `/api/v1/stock/${material}/batches/`,
+            lang,
+            controller.signal,
+          ).then((rows) => {
+            if (!controller.signal.aborted) setParts(rows);
+          });
+    loaded
       .catch((err) => {
         if (!controller.signal.aborted) setPartError(err);
       })
@@ -308,12 +337,12 @@ function OperationForm({
         if (!controller.signal.aborted) setPartLoading(false);
       });
     return () => controller.abort();
-  }, [material, selectedIssue, kind, lang, reset]);
+  }, [material, selectedIssue, kind, lang, reset, workerIssue]);
   const allocations =
     kind === "returns"
       ? issueParts.map((p) => ({
           id: p.batch_id,
-          available: p.quantity,
+          available: p.returnable_quantity ?? "0",
           date: p.received_on,
           price: p.unit_price,
         }))
@@ -351,15 +380,25 @@ function OperationForm({
                 }
               : { reason: form.get("reason") }),
           };
-    const result = await operation.submit({
-      ...body,
-      allocations: chosen.map(([batch_id, quantity]) => ({
-        batch_id: Number(batch_id),
-        quantity,
-      })),
-    });
+    const result = await operation.submit(
+      workerIssue
+        ? {
+            material_id: Number(material),
+            quantity: workerQuantity,
+            project_id: Number(form.get("project")),
+            note: form.get("reason"),
+          }
+        : {
+            ...body,
+            allocations: chosen.map(([batch_id, quantity]) => ({
+              batch_id: Number(batch_id),
+              quantity,
+            })),
+          },
+    );
     if (result) {
       setNotice(true);
+      setWorkerQuantity("");
       setQuantities({});
       setReset((n) => n + 1);
       stocks.reload();
@@ -369,7 +408,7 @@ function OperationForm({
   }
   return (
     <section className="workflow-panel">
-      <h2>{t(labels[kind])}</h2>
+      <h2>{t(workerIssue ? "tookStock" : labels[kind])}</h2>
       {notice && (
         <div className="notice success" role="status">
           {t(kind === "issues" ? "issued" : "requestSaved")}
@@ -420,11 +459,13 @@ function OperationForm({
                   onChange={(e) => setMaterial(e.target.value)}
                 >
                   <option value="">{t("choose")}</option>
-                  {stocks.data.map((s) => (
-                    <option key={s.material.id} value={s.material.id}>
-                      {s.material.display_name} · {s.quantity_on_hand}
-                    </option>
-                  ))}
+                  {stocks.data
+                    .filter((s) => Number(s.quantity_on_hand) > 0)
+                    .map((s) => (
+                      <option key={s.material.id} value={s.material.id}>
+                        {s.material.display_name} · {s.quantity_on_hand}
+                      </option>
+                    ))}
                 </select>
                 {stocks.next && (
                   <button
@@ -437,7 +478,7 @@ function OperationForm({
                 )}
               </Field>
             )}
-            {kind !== "write-offs" && (
+            {kind !== "write-offs" && !workerIssue && (
               <Field label={t("operationDate")}>
                 <input
                   type="date"
@@ -450,11 +491,32 @@ function OperationForm({
             )}
             {kind === "issues" && (
               <>
-                <Field label={t("recipient")}>
-                  <input name="recipient" required maxLength={200} />
-                </Field>
+                {workerIssue ? (
+                  <Field label={t("quantity")}>
+                    <input
+                      type="number"
+                      required
+                      min="0.01"
+                      step="0.01"
+                      value={workerQuantity}
+                      onChange={(event) =>
+                        setWorkerQuantity(event.target.value)
+                      }
+                    />
+                  </Field>
+                ) : (
+                  <Field label={t("recipient")}>
+                    <input name="recipient" required maxLength={200} />
+                  </Field>
+                )}
                 <Field label={t("projectId")}>
-                  <input name="project" type="number" min="1" step="1" />
+                  <input
+                    name="project"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required={workerIssue}
+                  />
                 </Field>
               </>
             )}
@@ -466,67 +528,71 @@ function OperationForm({
               />
             </Field>
           </EntryTable>
-          <div className="allocation-section">
-            <h3>{t("batchSelection")}</h3>
-            <p className="form-hint">
-              {t(kind === "returns" ? "returnBatches" : "manualBatches")}
-            </p>
-            {partLoading && <div role="status">{t("loading")}</div>}
-            {!allocations.length && !partLoading && (material || issueId) && (
-              <p className="empty">{t("noBatches")}</p>
-            )}
-            {allocations.length > 0 && (
-              <TableViewport lang={lang} className="">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>{t("batch")}</th>
-                      <th>{t("operationDate")}</th>
-                      <th>{t("quantity")}</th>
-                      {can(user, "inventory.view_purchase_price") && (
-                        <th>{t("unitPrice")}</th>
-                      )}
-                      <th>{t("selectedTotal")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allocations.map((p) => (
-                      <tr key={p.id}>
-                        <td>#{p.id}</td>
-                        <td>{p.date}</td>
-                        <td>{p.available}</td>
+          {!workerIssue && (
+            <div className="allocation-section">
+              <h3>{t("batchSelection")}</h3>
+              <p className="form-hint">
+                {t(kind === "returns" ? "returnBatches" : "manualBatches")}
+              </p>
+              {partLoading && <div role="status">{t("loading")}</div>}
+              {!allocations.length && !partLoading && (material || issueId) && (
+                <p className="empty">{t("noBatches")}</p>
+              )}
+              {allocations.length > 0 && (
+                <TableViewport lang={lang} className="">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t("batch")}</th>
+                        <th>{t("operationDate")}</th>
+                        <th>{t("quantity")}</th>
                         {can(user, "inventory.view_purchase_price") && (
-                          <td>{p.price ? money(p.price, lang) : "—"}</td>
+                          <th>{t("unitPrice")}</th>
                         )}
-                        <td>
-                          <input
-                            className="quantity-input"
-                            aria-label={`${t("batch")} #${p.id}`}
-                            type="number"
-                            min="0"
-                            max={p.available}
-                            step="0.01"
-                            value={quantities[p.id] || ""}
-                            onChange={(e) =>
-                              setQuantities((q) => ({
-                                ...q,
-                                [p.id]: e.target.value,
-                              }))
-                            }
-                          />
-                        </td>
+                        <th>{t("selectedTotal")}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </TableViewport>
-            )}
-          </div>
+                    </thead>
+                    <tbody>
+                      {allocations.map((p) => (
+                        <tr key={p.id}>
+                          <td>#{p.id}</td>
+                          <td>{p.date}</td>
+                          <td>{p.available}</td>
+                          {can(user, "inventory.view_purchase_price") && (
+                            <td>{p.price ? money(p.price, lang) : "—"}</td>
+                          )}
+                          <td>
+                            <input
+                              className="quantity-input"
+                              aria-label={`${t("batch")} #${p.id}`}
+                              type="number"
+                              min="0"
+                              max={p.available}
+                              step="0.01"
+                              value={quantities[p.id] || ""}
+                              onChange={(e) =>
+                                setQuantities((q) => ({
+                                  ...q,
+                                  [p.id]: e.target.value,
+                                }))
+                              }
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </TableViewport>
+              )}
+            </div>
+          )}
         </fieldset>
         <div className="dialog-actions">
-          <span>
-            {t("selectedTotal")}: <strong>{total.toFixed(2)}</strong>
-          </span>
+          {!workerIssue && (
+            <span>
+              {t("selectedTotal")}: <strong>{total.toFixed(2)}</strong>
+            </span>
+          )}
           {operation.pending ? (
             <button
               type="button"
@@ -546,7 +612,13 @@ function OperationForm({
           ) : (
             <button
               className="primary"
-              disabled={operation.busy || !chosen.length || partLoading}
+              disabled={
+                operation.busy ||
+                partLoading ||
+                (workerIssue
+                  ? !material || !Number(workerQuantity)
+                  : !chosen.length)
+              }
             >
               {t(operation.busy ? "saving" : "saveChanges")}
             </button>
