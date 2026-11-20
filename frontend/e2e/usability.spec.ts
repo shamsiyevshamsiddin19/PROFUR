@@ -1,9 +1,26 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
-test("keyboard entry, empty filters and real table scrolling remain usable", async ({
+async function expectTableToFit(viewport: Locator) {
+  await expect
+    .poll(() =>
+      viewport.evaluate((node) => {
+        const { left, right } = node.getBoundingClientRect();
+        return (
+          node.scrollWidth <= node.clientWidth + 1 &&
+          left >= 0 &&
+          right <= innerWidth + 1
+        );
+      }),
+    )
+    .toBe(true);
+}
+
+test("keyboard entry, empty filters and responsive tables remain usable", async ({
   page,
 }, info) => {
   test.setTimeout(60000);
+  const phone = info.project.name.startsWith("mobile");
+  if (phone) await page.setViewportSize({ width: 320, height: 720 });
   await page.goto("/");
   await page
     .getByRole("combobox", { name: "Language", exact: true })
@@ -77,13 +94,18 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   });
   await quantity.fill("2");
   await total.fill("60");
-  // A narrow viewport scrolls inside the entry table, never the whole page.
+  if (phone) {
+    await expectTableToFit(page.locator(".entry-viewport"));
+    await expect(
+      entry.locator("label", { hasText: "Quantity" }),
+    ).toBeInViewport();
+  }
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await entry.getByRole("columnheader").first().scrollIntoViewIfNeeded();
+  await entry.scrollIntoViewIfNeeded();
   await page.screenshot({
     path: info.outputPath("tabular-entry-" + info.project.name + ".png"),
     fullPage: true,
@@ -130,6 +152,14 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   expect(saved.status()).toBe(201);
   const receipt = await saved.json();
   expect(receipt.quantity_on_hand_after).toBe("2.00");
+  if (phone) {
+    const recent = page.locator(".recent-receipts-table");
+    await expect(recent.getByText("Keyboard verification")).toBeVisible();
+    await expectTableToFit(page.locator(".table-wrap").filter({ has: recent }));
+    await expect(recent.locator(".mobile-cell-label").last()).toHaveText(
+      /Notes?/,
+    );
+  }
   // Enough real rows to exercise sticky headers and a genuinely overflowing viewport.
   for (let i = 0; i < 24; i++) {
     const result = await page.request.post("/api/v1/receipts/", {
@@ -147,6 +177,34 @@ test("keyboard entry, empty filters and real table scrolling remain usable", asy
   await page.goto("/#history");
   await expect(page.locator("tbody tr")).toHaveCount(20);
   const viewport = page.locator(".table-wrap");
+  if (phone) {
+    await expectTableToFit(viewport);
+    await expect(viewport).not.toHaveAttribute("tabindex");
+    await expect(page.locator(".table-scroll-hint")).toBeHidden();
+    const firstRow = viewport.locator("tbody tr").first();
+    const labels = await firstRow
+      .locator(".mobile-cell-label")
+      .allTextContents();
+    expect(labels).toEqual(
+      await viewport.locator("thead th").allTextContents(),
+    );
+    await firstRow
+      .locator(".mobile-cell-label")
+      .last()
+      .scrollIntoViewIfNeeded();
+    await expect(
+      firstRow.locator(".mobile-cell-label").last(),
+    ).toBeInViewport();
+    await page.mouse.wheel(800, 0);
+    expect(await viewport.evaluate((node) => node.scrollLeft)).toBe(0);
+    await page.screenshot({
+      path: info.outputPath(
+        "warehouse-usability-" + info.project.name + ".png",
+      ),
+      fullPage: true,
+    });
+    return;
+  }
   await expect(viewport).toHaveAttribute("tabindex", "0");
   await viewport.hover();
   const header = viewport.locator("th").first();

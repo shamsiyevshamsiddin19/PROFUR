@@ -145,3 +145,5 @@ Mijoz sinovidan so‘ng kirim, ombor amallari, katalog va xarajatlar havolalari 
 Ishlab chiqarish ustasi, Bosh hisobchi va Ta’minotchi sinov rollari endi demo ma’lumotlarida yaratilmaydi. Avval yaratilganlarini tekshirish uchun `python backend/manage.py retire_warehouse_roles`, o‘chirish uchun `--apply` qo‘shiladi. Buyruq biriktirilgan yoki material ko‘rinishida ishlatilayotgan rol bo‘lsa, o‘chirishni to‘xtatadi. Administrator, Ombor mudiri va Ishchi rollari saqlanadi.
 
 Dalil: frontend ssenariylari ruxsatsiz manzil, faqat chiqimga vakolat va faqat xarajatlarni o‘qish huquqini tekshiradi. Backend sinovi rollarni o‘chirish chegarasi va takroriy bajarilishini tekshiradi.
+
+2026-11-20 · PCRM-48 · Telefon kengligida (650 px gacha) umumiy jadval yozuvlari va kiritish maydonlari ikki ustunda joylashadi. Har qiymat yonida o‘z sarlavhasi bor, uzun matn keyingi qatorga o‘tadi. Gorizontal surish o‘chirilgan. Klaviatura oqimi va ruxsatlar avvalgidek ishlaydi.

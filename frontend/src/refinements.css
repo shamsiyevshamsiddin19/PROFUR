@@ -645,7 +645,7 @@ input[type="number"],
   }
 }
 
-/* Data entry and browsing share a native table layout at every screen size. */
+/* The phone layout restores the form labels beside their controls. */
 .visually-hidden,
 .entry-table .field > label {
   position: absolute;
@@ -896,8 +896,8 @@ input[type="number"],
   .catalog-entry-table .entry-col-6 { width: 10%; }
 }
 
-/* Mobile & Tablet fallback: allow smooth scroll when screen is smaller than 850px */
-@media (max-width: 850px) {
+/* Tablet fallback while the desktop columns need more space. */
+@media (651px <= width <= 850px) {
   .entry-table {
     min-width: 680px;
   }
