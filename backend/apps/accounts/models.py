@@ -77,7 +77,9 @@ class User(AbstractUser):
     is_approved = models.BooleanField(
         default=True,
         verbose_name=_("Tasdiqlangan"),
-        help_text=_("Admin tomonidan tasdiqlangan foydalanuvchi tizimga kirishi mumkin."),
+        help_text=_(
+            "Admin tomonidan tasdiqlangan foydalanuvchi tizimga kirishi mumkin."
+        ),
     )
 
     class Meta:

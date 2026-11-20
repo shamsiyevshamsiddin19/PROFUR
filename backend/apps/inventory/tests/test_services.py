@@ -1,14 +1,20 @@
-from decimal import Decimal
 from datetime import date
-from django.test import TestCase
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 
 from apps.inventory.models import (
-    StockMovement, StockBalance, ImmutableLedgerError,
+    ImmutableLedgerError,
+    StockMovement,
 )
 from apps.inventory.services import (
-    receive, issue_stock, decrease, Allocation, InsufficientStockError,
+    Allocation,
+    InsufficientStockError,
+    issue_stock,
+    receive,
 )
+
 from .factories import make_admin, make_material, stock_up
 
 
@@ -159,7 +165,9 @@ class IssueTest(TestCase):
         with self.assertRaises(InsufficientStockError):
             issue_stock(
                 material=self.material,
-                allocations=[Allocation(batch_id=self.batch.id, quantity=Decimal("200"))],
+                allocations=[
+                    Allocation(batch_id=self.batch.id, quantity=Decimal("200"))
+                ],
                 issued_on=date.today(),
                 recipient_name="Worker",
                 user=self.user,

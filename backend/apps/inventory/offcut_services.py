@@ -3,7 +3,7 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from apps.inventory.models import LeftoverOffcut, OFFCUT_UNITS
+from apps.inventory.models import OFFCUT_UNITS, LeftoverOffcut
 
 
 class OffcutDimensionError(Exception):
@@ -15,8 +15,7 @@ class OffcutDimensionError(Exception):
 class OffcutUnitError(Exception):
     def __init__(self, unit):
         self.message = (
-            f"Material unit '{unit}' does not support offcuts. "
-            f"Allowed: {OFFCUT_UNITS}"
+            f"Material unit '{unit}' does not support offcuts. Allowed: {OFFCUT_UNITS}"
         )
         super().__init__(self.message)
 
@@ -28,13 +27,11 @@ def _validate_offcut_dimensions(material, length_mm, width_mm):
 
     if mat_length and mat_width:
         # Check both orientations (normal and rotated)
-        fits_normal = (
-            length_mm <= mat_length
-            and (width_mm is None or width_mm <= mat_width)
+        fits_normal = length_mm <= mat_length and (
+            width_mm is None or width_mm <= mat_width
         )
-        fits_rotated = (
-            length_mm <= mat_width
-            and (width_mm is None or width_mm <= mat_length)
+        fits_rotated = length_mm <= mat_width and (
+            width_mm is None or width_mm <= mat_length
         )
         if not fits_normal and not fits_rotated:
             raise OffcutDimensionError(
@@ -44,8 +41,7 @@ def _validate_offcut_dimensions(material, length_mm, width_mm):
     elif mat_length:
         if length_mm > mat_length:
             raise OffcutDimensionError(
-                f"Offcut length {length_mm}mm exceeds material length "
-                f"{mat_length}mm."
+                f"Offcut length {length_mm}mm exceeds material length {mat_length}mm."
             )
 
 

@@ -114,7 +114,9 @@ class ReceiptCreateSerializer(serializers.Serializer):
 
         if total and unit:
             raise serializers.ValidationError(
-                _("total_amount yoki unit_price dan faqat bittasini kiriting, ikkalasini emas.")
+                _(
+                    "total_amount yoki unit_price dan faqat bittasini kiriting, ikkalasini emas."
+                )
             )
         if not total and not unit:
             raise serializers.ValidationError(

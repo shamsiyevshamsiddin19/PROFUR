@@ -18,9 +18,16 @@ class OffcutSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeftoverOffcut
         fields = [
-            "id", "material", "material_name",
-            "length_mm", "width_mm", "quantity",
-            "note", "registered_by", "registered_by_name", "created_at",
+            "id",
+            "material",
+            "material_name",
+            "length_mm",
+            "width_mm",
+            "quantity",
+            "note",
+            "registered_by",
+            "registered_by_name",
+            "created_at",
         ]
         read_only_fields = ["id", "registered_by", "created_at"]
 
@@ -32,21 +39,31 @@ class OffcutSerializer(serializers.ModelSerializer):
 class OffcutCreateSerializer(serializers.Serializer):
     material_id = serializers.IntegerField()
     length_mm = serializers.DecimalField(
-        max_digits=10, decimal_places=2, min_value=0.01,
+        max_digits=10,
+        decimal_places=2,
+        min_value=0.01,
     )
     width_mm = serializers.DecimalField(
-        max_digits=10, decimal_places=2, min_value=0.01,
-        required=False, allow_null=True,
+        max_digits=10,
+        decimal_places=2,
+        min_value=0.01,
+        required=False,
+        allow_null=True,
     )
     quantity = serializers.DecimalField(
-        max_digits=12, decimal_places=2, min_value=0.01, default=1,
+        max_digits=12,
+        decimal_places=2,
+        min_value=0.01,
+        default=1,
     )
     note = serializers.CharField(max_length=500, required=False, default="")
 
 
 class OffcutWithdrawSerializer(serializers.Serializer):
     quantity = serializers.DecimalField(
-        max_digits=12, decimal_places=2, min_value=0.01,
+        max_digits=12,
+        decimal_places=2,
+        min_value=0.01,
     )
     reason = serializers.CharField(max_length=500, required=False, default="")
 

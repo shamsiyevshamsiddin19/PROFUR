@@ -1,12 +1,16 @@
 from decimal import Decimal
-from django.test import TestCase
-from django.core.exceptions import ValidationError
 
-from apps.inventory.offcut_services import (
-    register_offcut, withdraw_offcut,
-    OffcutUnitError, OffcutDimensionError,
-)
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+
 from apps.inventory.models import LeftoverOffcut
+from apps.inventory.offcut_services import (
+    OffcutDimensionError,
+    OffcutUnitError,
+    register_offcut,
+    withdraw_offcut,
+)
+
 from .factories import make_admin, make_material
 
 
@@ -16,8 +20,10 @@ class OffcutRegistrationTest(TestCase):
 
     def test_register_sheet_offcut(self):
         mat = make_material(
-            name="Sheet", unit="sheet",
-            length_cm=Decimal("100"), width_cm=Decimal("200"),
+            name="Sheet",
+            unit="sheet",
+            length_cm=Decimal("100"),
+            width_cm=Decimal("200"),
         )
         offcut = register_offcut(
             material=mat,
@@ -32,7 +38,8 @@ class OffcutRegistrationTest(TestCase):
 
     def test_register_meter_offcut(self):
         mat = make_material(
-            name="Meter Mat", unit="meter",
+            name="Meter Mat",
+            unit="meter",
             length_cm=Decimal("500"),
         )
         offcut = register_offcut(
@@ -57,8 +64,10 @@ class OffcutRegistrationTest(TestCase):
 
     def test_reject_oversized_offcut(self):
         mat = make_material(
-            name="Small Sheet", unit="sheet",
-            length_cm=Decimal("50"), width_cm=Decimal("50"),
+            name="Small Sheet",
+            unit="sheet",
+            length_cm=Decimal("50"),
+            width_cm=Decimal("50"),
         )
         with self.assertRaises(OffcutDimensionError):
             register_offcut(
@@ -74,8 +83,10 @@ class OffcutWithdrawalTest(TestCase):
     def setUp(self):
         self.user = make_admin()
         self.mat = make_material(
-            name="W Sheet", unit="sheet",
-            length_cm=Decimal("100"), width_cm=Decimal("200"),
+            name="W Sheet",
+            unit="sheet",
+            length_cm=Decimal("100"),
+            width_cm=Decimal("200"),
         )
         self.offcut = register_offcut(
             material=self.mat,

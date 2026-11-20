@@ -1,6 +1,8 @@
 from decimal import Decimal
-from django.contrib.auth import get_user_model
+
 from accounts.models import Role
+from django.contrib.auth import get_user_model
+
 from apps.catalog.models import Category, Material
 
 User = get_user_model()
@@ -56,8 +58,10 @@ def make_material(name="Test Material", unit="sheet", category=None, **kwargs):
 
 def stock_up(material, quantity, price, user):
     """Create a batch (kirim) for a material."""
-    from apps.inventory.services import receive
     from datetime import date
+
+    from apps.inventory.services import receive
+
     batch, balance = receive(
         material=material,
         received_on=date.today(),

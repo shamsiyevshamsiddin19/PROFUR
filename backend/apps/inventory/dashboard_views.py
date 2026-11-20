@@ -4,8 +4,6 @@ Dashboard — ombor umumiy ko'rinishi: qoldiq qiymati, kam qoldiq, oylik oqim.
 Eksport — harakatlar ro'yxatini CSV formatida yuklab olish.
 """
 
-import csv
-
 from django.http import StreamingHttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,10 +12,10 @@ from apps.accounts.permissions import HasPermissionCode
 from apps.inventory import selectors
 from apps.inventory.models import StockMovement
 
-
 # ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
+
 
 class DashboardView(APIView):
     permission_classes = [HasPermissionCode]
@@ -76,6 +74,7 @@ class DashboardView(APIView):
 # CSV eksport
 # ---------------------------------------------------------------------------
 
+
 def _csv_safe(value):
     """Neutralize spreadsheet formula injection."""
     s = str(value)
@@ -118,15 +117,21 @@ class ExportMovementsView(APIView):
             yield b"\xef\xbb\xbf"
 
             header = [
-                "ID", "Type", "Material", "Quantity",
-                "On Hand After", "Reason", "Created By", "Date",
+                "ID",
+                "Type",
+                "Material",
+                "Quantity",
+                "On Hand After",
+                "Reason",
+                "Created By",
+                "Date",
             ]
             if can_see_prices:
                 header.insert(5, "Unit Price")
             yield ",".join(header) + "\r\n"
 
             for chunk_start in range(0, qs.count(), 500):
-                for m in qs[chunk_start:chunk_start + 500]:
+                for m in qs[chunk_start : chunk_start + 500]:
                     row = [
                         _csv_safe(m.id),
                         _csv_safe(m.type),
@@ -135,20 +140,16 @@ class ExportMovementsView(APIView):
                         _csv_safe(m.quantity_on_hand_after),
                     ]
                     if can_see_prices:
-                        row.append(
-                            _csv_safe(m.batch.unit_price if m.batch else "")
-                        )
-                    row.extend([
-                        _csv_safe(m.reason),
-                        _csv_safe(
-                            str(m.created_by) if m.created_by else ""
-                        ),
-                        _csv_safe(m.created_at.strftime("%Y-%m-%d %H:%M")),
-                    ])
+                        row.append(_csv_safe(m.batch.unit_price if m.batch else ""))
+                    row.extend(
+                        [
+                            _csv_safe(m.reason),
+                            _csv_safe(str(m.created_by) if m.created_by else ""),
+                            _csv_safe(m.created_at.strftime("%Y-%m-%d %H:%M")),
+                        ]
+                    )
                     yield ",".join(str(v) for v in row) + "\r\n"
 
-        response = StreamingHttpResponse(
-            rows(), content_type="text/csv; charset=utf-8"
-        )
+        response = StreamingHttpResponse(rows(), content_type="text/csv; charset=utf-8")
         response["Content-Disposition"] = 'attachment; filename="movements.csv"'
         return response

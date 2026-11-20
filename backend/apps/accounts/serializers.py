@@ -249,7 +249,9 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError(_("Bu foydalanuvchi nomi allaqachon mavjud."))
+            raise serializers.ValidationError(
+                _("Bu foydalanuvchi nomi allaqachon mavjud.")
+            )
         return value
 
     def create(self, validated_data):
