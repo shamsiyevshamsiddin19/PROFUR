@@ -213,6 +213,9 @@ def test_role_request_does_not_assign_role_until_admin_verifies(warehouse):
     payload = {
         "username": "new_sawyer",
         "password": "test-worker-pass-42",
+        "first_name": "Anvar",
+        "last_name": "",
+        "phone": "",
         "requested_roles": [role.code],
     }
     assert (

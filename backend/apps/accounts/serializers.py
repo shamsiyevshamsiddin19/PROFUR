@@ -247,9 +247,15 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(
         write_only=True, min_length=8, trim_whitespace=False
     )
-    first_name = serializers.CharField(max_length=150, required=False, default="")
-    last_name = serializers.CharField(max_length=150, required=False, default="")
-    phone = serializers.CharField(max_length=20, required=False, default="")
+    first_name = serializers.CharField(
+        max_length=150, required=False, allow_blank=True, default=""
+    )
+    last_name = serializers.CharField(
+        max_length=150, required=False, allow_blank=True, default=""
+    )
+    phone = serializers.CharField(
+        max_length=20, required=False, allow_blank=True, default=""
+    )
 
     requested_roles = serializers.ListField(
         child=serializers.CharField(max_length=50),
