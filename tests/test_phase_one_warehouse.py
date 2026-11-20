@@ -282,7 +282,7 @@ def test_opening_balance_increases_stock_without_inflating_monthly_purchases(war
 
 def test_same_paint_can_have_two_independently_named_bucket_sizes(warehouse):
     admin, *_ = warehouse
-    category = Category.objects.get(name="Kraska")
+    category = Category.objects.create(name="Sinov bo‘yoqlari")
     for capacity in ("12", "25"):
         response = admin.post(
             "/api/v1/materials/",

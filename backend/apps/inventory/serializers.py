@@ -7,7 +7,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound
 
+from apps.catalog.access import visible_materials
 from apps.catalog.models import Material
 
 from .models import AMOUNT, QUANTITY, Batch, Currency, StockMovement
@@ -29,6 +31,12 @@ def replay_body_for_user(body: dict, user) -> dict:
     Idempotentlikdagi asl javob va biznes amal o'zgarmaydi. Ruxsat qaytarilsa,
     keyingi takrorda dastlab saqlangan narxlar yana ko'rinishi mumkin.
     """
+    material_id = (body.get("material") or {}).get("id")
+    if (
+        material_id is not None
+        and not visible_materials(user).filter(pk=material_id).exists()
+    ):
+        raise NotFound()
     data = deepcopy(body)
     if not can_view_prices(user):
         for field in (*PRICE_FIELDS, "total_cost"):
