@@ -110,14 +110,19 @@ test("uncertain issue restores and retries the exact payload and key after remou
 });
 test("permissionless user cannot access workflow screens through a direct hash", async () => {
   location.hash = "#operations";
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () => json({ ...user, roles: [], role_codes: [] })),
+  const fetch = vi.fn(async (_path: string) =>
+    json({ ...user, roles: [], role_codes: [] }),
   );
+  vi.stubGlobal("fetch", fetch);
   render(<App />);
-  await screen.findByText("Bu bo‘lim uchun ruxsatingiz yo‘q.");
-  expect(screen.queryByRole("link", { name: "Ombor amallari" })).toBeNull();
-  expect(screen.queryByRole("button", { name: "Saqlash" })).toBeNull();
+  await screen.findByText(/Sizga hozircha ombor bo‘yicha amal biriktirilmagan/);
+  expect(location.hash).toBe("#settings");
+  expect(
+    within(screen.getByRole("navigation")).getAllByRole("link"),
+  ).toHaveLength(1);
+  expect(new Set(fetch.mock.calls.map(([path]) => path))).toEqual(
+    new Set(["/api/auth/me/"]),
+  );
 });
 test("CSV values cannot execute spreadsheet formulas and quotes remain escaped", () => {
   expect(csvCell('=HYPERLINK("https://example.com")')).toBe(
@@ -135,7 +140,11 @@ test("expense form labels select their controls and an uncertain write reuses it
       {
         code: "ACCOUNTANT",
         name: "Accountant",
-        permissions: ["expenses.view_expense", "expenses.add_expense"],
+        permissions: [
+          "expenses.view_expense",
+          "expenses.add_expense",
+          "expenses.view_expensetype",
+        ],
       },
     ],
   };
@@ -165,10 +174,9 @@ test("expense form labels select their controls and an uncertain write reuses it
     within(form).getByLabelText("Expense type", { exact: true }),
     { target: { value: "tax" } },
   );
-  fireEvent.change(
-    within(form).getByLabelText("Amount", { exact: true }),
-    { target: { value: "12.50" } },
-  );
+  fireEvent.change(within(form).getByLabelText("Amount", { exact: true }), {
+    target: { value: "12.50" },
+  });
   fireEvent.change(
     within(form).getByLabelText("Project number", { exact: true }),
     { target: { value: "7" } },
@@ -192,4 +200,50 @@ test("expense form labels select their controls and an uncertain write reuses it
     expense_type: "tax",
   });
   await screen.findByText("Saved.", { exact: true });
+});
+
+test("an issue-only user lands on operations with just the permitted tab", async () => {
+  location.hash = "#receiving";
+  const fetch = vi.fn(async (path: string) =>
+    path === "/api/auth/me/"
+      ? json(user)
+      : json({ results: [], count: 0, next: null }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<App />);
+  const tabs = await screen.findAllByRole("tab");
+  expect(tabs.map((tab) => tab.textContent)).toEqual(["Chiqim"]);
+  expect(location.hash).toBe("#operations");
+  expect(screen.queryByRole("link", { name: "Material kirimi" })).toBeNull();
+  expect(screen.queryByRole("columnheader", { name: "Amallar" })).toBeNull();
+  expect(
+    fetch.mock.calls.some(([path]) => path.startsWith("/api/v1/receipts/")),
+  ).toBe(false);
+});
+
+test("an expense reader without type permissions loads only expenses", async () => {
+  const expenseReader = {
+    ...user,
+    roles: [
+      {
+        code: "COST_READER",
+        name: "Cost reader",
+        permissions: ["expenses.view_expense"],
+      },
+    ],
+  };
+  const fetch = vi.fn(async (path: string) =>
+    path === "/api/auth/me/"
+      ? json(expenseReader)
+      : json({ results: [], count: 0, next: null }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<App />);
+  await screen.findByRole("heading", { name: "Xarajatlar", level: 1 });
+  expect(screen.queryByRole("combobox", { name: "Xarajat turi" })).toBeNull();
+  expect(screen.queryByRole("link", { name: "Xarajat turlari" })).toBeNull();
+  expect(fetch.mock.calls.map(([path]) => path)).toEqual([
+    "/api/auth/me/",
+    "/api/v1/expenses/",
+  ]);
 });

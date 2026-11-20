@@ -44,6 +44,19 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
         ],
     )
     user.roles.add(role)
+    for username, permissions in {
+        "browser_worker": [],
+        "browser_issuer": ["inventory.view_stock", "inventory.add_issue"],
+        "browser_expense_reader": ["expenses.view_expense"],
+    }.items():
+        member = get_user_model().objects.create_user(
+            username=username, password="browser-test-only-password"
+        )
+        member.roles.add(
+            Role.objects.create(
+                code=username.upper(), name=username, permissions=permissions
+            )
+        )
     category = Category.objects.get(name="LMDF")
     Material.objects.create(name="Browser MDF", category=category, unit=Unit.SHEET)
     Material.objects.create(

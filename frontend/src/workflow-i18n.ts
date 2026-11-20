@@ -44,6 +44,11 @@ export const workflowMessages = {
     "Укажите количество из партий",
     "Select quantities from batches",
   ],
+  returnBatches: [
+    "Har bir partiyaga qaytariladigan miqdorni kiriting.",
+    "Укажите количество для возврата в каждую партию.",
+    "Enter the quantity to return to each batch.",
+  ],
   manualBatches: [
     "Har bir partiyadan olinadigan miqdorni kiriting.",
     "Укажите количество из каждой партии.",

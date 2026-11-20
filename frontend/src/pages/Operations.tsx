@@ -24,47 +24,51 @@ import {
   Status,
 } from "../components/WorkflowUI";
 
-type Kind = "issues" | "returns" | "write-offs";
+import {
+  availableOperations,
+  operationAccess,
+  type OperationKind as Kind,
+} from "../access";
 const labels = {
   issues: "issue",
   returns: "return",
   "write-offs": "write_off",
 } as const;
-const permissions = {
-  issues: "inventory.add_issue",
-  returns: "inventory.add_return",
-  "write-offs": "inventory.add_write_off",
-};
 export function Operations({ lang, user }: { lang: Language; user: User }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
-  const [kind, setKind] = useState<Kind>("issues");
+  const allowed = availableOperations(user);
+  const [selected, setKind] = useState<Kind | null>(null);
+  const kind = selected && allowed.includes(selected) ? selected : allowed[0];
   const [status, setStatus] = useState("");
   const [revision, setRevision] = useState(0);
   const [decision, setDecision] = useState<{
     row: Operation;
+    kind: Kind;
     action: "approve" | "reject";
   } | null>(null);
   const records = useRecords<Operation>(
-    `/api/v1/${kind}/` +
-      (status && kind !== "issues" ? `?status=${status}` : ""),
+    kind
+      ? `/api/v1/${kind}/` +
+          (status && kind !== "issues" ? `?status=${status}` : "")
+      : null,
     lang,
     revision,
   );
-  const approvalCode =
-    kind === "returns"
-      ? "inventory.approve_return"
-      : "inventory.approve_write_off";
+  if (!kind) return null;
+  const approvalCode = operationAccess[kind].approve;
+  const canApprove = approvalCode !== null && can(user, approvalCode);
   return (
     <>
       <div className="workflow-toolbar">
         <div className="tabs" role="tablist" aria-label={t("operations")}>
-          {(Object.keys(labels) as Kind[]).map((k) => (
+          {allowed.map((k) => (
             <button
               key={k}
               role="tab"
               aria-selected={kind === k}
               className={kind === k ? "selected" : ""}
               onClick={() => {
+                setDecision(null);
                 setKind(k);
                 setStatus("");
               }}
@@ -88,7 +92,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           </select>
         )}
       </div>
-      {can(user, permissions[kind]) && (
+      {can(user, operationAccess[kind].create) && (
         <OperationForm
           key={kind}
           kind={kind}
@@ -115,7 +119,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 <th>{t("recipient")}</th>
                 <th>{t("status")}</th>
                 <th>{t("createdBy")}</th>
-                <th>{t("actions")}</th>
+                {canApprove && <th>{t("actions")}</th>}
               </tr>
             </thead>
             <tbody>
@@ -137,26 +141,30 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                     {!row.status && "—"}
                   </td>
                   <td>{row.created_by.name}</td>
-                  <td>
-                    {row.status === "pending" && can(user, approvalCode) && (
-                      <div className="row-actions">
-                        <button
-                          className="text-button"
-                          onClick={() =>
-                            setDecision({ row, action: "approve" })
-                          }
-                        >
-                          {t("approve")}
-                        </button>
-                        <button
-                          className="text-button danger-text"
-                          onClick={() => setDecision({ row, action: "reject" })}
-                        >
-                          {t("reject")}
-                        </button>
-                      </div>
-                    )}
-                  </td>
+                  {canApprove && (
+                    <td>
+                      {row.status === "pending" && (
+                        <div className="row-actions">
+                          <button
+                            className="text-button"
+                            onClick={() =>
+                              setDecision({ row, kind, action: "approve" })
+                            }
+                          >
+                            {t("approve")}
+                          </button>
+                          <button
+                            className="text-button danger-text"
+                            onClick={() =>
+                              setDecision({ row, kind, action: "reject" })
+                            }
+                          >
+                            {t("reject")}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -169,9 +177,8 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           lang={lang}
         />
       </section>
-      {decision && (
+      {decision?.kind === kind && canApprove && (
         <Decision
-          kind={kind}
           {...decision}
           lang={lang}
           close={() => setDecision(null)}
@@ -196,7 +203,10 @@ function OperationForm({
   saved: () => void;
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
-  const stocks = useRecords<StockRow>("/api/v1/stock/", lang);
+  const stocks = useRecords<StockRow>(
+    kind === "returns" ? null : "/api/v1/stock/",
+    lang,
+  );
   const issues = useRecords<Operation>(
     kind === "returns" ? "/api/v1/issues/" : null,
     lang,
@@ -399,7 +409,9 @@ function OperationForm({
           </EntryTable>
           <div className="allocation-section">
             <h3>{t("batchSelection")}</h3>
-            <p className="form-hint">{t("manualBatches")}</p>
+            <p className="form-hint">
+              {t(kind === "returns" ? "returnBatches" : "manualBatches")}
+            </p>
             {partLoading && <div role="status">{t("loading")}</div>}
             {!allocations.length && !partLoading && (material || issueId) && (
               <p className="empty">{t("noBatches")}</p>
