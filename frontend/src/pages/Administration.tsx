@@ -15,6 +15,8 @@ import { useRecords } from "../hooks/useRecords";
 import { Field, Feedback, Modal, RecordsState } from "../components/WorkflowUI";
 import { TableViewport } from "../components/TableViewport";
 
+import { PendingAccounts } from "./PendingAccounts";
+
 type Role = {
   id: number;
   code: string;
@@ -40,6 +42,11 @@ const permissions: [string, MessageKey][] = [
   ["inventory.view_purchase_price", "unitPrice"],
   ["inventory.add_receipt", "newReceipt"],
   ["inventory.add_issue", "issue"],
+  ["inventory.worker", "workerMode"],
+  ["inventory.view_offcut", "offcutStock"],
+  ["inventory.add_offcut", "addOffcut"],
+  ["inventory.use_offcut", "useOffcut"],
+  ["inventory.view_report", "monthlyReport"],
   ["inventory.add_return", "return"],
   ["inventory.approve_return", "approve"],
   ["inventory.add_write_off", "write_off"],
@@ -72,7 +79,7 @@ export function Administration({
     lang,
     revision,
   );
-  const roles = useRecords<Role>("/api/auth/roles/", lang, revision);
+  const roles = useRecords<Role>("/api/auth/roles/", lang, revision, true);
   const [editor, setEditor] = useState<
     | { kind: "user"; value?: Account }
     | { kind: "role"; value?: Role }
@@ -149,6 +156,11 @@ export function Administration({
   }
   return (
     <div className="admin-page-container">
+      <PendingAccounts
+        roles={roles.data}
+        lang={lang}
+        onUpdate={() => setRevision((n) => n + 1)}
+      />
       {saved && (
         <div className="notice success" role="status">
           {t("savedChanges")}
@@ -162,7 +174,11 @@ export function Administration({
           </div>
           <div className="admin-toolbar-end">
             <div className="admin-search-box">
-              <Search size={15} className="admin-search-icon" aria-hidden="true" />
+              <Search
+                size={15}
+                className="admin-search-icon"
+                aria-hidden="true"
+              />
               <input
                 data-search-field
                 aria-keyshortcuts="/ Control+k Meta+k"
@@ -204,7 +220,9 @@ export function Administration({
                   <th style={{ width: "16%" }}>{t("userLogin")}</th>
                   <th style={{ width: "22%" }}>{t("role")}</th>
                   <th style={{ width: "12%" }}>{t("status")}</th>
-                  <th className="cell-actions" style={{ width: "24%" }}>{t("actions")}</th>
+                  <th className="cell-actions" style={{ width: "24%" }}>
+                    {t("actions")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -252,7 +270,9 @@ export function Administration({
                         ) : (
                           <XCircle size={12} aria-hidden="true" />
                         )}
-                        <span>{t(account.is_active ? "active" : "inactive")}</span>
+                        <span>
+                          {t(account.is_active ? "active" : "inactive")}
+                        </span>
                       </span>
                     </td>
                     <td className="cell-actions">
@@ -325,7 +345,9 @@ export function Administration({
                   <th style={{ width: "28%" }}>{t("roleName")}</th>
                   <th style={{ width: "18%" }}>{t("roleCode")}</th>
                   <th style={{ width: "38%" }}>{t("permissions")}</th>
-                  <th className="cell-actions" style={{ width: "16%" }}>{t("actions")}</th>
+                  <th className="cell-actions" style={{ width: "16%" }}>
+                    {t("actions")}
+                  </th>
                 </tr>
               </thead>
               <tbody>

@@ -100,6 +100,7 @@ class Material(TimeStampedModel):
                     "width_cm",
                     "thickness_cm",
                     "unit",
+                    "container_size",
                 ],
                 nulls_distinct=False,
                 name="catalog_material_unique_nomenclature",
@@ -133,4 +134,6 @@ class Material(TimeStampedModel):
             parts.append(
                 "×".join("—" if s is None else f"{s.normalize():f}" for s in sizes)
             )
+        if self.container_size is not None:
+            parts.append(f"{self.container_size.normalize():f} L")
         return " · ".join(part for part in parts if part)

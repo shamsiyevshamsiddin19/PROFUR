@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status, viewsets
 from rest_framework.exceptions import APIException, ErrorDetail, ValidationError
 
+from .access import visible_materials
 from .models import Category, Material, Unit
 from .serializers import CategorySerializer, MaterialSerializer
 
@@ -53,7 +54,13 @@ class MaterialHasHistoryError(APIException):
 
 
 # Eski partiyalar shu qiymatlar bilan kirgan, ularni o'zgartirish tarixni buzadi.
-HISTORY_LOCKED_FIELDS = ("unit", "length_cm", "width_cm", "thickness_cm")
+HISTORY_LOCKED_FIELDS = (
+    "unit",
+    "length_cm",
+    "width_cm",
+    "thickness_cm",
+    "container_size",
+)
 
 
 def bool_param(value: str | None, name: str) -> bool | None:
@@ -132,7 +139,9 @@ class MaterialViewSet(CreatePatchViewSet):
 
     def get_queryset(self) -> QuerySet[Material]:
         params = self.request.query_params
-        queryset = Material.objects.select_related("category", "stock")
+        queryset = visible_materials(self.request.user).select_related(
+            "category", "stock"
+        )
         if search := params.get("search", "").strip():
             queryset = queryset.filter(
                 Q(name__icontains=search) | Q(color__icontains=search)
@@ -165,7 +174,7 @@ class MaterialViewSet(CreatePatchViewSet):
             field in data and data[field] != getattr(instance, field)
             for field in HISTORY_LOCKED_FIELDS
         )
-        if changed and instance.batches.exists():
+        if changed and (instance.batches.exists() or instance.offcuts.exists()):
             raise MaterialHasHistoryError()
         self._save_unique(serializer)
 

@@ -1245,3 +1245,11 @@ input[type="number"],
     display: none;
   }
 }
+
+.review-detail { display: block; color: var(--muted); padding-top: 4px; }
+.report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 16px; margin: 18px 0; }
+.report-summary > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.report-summary dt { color: var(--muted); }
+.report-summary dd { margin: 6px 0 0; font-weight: 700; font-size: 18px; }
+.worker-registration .registration-fields { display: grid; gap: 12px; }
+.worker-registration input[type=checkbox] { width: auto; min-height: 18px; }

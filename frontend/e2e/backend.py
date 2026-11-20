@@ -46,6 +46,14 @@ with TemporaryDirectory(prefix="profur-browser-") as temporary:
     user.roles.add(role)
     for username, permissions in {
         "browser_worker": [],
+        "browser_sawyer": [
+            "inventory.worker",
+            "inventory.view_stock",
+            "inventory.add_issue",
+            "inventory.view_offcut",
+            "inventory.add_offcut",
+            "inventory.use_offcut",
+        ],
         "browser_issuer": ["inventory.view_stock", "inventory.add_issue"],
         "browser_expense_reader": ["expenses.view_expense"],
     }.items():

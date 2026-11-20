@@ -42,7 +42,7 @@ export function History({ lang }: { lang: Language }) {
       ];
       const values = rows.map((row) => [
         row.created_at,
-        `${t(row.type as MessageKey)} #${row.reference.id}`,
+        `${t(row.reference.kind === "opening" ? "openingBalance" : (row.type as MessageKey))} #${row.reference.id}`,
         row.material.display_name,
         row.quantity,
         row.quantity_on_hand_after,
@@ -168,7 +168,12 @@ export function History({ lang }: { lang: Language }) {
                   }).format(new Date(row.created_at))}
                 </td>
                 <td>
-                  {t(row.type as MessageKey)} #{row.reference.id}
+                  {t(
+                    row.reference.kind === "opening"
+                      ? "openingBalance"
+                      : (row.type as MessageKey),
+                  )}{" "}
+                  #{row.reference.id}
                 </td>
                 <td>{row.material.display_name}</td>
                 <td>{row.batch_id ? "#" + row.batch_id : "—"}</td>

@@ -4,13 +4,19 @@ Dashboard — ombor umumiy ko'rinishi: qoldiq qiymati, kam qoldiq, oylik oqim.
 Eksport — harakatlar ro'yxatini CSV formatida yuklab olish.
 """
 
+from datetime import date
+
+from accounts.permissions import HasPermissionCode
 from django.http import StreamingHttpResponse
+from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import HasPermissionCode
-from apps.inventory import selectors
-from apps.inventory.models import StockMovement
+from apps.catalog.access import is_shop_worker, visible_materials
+
+from .models import StockMovement
+from .monthly import current_month, month_report
 
 # ---------------------------------------------------------------------------
 # Dashboard
@@ -19,60 +25,19 @@ from apps.inventory.models import StockMovement
 
 class DashboardView(APIView):
     permission_classes = [HasPermissionCode]
-    permission_code = "inventory.view_stock"
+    required_permission = "inventory.view_report"
 
     def get(self, request):
-        can_see_prices = request.user.has_permission_code(
-            "inventory.view_purchase_price"
-        )
-        flows = selectors.recent_month_flows(6)
-        current = flows[-1] if flows else None
-        low_stock = selectors.low_stock_materials()
-
-        data = {
-            "currency": "USD",
-            "low_stock_count": low_stock.count(),
-            "low_stock": [
-                {
-                    "material_id": bal.material_id,
-                    "material_name": str(bal.material),
-                    "quantity_on_hand": bal.quantity_on_hand,
-                    "min_quantity": bal.min_quantity,
-                }
-                for bal in low_stock[:10]
-            ],
-            "current_month": {
-                "kirim_count": current.kirim_count if current else 0,
-                "chiqim_count": current.chiqim_count if current else 0,
-            },
-            "monthly_flows": [
-                {
-                    "month": f.month.isoformat(),
-                    "kirim_count": f.kirim_count,
-                    "chiqim_count": f.chiqim_count,
-                }
-                for f in flows
-            ],
-        }
-
-        if can_see_prices:
-            data["warehouse_valuation"] = str(selectors.warehouse_valuation())
-            data["current_month"]["kirim_usd"] = (
-                str(current.kirim_usd) if current else "0"
-            )
-            data["current_month"]["chiqim_usd"] = (
-                str(current.chiqim_usd) if current else "0"
-            )
-            for i, f in enumerate(flows):
-                data["monthly_flows"][i]["kirim_usd"] = str(f.kirim_usd)
-                data["monthly_flows"][i]["chiqim_usd"] = str(f.chiqim_usd)
-
-        return Response(data)
-
-
-# ---------------------------------------------------------------------------
-# CSV eksport
-# ---------------------------------------------------------------------------
+        raw = request.query_params.get("month")
+        try:
+            month = date.fromisoformat(raw + "-01") if raw else current_month()
+            if month.year > 9998:
+                raise ValueError
+        except ValueError:
+            raise ValidationError(
+                {"month": _("Oy YYYY-MM shaklida bo‘lishi kerak.")}
+            ) from None
+        return Response(month_report(request.user, month))
 
 
 def _csv_safe(value):
@@ -85,13 +50,16 @@ def _csv_safe(value):
 
 class ExportMovementsView(APIView):
     permission_classes = [HasPermissionCode]
-    permission_code = "inventory.view_stock"
+    required_permission = "inventory.view_stock"
 
     def get(self, request):
         qs = StockMovement.objects.select_related(
             "material", "batch", "created_by"
         ).order_by("-created_at")
 
+        qs = qs.filter(material__in=visible_materials(request.user))
+        if is_shop_worker(request.user):
+            qs = qs.filter(created_by=request.user)
         material = request.query_params.get("material")
         if material:
             qs = qs.filter(material_id=material)

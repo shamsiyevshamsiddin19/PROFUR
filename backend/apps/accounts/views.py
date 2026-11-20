@@ -10,12 +10,14 @@ from accounts.serializers import (
     UserSerializer,
 )
 from django.contrib.auth import login, logout
+from django.db import transaction
 from django.db.models import Q
 from django.middleware.csrf import get_token
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
-from rest_framework import generics, status
+from rest_framework import generics, serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -222,6 +224,27 @@ class UserResetPasswordView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def eligible_worker_roles():
+    candidates = Role.objects.exclude(code="ADMIN")
+    return [
+        role
+        for role in candidates
+        if "*" not in role.permissions
+        and (role.code == "WORKER" or "inventory.worker" in role.permissions)
+    ]
+
+
+class SignupRolesView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(
+            [{"code": role.code, "name": role.name} for role in eligible_worker_roles()]
+        )
+
+
+@method_decorator(csrf_protect, name="dispatch")
 class RegisterView(APIView):
     """Ishchi o'z-o'zini ro'yxatdan o'tkazish API'si. Admin tasdiqini kutadi."""
 
@@ -254,48 +277,54 @@ class PendingUsersView(APIView):
                 "last_name": u.last_name,
                 "phone": u.phone,
                 "date_joined": u.date_joined,
+                "requested_roles": u.requested_roles,
             }
             for u in pending
         ]
         return Response(data)
 
 
-class ApproveUserView(APIView):
-    """Kutayotgan foydalanuvchini tasdiqlash."""
+class ApprovalRolesSerializer(serializers.Serializer):
+    role_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(), many=True, required=False
+    )
 
+
+class ApproveUserView(APIView):
     permission_classes = [IsAdminRole]
 
+    @transaction.atomic
     def post(self, request, pk):
-        try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return Response(
-                {"detail": _("Foydalanuvchi topilmadi.")},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        role_ids = request.data.get("role_ids", [])
-        if role_ids:
-            roles = Role.objects.filter(id__in=role_ids)
-            user.roles.set(roles)
-
+        user = get_object_or_404(
+            User.objects.select_for_update(), pk=pk, is_active=True
+        )
+        if user.is_approved:
+            return Response({"detail": _("Foydalanuvchi allaqachon tasdiqlangan.")})
+        form = ApprovalRolesSerializer(data=request.data)
+        form.is_valid(raise_exception=True)
+        if "role_ids" in form.validated_data:
+            user.roles.set(form.validated_data["role_ids"])
         user.is_approved = True
         user.save(update_fields=["is_approved"])
         return Response({"detail": _("Foydalanuvchi tasdiqlandi.")})
 
 
 class RejectUserView(APIView):
-    """Kutayotgan foydalanuvchini rad etish (o'chirish)."""
+    """Kutayotgan arizani tarixda saqlagan holda faolsizlantirish."""
 
     permission_classes = [IsAdminRole]
 
+    @transaction.atomic
     def post(self, request, pk):
         try:
-            user = User.objects.get(pk=pk, is_approved=False)
+            user = User.objects.select_for_update().get(
+                pk=pk, is_approved=False, is_active=True
+            )
         except User.DoesNotExist:
             return Response(
                 {"detail": _("Kutayotgan foydalanuvchi topilmadi.")},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        user.delete()
-        return Response({"detail": _("Foydalanuvchi rad etildi va o'chirildi.")})
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+        return Response({"detail": _("Foydalanuvchi arizasi rad etildi.")})

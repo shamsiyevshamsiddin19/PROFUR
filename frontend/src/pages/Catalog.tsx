@@ -1,3 +1,4 @@
+import { adminAccess } from "../access";
 import { EntryTable } from "../components/EntryTable";
 import { TableViewport } from "../components/TableViewport";
 import { useState, type FormEvent } from "react";
@@ -226,6 +227,7 @@ export function Catalog({ lang, user }: { lang: Language; user: User }) {
             material={editing === "new" ? undefined : editing}
             lang={lang}
             categories={categories.data}
+            manageVisibility={adminAccess(user)}
             close={() => setEditing(null)}
             saved={() => {
               setEditing(null);
@@ -240,16 +242,24 @@ function MaterialForm({
   material,
   lang,
   categories,
+  manageVisibility,
   close,
   saved,
 }: {
   material?: Material;
   lang: Language;
   categories: Category[];
+  manageVisibility: boolean;
   close: () => void;
   saved: () => void;
 }) {
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
+  const roleList = useRecords<{ code: string; name: string }>(
+    manageVisibility ? "/api/auth/roles/" : null,
+    lang,
+    0,
+    true,
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -274,6 +284,12 @@ function MaterialForm({
           unit: data.get("unit"),
           is_active: data.get("is_active") === "on",
           ...dimensions,
+          container_size: data.get("container_size") || null,
+          ...(manageVisibility && !roleList.loading && !roleList.error
+            ? {
+                allowed_roles: data.getAll("allowed_roles"),
+              }
+            : {}),
         },
         undefined,
         material ? "PATCH" : "POST",
@@ -347,7 +363,39 @@ function MaterialForm({
                 />
               </Field>
             ))}
+            <Field label={t("containerCapacity")}>
+              <input
+                name="container_size"
+                type="number"
+                min="0.01"
+                step="0.01"
+                defaultValue={material?.container_size ?? ""}
+              />
+            </Field>
           </EntryTable>
+          {manageVisibility && (
+            <fieldset
+              className="permission-list"
+              disabled={roleList.loading || Boolean(roleList.error)}
+            >
+              <legend>{t("materialRoles")}</legend>
+              <p>{t("materialRolesHint")}</p>
+              <Feedback lang={lang} error={roleList.error} />
+              {roleList.data.map((role) => (
+                <label className="check-label" key={role.code}>
+                  <input
+                    name="allowed_roles"
+                    type="checkbox"
+                    value={role.code}
+                    defaultChecked={material?.allowed_roles?.includes(
+                      role.code,
+                    )}
+                  />
+                  {role.name}
+                </label>
+              ))}
+            </fieldset>
+          )}
           <label className="check-label">
             <input
               type="checkbox"

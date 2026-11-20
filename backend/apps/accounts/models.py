@@ -74,6 +74,7 @@ class User(AbstractUser):
         blank=True,
         verbose_name=_("Telefon raqami"),
     )
+    requested_roles = models.JSONField(default=list, blank=True)
     is_approved = models.BooleanField(
         default=True,
         verbose_name=_("Tasdiqlangan"),

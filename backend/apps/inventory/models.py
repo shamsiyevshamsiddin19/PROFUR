@@ -56,6 +56,7 @@ class Batch(models.Model):
     received_on = models.DateField(_("kirim sanasi"))
     quantity = models.DecimalField(_("miqdor"), **QUANTITY)
     quantity_remaining = models.DecimalField(_("qolgan miqdor"), **QUANTITY)
+    is_opening = models.BooleanField(default=False)
     total_amount = models.DecimalField(_("umumiy summa"), **AMOUNT)
     unit_price = models.DecimalField(_("birlik narxi"), **UNIT_PRICE)
     currency = models.CharField(
@@ -599,6 +600,13 @@ class LeftoverOffcut(models.Model):
         related_name="registered_offcuts",
         verbose_name=_("qayd etgan"),
     )
+    source_issue = models.ForeignKey(
+        StockIssue,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="offcuts",
+    )
     created_at = models.DateTimeField(_("yaratilgan"), auto_now_add=True)
 
     class Meta:
@@ -607,8 +615,8 @@ class LeftoverOffcut(models.Model):
         verbose_name_plural = _("qoldiq materiallar")
         constraints = [
             models.CheckConstraint(
-                condition=Q(quantity__gt=0),
-                name="offcut_quantity_positive",
+                condition=Q(quantity__gte=0),
+                name="offcut_quantity_non_negative",
             ),
             models.CheckConstraint(
                 condition=Q(length_mm__gt=0),
@@ -626,3 +634,56 @@ class LeftoverOffcut(models.Model):
         if self.width_mm:
             dims += f"×{self.width_mm}"
         return f"{self.material} offcut {dims}mm (qty: {self.quantity})"
+
+
+class WarehouseReview(models.Model):
+    """Post-action review and history. The decision never rewrites stock."""
+
+    class Kind(models.TextChoices):
+        ISSUE = "issue", _("Chiqim")
+        OFFCUT_ADD = "offcut_add", _("Kesilgan qoldiq qo‘shildi")
+        OFFCUT_USE = "offcut_use", _("Kesilgan qoldiq ishlatildi")
+        OFFCUT_CORRECTION = "offcut_correction", _("Kesilgan qoldiq tuzatildi")
+
+    class State(models.TextChoices):
+        PENDING = "pending", _("Ko‘rik kutilmoqda")
+        REVIEWED = "reviewed", _("Ko‘rib chiqildi")
+        FLAGGED = "flagged", _("Tuzatish kerak")
+
+    kind = models.CharField(max_length=24, choices=Kind.choices)
+    state = models.CharField(
+        max_length=12, choices=State.choices, default=State.PENDING
+    )
+    material = models.ForeignKey("catalog.Material", on_delete=models.PROTECT)
+    issue = models.ForeignKey(
+        StockIssue, null=True, blank=True, on_delete=models.PROTECT
+    )
+    offcut = models.ForeignKey(
+        LeftoverOffcut, null=True, blank=True, on_delete=models.PROTECT
+    )
+    quantity = models.DecimalField(**QUANTITY)
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    note = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.CharField(max_length=500, blank=True)
+    correction_of = models.OneToOneField(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="correction",
+    )
+
+    class Meta:
+        ordering = ["-id"]
+        indexes = [models.Index(fields=["state", "-id"])]

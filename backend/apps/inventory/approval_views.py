@@ -18,6 +18,8 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.catalog.access import is_shop_worker, visible_materials
+
 from . import services
 from .approval_serializers import (
     DecisionSerializer,
@@ -90,7 +92,9 @@ class ApprovalRequestViewSet(
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         """So'rov yozadi. Qoldiq o'zgarmaydi; limit/qoldiq yetmasa 409."""
-        serializer = self.create_serializer_class(data=request.data)
+        serializer = self.create_serializer_class(
+            data=request.data, context={"request": request}
+        )
 
         def perform() -> dict:
             """Tanani tekshiradi, so'rovni saqlaydi va javob tanasini qaytaradi."""
@@ -146,6 +150,10 @@ class StockReturnViewSet(ApprovalRequestViewSet):
         queryset = StockReturn.objects.select_related(
             "issue__material", "created_by", "decided_by"
         ).prefetch_related("allocations__batch")
+        user = self.request.user
+        queryset = queryset.filter(issue__material__in=visible_materials(user))
+        if is_shop_worker(user):
+            queryset = queryset.filter(created_by=user)
         if issue := int_query_param(self.request, "issue"):
             queryset = queryset.filter(issue_id=issue)
         if material := int_query_param(self.request, "material"):
@@ -182,6 +190,9 @@ class WriteOffViewSet(ApprovalRequestViewSet):
         queryset = WriteOff.objects.select_related(
             "material", "created_by", "decided_by"
         ).prefetch_related("allocations__batch")
+        queryset = queryset.filter(material__in=visible_materials(self.request.user))
+        if is_shop_worker(self.request.user):
+            queryset = queryset.filter(created_by=self.request.user)
         if material := int_query_param(self.request, "material"):
             queryset = queryset.filter(material_id=material)
         return self.filter_common(queryset)

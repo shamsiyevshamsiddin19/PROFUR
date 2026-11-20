@@ -4,7 +4,7 @@ from accounts.models import Role, User
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -241,11 +241,35 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.Serializer):
     """Ishchi o'z-o'zini ro'yxatdan o'tkazish uchun serializer."""
 
-    username = serializers.CharField(max_length=150)
-    password = serializers.CharField(write_only=True, min_length=6)
-    first_name = serializers.CharField(max_length=150, required=False, default="")
-    last_name = serializers.CharField(max_length=150, required=False, default="")
-    phone = serializers.CharField(max_length=20, required=False, default="")
+    username = serializers.CharField(
+        max_length=150, validators=[User.username_validator]
+    )
+    password = serializers.CharField(
+        write_only=True, min_length=8, trim_whitespace=False
+    )
+    first_name = serializers.CharField(
+        max_length=150, required=False, allow_blank=True, default=""
+    )
+    last_name = serializers.CharField(
+        max_length=150, required=False, allow_blank=True, default=""
+    )
+    phone = serializers.CharField(
+        max_length=20, required=False, allow_blank=True, default=""
+    )
+
+    requested_roles = serializers.ListField(
+        child=serializers.CharField(max_length=50),
+        max_length=20,
+        required=False,
+        default=list,
+    )
+
+    def validate_requested_roles(self, values):
+        from .views import eligible_worker_roles
+
+        if set(values) - {role.code for role in eligible_worker_roles()}:
+            raise serializers.ValidationError(_("Tanlangan ishchi roli mavjud emas."))
+        return list(dict.fromkeys(values))
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
@@ -262,9 +286,20 @@ class RegisterSerializer(serializers.Serializer):
             phone=validated_data.get("phone", ""),
             is_approved=False,
             is_active=True,
+            requested_roles=validated_data["requested_roles"],
         )
+        try:
+            validate_password(validated_data["password"], user)
+        except DjangoValidationError as error:
+            raise serializers.ValidationError({"password": error.messages}) from error
         user.set_password(validated_data["password"])
-        user.save()
+        try:
+            with transaction.atomic():
+                user.save()
+        except IntegrityError as error:
+            raise serializers.ValidationError(
+                {"username": _("Bu foydalanuvchi nomi allaqachon mavjud.")}
+            ) from error
         return user
 
 

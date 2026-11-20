@@ -6,6 +6,8 @@ from rest_framework import mixins, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.catalog.access import visible_materials
+
 from .models import StockNotification
 
 
@@ -34,7 +36,8 @@ class NotificationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         queryset = StockNotification.objects.filter(
-            recipient=self.request.user
+            recipient=self.request.user,
+            material__in=visible_materials(self.request.user),
         ).select_related("material")
         if self.request.query_params.get("unread") == "true":
             queryset = queryset.filter(read_at__isnull=True)

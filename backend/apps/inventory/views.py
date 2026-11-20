@@ -20,6 +20,8 @@ from rest_framework.exceptions import APIException, ErrorDetail, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.catalog.access import visible_materials
+
 from . import services
 from .models import Batch, IdempotencyKey
 from .serializers import (
@@ -97,7 +99,9 @@ class ReceiptViewSet(
 
     def get_queryset(self) -> QuerySet[Batch]:
         params = self.request.query_params
-        queryset = Batch.objects.select_related("material", "created_by")
+        queryset = Batch.objects.select_related("material", "created_by").filter(
+            material__in=visible_materials(self.request.user)
+        )
         if material := params.get("material"):
             if not material.isdigit():
                 raise ValidationError(
@@ -124,6 +128,12 @@ class ReceiptViewSet(
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         data["material"] = data.pop("material_id")
+        if data["is_opening"] and not request.user.is_admin_role:
+            raise ValidationError(
+                {"is_opening": _("Boshlang‘ich qoldiqni administrator kiritadi.")}
+            )
+        if not visible_materials(request.user).filter(pk=data["material"].pk).exists():
+            raise ValidationError({"material_id": _("Material mavjud emas.")})
         try:
             with transaction.atomic():
                 batch, balance = services.receive(user=request.user, **data)

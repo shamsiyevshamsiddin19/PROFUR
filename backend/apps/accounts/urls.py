@@ -11,6 +11,7 @@ from accounts.views import (
     RejectUserView,
     RoleDetailView,
     RoleListCreateView,
+    SignupRolesView,
     UserDeactivateView,
     UserDetailView,
     UserListCreateView,
@@ -21,6 +22,7 @@ from django.urls import path
 app_name = "accounts"
 
 urlpatterns = [
+    path("signup-roles/", SignupRolesView.as_view(), name="signup-roles"),
     path("register/", RegisterView.as_view(), name="register"),
     path("pending/", PendingUsersView.as_view(), name="pending-users"),
     path("login/", LoginView.as_view(), name="login"),
