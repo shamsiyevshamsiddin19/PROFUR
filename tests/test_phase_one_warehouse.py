@@ -252,3 +252,29 @@ def test_impossible_unit_price_total_does_not_create_a_batch(warehouse):
     )
     assert response.status_code == 400, response.data
     assert not Batch.objects.exists()
+
+
+def test_opening_balance_increases_stock_without_inflating_monthly_purchases(warehouse):
+    admin, worker, _, sheet, _ = warehouse
+    opening = receive(admin, sheet, 20, total_amount="500.00", is_opening=True)
+    assert opening["is_opening"] is True
+    receive(admin, sheet, 30, unit_price="28.00")
+    report = admin.get("/api/v1/dashboard/").data
+    assert report["totals"]["received"] == "840.00"
+    assert report["totals"]["warehouse_value"] == "1340.00"
+    assert report["rows"][0]["received"] == "30.00"
+    assert worker.get(f"/api/v1/stock/{sheet.pk}/").data["quantity_on_hand"] == "50.00"
+    late = post(
+        admin,
+        "/api/v1/receipts/",
+        {
+            "material_id": sheet.pk,
+            "quantity": "1",
+            "total_amount": "25",
+            "currency": "USD",
+            "received_on": timezone.localdate().isoformat(),
+            "is_opening": True,
+        },
+    )
+    assert late.status_code == 400
+    assert Batch.objects.filter(material=sheet).count() == 2
