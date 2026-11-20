@@ -12,7 +12,7 @@ import {
   type Operation,
   type Allocation,
 } from "../api";
-import { translate, type Language } from "../i18n";
+import { translate, unitLabel, type Language } from "../i18n";
 import { localDate, money } from "../format";
 import { useRecords } from "../hooks/useRecords";
 import { useIdempotentWrite } from "../hooks/useIdempotentWrite";
@@ -40,6 +40,9 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
   const [selected, setKind] = useState<Kind | null>(null);
   const kind = selected && allowed.includes(selected) ? selected : allowed[0];
   const [status, setStatus] = useState("");
+  const [selection, setSelection] = useState<{ kind: Kind; id: string } | null>(
+    null,
+  );
   const [revision, setRevision] = useState(0);
   const [decision, setDecision] = useState<{
     row: Operation;
@@ -57,6 +60,11 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
   if (!kind) return null;
   const approvalCode = operationAccess[kind].approve;
   const canApprove = approvalCode !== null && can(user, approvalCode);
+  const pendingRows = records.data.filter((row) => row.status === "pending");
+  const picked =
+    selection?.kind === kind
+      ? pendingRows.find((row) => String(row.id) === selection.id)
+      : undefined;
   return (
     <>
       <div className="workflow-toolbar">
@@ -69,6 +77,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
               className={kind === k ? "selected" : ""}
               onClick={() => {
                 setDecision(null);
+                setSelection(null);
                 setKind(k);
                 setStatus("");
               }}
@@ -81,7 +90,10 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           <select
             aria-label={t("status")}
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => {
+              setSelection(null);
+              setStatus(e.target.value);
+            }}
           >
             <option value="">{t("all")}</option>
             {(["pending", "approved", "rejected"] as const).map((s) => (
@@ -108,6 +120,50 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
             {t("refresh")}
           </button>
         </div>
+        {canApprove && pendingRows.length > 0 && (
+          <div
+            className="mobile-decision-toolbar"
+            role="group"
+            aria-label={t("reviewRequests")}
+          >
+            <Field label={t("pendingReview")}>
+              <select
+                value={picked?.id ?? ""}
+                onChange={(event) =>
+                  setSelection({ kind, id: event.target.value })
+                }
+              >
+                <option value="">{t("choose")}</option>
+                {pendingRows.map((row) => (
+                  <option key={row.id} value={row.id}>
+                    #{row.id} · {row.material.display_name} · {row.quantity}{" "}
+                    {unitLabel(row.material.unit, lang)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <button
+              className="primary"
+              disabled={!picked}
+              onClick={() => {
+                if (picked)
+                  setDecision({ row: picked, kind, action: "approve" });
+              }}
+            >
+              {t("approve")}
+            </button>
+            <button
+              className="secondary danger-text"
+              disabled={!picked}
+              onClick={() => {
+                if (picked)
+                  setDecision({ row: picked, kind, action: "reject" });
+              }}
+            >
+              {t("reject")}
+            </button>
+          </div>
+        )}
         <TableViewport lang={lang} className="">
           <table>
             <thead>
@@ -119,7 +175,9 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                 <th>{t("recipient")}</th>
                 <th>{t("status")}</th>
                 <th>{t("createdBy")}</th>
-                {canApprove && <th>{t("actions")}</th>}
+                {canApprove && (
+                  <th className="decision-column">{t("actions")}</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -142,7 +200,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
                   </td>
                   <td>{row.created_by.name}</td>
                   {canApprove && (
-                    <td>
+                    <td className="decision-column">
                       {row.status === "pending" && (
                         <div className="row-actions">
                           <button
@@ -183,6 +241,7 @@ export function Operations({ lang, user }: { lang: Language; user: User }) {
           lang={lang}
           close={() => setDecision(null)}
           saved={() => {
+            setSelection(null);
             setDecision(null);
             setRevision((n) => n + 1);
           }}

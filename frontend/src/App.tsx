@@ -121,8 +121,7 @@ export function App() {
       user &&
       screen !== requestedScreen &&
       location.hash &&
-      location.hash ===
-        (requestedScreen ? "#" + requestedScreen : location.hash)
+      currentScreen() === requestedScreen
     ) {
       history.replaceState(history.state, "", "#" + screen);
       setScreen(screen);
@@ -178,6 +177,7 @@ export function App() {
     return () => controller.abort();
   }, []);
   const userId = user?.id;
+  useEffect(() => setUnreadCount(0), [userId]);
   useEffect(() => {
     if (!userId) return;
     let controller: AbortController | undefined;
@@ -248,7 +248,7 @@ export function App() {
       controller.abort();
       clearInterval(interval);
     };
-  }, [canSeeNotifications, lang, screen]);
+  }, [canSeeNotifications, userId, lang, screen]);
 
   useEffect(() => {
     const nav = navRef.current;

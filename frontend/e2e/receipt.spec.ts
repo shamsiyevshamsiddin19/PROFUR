@@ -16,6 +16,37 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   ).toBeVisible();
 
   const materialName = `Warehouse ${testInfo.project.name}`;
+  async function openApproval() {
+    const row = page
+      .locator("section.recent tbody tr")
+      .filter({ hasText: materialName });
+    await expect(row).toHaveCount(1);
+    const mobile = page.getByRole("group", {
+      name: "Review requests",
+      exact: true,
+    });
+    if (await mobile.isVisible()) {
+      const approve = mobile.getByRole("button", {
+        name: "Approve",
+        exact: true,
+      });
+      await expect(approve).toBeDisabled();
+      const picker = mobile.getByRole("combobox", {
+        name: "Pending request",
+        exact: true,
+      });
+      const value = await picker
+        .getByRole("option")
+        .filter({ hasText: materialName })
+        .getAttribute("value");
+      expect(value).toBeTruthy();
+      await picker.selectOption(value!);
+      await approve.click();
+    } else {
+      await row.getByRole("button", { name: "Approve", exact: true }).click();
+    }
+  }
+
   const csrf = await (await page.request.get("/api/auth/csrf/")).json();
   const categories = await (
     await page.request.get("/api/v1/categories/?search=LMDF")
@@ -126,7 +157,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await expect(
     page.getByText("Request saved. Awaiting approval.", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await openApproval();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Approve", exact: true })
@@ -148,7 +179,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
   await expect(
     page.getByText("Request saved. Awaiting approval.", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await openApproval();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Approve", exact: true })
@@ -174,7 +205,7 @@ test("mobile warehouse workflow persists receipts, issues, approvals and expense
     .locator("form")
     .getByLabel("Expense type", { exact: true })
     .selectOption("tax");
-  await page.getByLabel("Amount · USD", { exact: true }).fill("12.50");
+  await page.getByLabel("Amount", { exact: true }).fill("12.50");
   await page
     .locator("form")
     .getByLabel("Project number", { exact: true })

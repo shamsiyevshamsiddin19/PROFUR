@@ -188,6 +188,8 @@ def test_issue_split_across_batches_costs_each_batch_price(keeper, keeper_user, 
 
 def test_total_cost_rounds_half_up_to_cents(keeper, keeper_user, egger):
     """Tannarx faqat oxirida sentgacha ``ROUND_HALF_UP`` bilan yaxlitlanadi."""
+    egger.unit = "kg"
+    egger.save(update_fields=["unit"])
     batch = receive(egger, keeper_user, "3", "100.00")  # 33.333333 $
 
     response = post_issue(keeper, issue_body(egger, (batch, "1.5")))

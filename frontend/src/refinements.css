@@ -1210,3 +1210,32 @@ input[type="number"],
 .admin-action-btn svg {
   flex-shrink: 0;
 }
+
+.mobile-decision-toolbar {
+  display: none;
+}
+@media (max-width: 650px) {
+  .mobile-decision-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .mobile-decision-toolbar .field {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+  .mobile-decision-toolbar select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+  .mobile-decision-toolbar > button {
+    flex: 1;
+    min-height: 44px;
+  }
+  .table-region .decision-column {
+    display: none;
+  }
+}
