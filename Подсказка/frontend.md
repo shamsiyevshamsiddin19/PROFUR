@@ -147,3 +147,5 @@ Ishlab chiqarish ustasi, Bosh hisobchi va Ta’minotchi sinov rollari endi demo 
 Dalil: frontend ssenariylari ruxsatsiz manzil, faqat chiqimga vakolat va faqat xarajatlarni o‘qish huquqini tekshiradi. Backend sinovi rollarni o‘chirish chegarasi va takroriy bajarilishini tekshiradi.
 
 2026-11-20 · PCRM-48 · Telefon kengligida (650 px gacha) umumiy jadval yozuvlari va kiritish maydonlari ikki ustunda joylashadi. Har qiymat yonida o‘z sarlavhasi bor, uzun matn keyingi qatorga o‘tadi. Gorizontal surish o‘chirilgan. Klaviatura oqimi va ruxsatlar avvalgidek ishlaydi.
+
+2026-11-20 · PCRM-48 · Brauzer yorlig‘iga to‘q yashil fonda oq «P» belgili favicon qo‘shildi. Yig‘ilgan sahifadagi havola PNG fayliga yo‘naltiriladi. Frontend yig‘ilishi va 12 ta sinov o‘tdi. [Vazifa #64](https://github.com/shamsiyevshamsiddin19/PROFUR/issues/64)
